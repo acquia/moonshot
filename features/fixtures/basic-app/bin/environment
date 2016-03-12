@@ -1,0 +1,19 @@
+#!/usr/bin/env ruby
+
+require 'bundler/setup'
+require 'moonshot'
+
+# Set up Moonshot tooling for our environment.
+class MyService < Moonshot::CLI
+  self.application_name = 'my-service'
+  self.artifact_repository = S3Bucket.new('moonshot-tests')
+  self.build_mechanism = Script.new('script/build.sh')
+  self.deployment_mechanism = CodeDeploy.new(asg: 'AutoScalingGroup')
+
+  desc 'my-custom-function', 'Summon a mouse.'
+  def my_custom_function
+    puts '<:3)~~ eek! a mouse!'
+  end
+end
+
+MyService.start

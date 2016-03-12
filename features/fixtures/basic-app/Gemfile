@@ -1,0 +1,10 @@
+source 'https://rubygems.org'
+
+gemspec
+
+group :development do
+  # This path works between the actual path and the Aruba tmp dir, but seems
+  # fragile. Could do a recursive search for microbus.gemspec instead.
+  path = '../../../.'
+  gem 'moonshot', path: path if File.exist?("#{path}/moonshot.gemspec")
+end
