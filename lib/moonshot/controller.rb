@@ -56,6 +56,11 @@ module Moonshot
       run_plugins(:post_deploy)
     end
 
+    def list_builds(limit, filter)
+      run_plugins(:list_builds)
+      run_hook(:repo, :list_builds, limit, filter)
+    end
+
     def delete
       run_plugins(:pre_delete)
       run_hook(:deploy, :pre_delete)

@@ -226,6 +226,33 @@ Output:
 [ ✓ ] [ 1m 0s ] Deployment d-M4FY304KE completed successfully!   
 ```
 
+## List Builds
+
+List all the builds from your S3 artifact repository.
+
+|Description|Long Form|Short Form|Type|Example|Default|
+|---|---|---|---|---|---|
+|Limit Results|limit|l|numeric||10|
+|Filter Results|filter||string|v1.0||
+|Interactive Logger|interactive_logger||boolean||true|
+|Verbose|verbose|v|boolean||false|
+
+Example:
+
+```shell
+./bin/environment list-builds --limit 1 --filter v1.0
+```
+
+Output:
+
+```shell
+┌─ Builds
+│
+│ 2016-03-03 13:52:30 UTC my-aws-account release-v1.0.0 4.96 MB
+│
+└──
+```
+
 ## Delete
 
 Delete an existing environment.

@@ -1,3 +1,6 @@
+require 'moonshot/unicode_table'
+require 'moonshot/s3_builds_printer'
+
 # The S3Bucket stores builds in an S3 Bucket.
 #
 # For example:
@@ -35,6 +38,13 @@ class Moonshot::ArtifactRepository::S3Bucket
     "#{version_name}.tar.gz"
   end
 
+  def list_builds_hook(limit, filter)
+    builds = get_builds
+    t = Moonshot::UnicodeTable.new('')
+    Moonshot::S3BuildsPrinter.new(builds, limit, filter, t).print
+    t.draw_children
+  end
+
   private
 
   def upload_to_s3(file, key)
@@ -44,6 +54,13 @@ class Moonshot::ArtifactRepository::S3Bucket
       bucket: @bucket_name,
       storage_class: 'STANDARD_IA'
     )
+  end
+
+  def get_builds
+    resp = s3_client.list_objects(
+      bucket: @bucket_name
+    )
+    resp.contents
   end
 
   def doctor_check_bucket_exists
