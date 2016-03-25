@@ -133,10 +133,10 @@ module Moonshot
 
     desc 'list-builds', 'List available builds from your artifact repository.' # rubocop:disable LineLength
     option :limit, type: :numeric, default: 10, aliases: '-l',
-           desc: 'Limit the number of results. 0 stands for no limit.'
+                   desc: 'Limit the number of results. 0 stands for no limit.'
     option :filter, type: :string, desc: 'Filter the builds by providing a name or part of a name.'
     def list_builds
-      raise Thor::Error, 'Please provide a valid integer for "--limit".' unless options[:limit].is_a? Integer
+      raise Thor::Error, 'Please provide a valid integer for "--limit".' unless options[:limit].is_a? Integer # rubocop:disable LineLength
       controller.list_builds(options[:limit], options[:filter])
     end
 

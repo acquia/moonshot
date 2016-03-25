@@ -253,6 +253,11 @@ Output:
 └──
 ```
 
+Output format is the following:
+
+|Last Modified|Owner Account|Build Name (S3 Key)|Size|
+|---|---|---|---|
+
 ## Delete
 
 Delete an existing environment.
