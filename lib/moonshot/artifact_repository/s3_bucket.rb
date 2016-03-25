@@ -39,7 +39,7 @@ class Moonshot::ArtifactRepository::S3Bucket
   end
 
   def list_builds_hook(limit, filter)
-    builds = get_builds
+    builds = list_builds
     t = Moonshot::UnicodeTable.new('')
     Moonshot::S3BuildsPrinter.new(builds, limit, filter, t).print
     t.draw_children
@@ -56,7 +56,7 @@ class Moonshot::ArtifactRepository::S3Bucket
     )
   end
 
-  def get_builds
+  def list_builds
     resp = s3_client.list_objects(
       bucket: @bucket_name
     )

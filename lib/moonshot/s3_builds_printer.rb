@@ -19,7 +19,7 @@ module Moonshot
       builds = builds.first(@limit) unless @limit == 0
 
       if builds.count == 0
-        t.add_line("No builds were found with the provided parameters.".red)
+        t.add_line('No builds were found with the provided parameters.'.red)
       end
 
       rows = builds.map do |build|
