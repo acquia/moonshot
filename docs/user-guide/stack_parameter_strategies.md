@@ -71,8 +71,9 @@ hashes of the following format:
 }
 ```
 
-You either supply a value for `parameter_value` or set `use_previous_value` to `true`, which leaves the parameter
-as it currently is.
+You either supply a value for `parameter_value` or set
+`use_previous_value` to `true`, which leaves the parameter as it
+currently is.
 
 Example:
 
@@ -90,7 +91,5 @@ class CustomStrategy
 end
 ```
 
-In order to use your custom strategy class, set a new instance of your class
-to `ControllerConfig`'s `parameter_strategy` attribute.
-
-
+In order to use your custom strategy class, set a new instance of your
+class to `ControllerConfig`'s `parameter_strategy` attribute.

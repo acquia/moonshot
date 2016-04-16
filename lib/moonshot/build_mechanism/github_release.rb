@@ -72,7 +72,7 @@ module Moonshot::BuildMechanism
       say("#{@changes}\n\n")
 
       q = "Do you want to tag and release this commit as #{version}? [y/n]"
-      raise Thor::Error, 'Release declined.' unless yes?(q)
+      raise 'Release declined.' unless yes?(q)
     end
 
     def git_tag(tag, sha, annotation)

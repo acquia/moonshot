@@ -4,7 +4,6 @@ module Moonshot # rubocop:disable Metrics/ModuleLength
     let(:resources) do
       Resources.new(
         ilog: double(InteractiveLogger).as_null_object,
-        log: double(Logger).as_null_object,
         stack: double(Stack).as_null_object
       )
     end

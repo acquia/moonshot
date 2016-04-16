@@ -1,5 +1,6 @@
 require_relative 'default_strategy'
 require_relative 'ssh_config'
+require_relative 'task'
 
 module Moonshot
   # Holds configuration for Moonshot::Controller
@@ -11,7 +12,6 @@ module Moonshot
     attr_accessor :deployment_mechanism
     attr_accessor :environment_name
     attr_accessor :interactive_logger
-    attr_accessor :logger
     attr_accessor :parent_stacks
     attr_accessor :plugins
     attr_accessor :show_all_stack_events
@@ -24,7 +24,6 @@ module Moonshot
     def initialize
       @auto_prefix_stack = true
       @interactive_logger = InteractiveLogger.new
-      @logger = Logger.new(STDOUT)
       @parent_stacks = []
       @plugins = []
       @show_all_stack_events = false

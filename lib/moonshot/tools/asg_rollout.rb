@@ -4,7 +4,7 @@ require_relative 'asg_rollout/hook_exec_environment'
 
 module Moonshot
   module Tools
-    class ASGRollout # rubocop:disable Documentation
+    class ASGRollout
       attr_accessor :config
 
       def initialize(controller:, logical_id:)

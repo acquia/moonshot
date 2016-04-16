@@ -2,15 +2,21 @@ require 'English'
 require 'aws-sdk'
 require 'logger'
 require 'thor'
+require 'interactive-logger'
 
 module Moonshot
-  module ArtifactRepository # rubocop:disable Documentation
+  def self.config
+    @config ||= Moonshot::ControllerConfig.new
+    block_given? ? yield(@config) : @config
   end
-  module BuildMechanism # rubocop:disable Documentation
+
+  module ArtifactRepository
   end
-  module DeploymentMechanism # rubocop:disable Documentation
+  module BuildMechanism
   end
-  module Plugins # rubocop:disable Documentation
+  module DeploymentMechanism
+  end
+  module Plugins
   end
 end
 
@@ -23,13 +29,28 @@ end
 
   # Core
   'interactive_logger_proxy',
+  'command_line',
+  'command',
+  'ssh_command',
+  'commands/build',
+  'commands/console',
+  'commands/create',
+  'commands/delete',
+  'commands/deploy',
+  'commands/doctor',
+  'commands/list',
+  'commands/push',
+  'commands/ssh',
+  'commands/status',
+  'commands/update',
   'controller',
   'controller_config',
-  'cli',
   'stack',
   'stack_config',
   'stack_lister',
   'stack_events_poller',
+  'merge_strategy',
+  'default_strategy',
 
   # Built-in mechanisms
   'artifact_repository/s3_bucket',

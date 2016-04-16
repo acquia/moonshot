@@ -1,13 +1,13 @@
 describe Moonshot::Stack do
   include_context 'with a working moonshot application'
 
-  let(:ilog) { Moonshot::InteractiveLoggerProxy.new(log) }
   let(:log) { instance_double('Logger').as_null_object }
+  let(:ilog) { Moonshot::InteractiveLoggerProxy.new(log) }
   let(:parent_stacks) { [] }
   let(:cf_client) { instance_double(Aws::CloudFormation::Client) }
 
   subject do
-    described_class.new('test', app_name: 'rspec-app', log: log, ilog: ilog) do |c|
+    described_class.new('test', app_name: 'rspec-app', ilog: ilog) do |c|
       c.parent_stacks = parent_stacks
     end
   end

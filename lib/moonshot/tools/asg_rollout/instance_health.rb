@@ -1,7 +1,7 @@
 module Moonshot
   module Tools
     class ASGRollout
-      class InstanceHealth # rubocop:disable Documentation
+      class InstanceHealth
         attr_reader :asg_status, :elb_status
 
         VALID_ASG_IN_SERVICE_STATES = ['InService'].freeze

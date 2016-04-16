@@ -3,9 +3,10 @@
 **Warning, the plugin support in Moonshot is a work-in-progress. The interface
 to plugins may change dramatically in future versions.**
 
-Moonshot supports adding plugins (implemented as a Ruby class) to the controller
-that can perform actions before and after the `create`, `update`, `delete`, `deploy-code`,
-`status` and `doctor` actions.
+
+Moonshot supports adding plugins (implemented as a Ruby class) to the
+controller that can perform actions before and after the `create`,
+`update`, `delete`, `deploy`, `status`, `doctor` and `ssh` actions.
 
 ## Writing a Moonshot Plugin
 
@@ -40,12 +41,20 @@ CloudFormation stack.
 
 ## Adding a plugin to a CLI tool.
 
-Once you have defined or included your plugin class, you can add a plugin like so:
+Once you have defined or included your plugin class, you can add a
+plugin by modifying your `Moonfile.rb` file, like so:
 
 ```ruby
-class MyApp < Moonshot::CLI
-  self.application_name = 'my-app'
+Moonshot.config do |c|
+  c.app_name = 'my-app'
   # ...
-  plugin MyPlugin.new
+  c.plugins << MyPlugin.new
 end
 ```
+
+## Auto-loading Plugin Source
+
+The Moonshot CLI tool will auto-load plugin source in the path
+`moonshot/plugins/**/*.rb` relative to the `Moonfile.rb` file for your
+project. This can be useful for plugins that define project-specific
+behaviors.

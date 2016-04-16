@@ -159,13 +159,13 @@ class Moonshot::DeploymentMechanism::CodeDeploy # rubocop:disable ClassLength
     @asg_logical_ids.each do |asg_logical_id|
       asg_name = stack.physical_id_for(asg_logical_id)
       unless asg_name
-        raise Thor::Error, "Could not find #{asg_logical_id} resource in Stack."
+        raise "Could not find #{asg_logical_id} resource in Stack."
       end
 
       groups = as_client.describe_auto_scaling_groups(
         auto_scaling_group_names: [asg_name])
       if groups.auto_scaling_groups.empty?
-        raise Thor::Error, "Could not find ASG #{asg_name}."
+        raise "Could not find ASG #{asg_name}."
       end
 
       autoscaling_groups.push(groups.auto_scaling_groups.first)
@@ -219,7 +219,7 @@ class Moonshot::DeploymentMechanism::CodeDeploy # rubocop:disable ClassLength
   def role
     iam_client.get_role(role_name: @codedeploy_role).role
   rescue Aws::IAM::Errors::NoSuchEntity
-    raise Thor::Error, "Did not find an IAM Role: #{@codedeploy_role}"
+    raise "Did not find an IAM Role: #{@codedeploy_role}"
   end
 
   def delete_deployment_group
@@ -298,7 +298,7 @@ class Moonshot::DeploymentMechanism::CodeDeploy # rubocop:disable ClassLength
       end
     end
 
-    raise Thor::Error, 'Deployment was unsuccessful!'
+    raise 'Deployment was unsuccessful!'
   end
 
   def revision_for_artifact_repo(artifact_repo, version_name)

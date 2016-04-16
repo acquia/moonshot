@@ -8,8 +8,7 @@ module Moonshot
       end
     end
 
-    def initialize(filename, log:)
-      @log = log
+    def initialize(filename)
       @filename = filename
     end
 

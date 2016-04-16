@@ -16,3 +16,5 @@ Style/ClassAndModuleChildren:
   Enabled: false
 Metrics/ClassLength:
   Max: 130
+Style/Documentation:
+  Enabled: false

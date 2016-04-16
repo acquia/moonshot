@@ -1,14 +1,16 @@
 Gem::Specification.new do |s|
   s.name        = 'moonshot'
-  s.version     = '0.7.7'
+  s.version     = '1.0.0'
   s.licenses    = ['Apache-2.0']
-  s.summary     = 'A library for launching services into AWS'
-  s.description = 'A library for launching services into AWS.'
+  s.summary     = 'A library and CLI tool for launching services into AWS'
+  s.description = 'A library and CLI tool for launching services into AWS.'
   s.authors     = [
     'Cloud Engineering <engineering@acquia.com>'
   ]
   s.email       = 'engineering@acquia.com'
-  s.files       = Dir['lib/**/*.rb']
+  s.files       = Dir['lib/**/*.rb'] + Dir['bin/*']
+  s.bindir      = 'bin'
+  s.executables = ['moonshot']
   s.homepage    = 'https://github.com/acquia/moonshot'
 
   s.add_dependency('aws-sdk', '~> 2.0', '>= 2.2.0')
@@ -24,6 +26,7 @@ Gem::Specification.new do |s|
   s.add_dependency('semantic')
   s.add_dependency('travis')
   s.add_dependency('vandamme')
+  s.add_dependency('pry')
 
   s.add_development_dependency('rspec')
   s.add_development_dependency('simplecov')

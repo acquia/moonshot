@@ -1,6 +1,6 @@
 module Moonshot
   module Tools
-    class ASGRolloutConfig # rubocop:disable Documentation
+    class ASGRolloutConfig
       attr_reader :pre_detach, :terminate_when, :terminate_when_timeout, :terminate
       attr_accessor :terminate_when_delay, :instance_health_delay
 

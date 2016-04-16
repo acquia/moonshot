@@ -6,9 +6,9 @@ module Moonshot
 
     private
 
+    # TODO: Deprecate this interface.
     def log
-      raise 'Resources not provided to Mechanism!' unless @resources
-      @resources.log
+      @log ||= Logger.new(STDOUT)
     end
 
     def stack

@@ -22,10 +22,9 @@ module Moonshot
     attr_reader :name
 
     # TODO: Refactor more of these parameters into the config object.
-    def initialize(name, app_name:, log:, ilog:, config: StackConfig.new)
+    def initialize(name, app_name:, ilog:, config: StackConfig.new)
       @name = name
       @app_name = app_name
-      @log = log
       @ilog = ilog
       @config = config
       yield @config if block_given?
@@ -49,7 +48,7 @@ module Moonshot
     end
 
     def update
-      raise Thor::Error, "No stack found #{@name.blue}!" unless stack_exists?
+      raise "No stack found #{@name.blue}!" unless stack_exists?
 
       should_wait = true
       @ilog.start "Updating #{stack_name}." do |s|
@@ -62,7 +61,7 @@ module Moonshot
       end
 
       success = should_wait ? wait_for_stack_state(:stack_update_complete, 'updated') : true
-      raise Thor::Error, 'Failed to update the CloudFormation Stack.' unless success
+      raise 'Failed to update the CloudFormation Stack.' unless success
       success
     end
 
@@ -218,8 +217,8 @@ module Moonshot
     end
 
     def load_template_file
-      json_template = JsonStackTemplate.new(json_template_path, log: @log)
-      yaml_template = YamlStackTemplate.new(yaml_template_path, log: @log)
+      json_template = JsonStackTemplate.new(json_template_path)
+      yaml_template = YamlStackTemplate.new(yaml_template_path)
       case
       when json_template.exist?
         json_template
@@ -268,11 +267,11 @@ module Moonshot
     # @return [Aws::CloudFormation::Types::Stack]
     def get_stack(name)
       stacks = cf_client.describe_stacks(stack_name: name).stacks
-      raise Thor::Error, "Could not describe stack: #{name}" if stacks.empty?
+      raise "Could not describe stack: #{name}" if stacks.empty?
 
       stacks.first
     rescue Aws::CloudFormation::Errors::ValidationError
-      raise Thor::Error, "Could not describe stack: #{name}"
+      raise "Could not describe stack: #{name}"
     end
 
     def create_stack
@@ -286,7 +285,7 @@ module Moonshot
         ]
       )
     rescue Aws::CloudFormation::Errors::AccessDenied
-      raise Thor::Error, 'You are not authorized to perform create_stack calls.'
+      raise 'You are not authorized to perform create_stack calls.'
     end
 
     # @return [Boolean]
@@ -304,7 +303,7 @@ module Moonshot
       )
       true
     rescue Aws::CloudFormation::Errors::ValidationError => e
-      raise Thor::Error, e.message unless
+      raise e.message unless
         e.message == 'No updates are to be performed.'
       false
     end

@@ -6,7 +6,7 @@ Moonshot plugin for backing up config files.
 
 The plugin collects and deflates certain files to a single tarball,
 and uploads that to a a given S3 bucket. The whole process happens
-in memory, nothing is written to disk. The plugin currently supports single files only, 
+in memory, nothing is written to disk. The plugin currently supports single files only,
 including whole directories in your tarball is not possible yet.
 
 The plugin uses the Moonshot AWS config, meaning that the bucket must be
@@ -31,7 +31,9 @@ If you wish to back up only the current template and parameter files, you can si
 use the factory method provided:
 
 ```ruby
-plugin(Moonshot::Plugins::Backup.to_bucket('your-bucket-name'))
+Moonshot.config do |c|
+  # ...
+  c.plugins << Moonshot::Plugins::Backup.to_bucket('your-bucket-name')
 ```
 
 ## Placeholders
@@ -50,8 +52,7 @@ A possible use-case is backing up a CF template and/or
 parameter file after create or update.
 
 ```ruby
-plugin(
-  Backup.new do |b|
+  c.plugins << Backup.new do |b|
     b.bucket = 'your-bucket-name'
 
     b.files = [
@@ -61,12 +62,10 @@ plugin(
 
     b.hooks = [:post_create, :post_update]
   end
-)
 ```
 
 ```ruby
-plugin(
-  Backup.new do |b|
+  c.plugins << Backup.new do |b|
     b.buckets = {
       'dev_account' => 'dev_bucket',
       'prod_account' => 'prod_bucket'
@@ -79,5 +78,4 @@ plugin(
 
     b.hooks = [:post_create, :post_update]
   end
-)
 ```

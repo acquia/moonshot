@@ -9,19 +9,15 @@ support).
 
 ## Example
 
-The ASGRollout class is intended to be used within a method in your
-project's derived class of the Moonshot::CLI class.
+The ASGRollout class is intended to be used within a [CLI extension][1]
+within your project. Here's an example of what it might look like:
 
 ```ruby
-#!/usr/bin/env ruby
+class Rollout < Moonshot::Command
+  self.usage = "rollout"
+  self.description = "Update all instances to the latest LaunchConfiguration"
 
-require 'moonshot'
-
-class MyService < Moonshot::CLI
-  # .. normal configuration ..
-
-  desc :asg_rollout, 'Update instances in the Auto Scaling Group'
-  def asg_rollout
+  def execute
     ar = Moonshot::Tools::ASGRollout.new do |config|
       config.controller = controller
       config.logical_id = 'APIAutoScalingGroup'
@@ -35,8 +31,6 @@ class MyService < Moonshot::CLI
     ar.run!
   end
 end
-
-MyService.start
 ```
 
 ## Configuration

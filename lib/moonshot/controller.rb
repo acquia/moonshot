@@ -4,7 +4,7 @@ require_relative 'ssh_command_builder'
 module Moonshot
   # The Controller coordinates and performs all Moonshot actions.
   class Controller # rubocop:disable ClassLength
-    attr_reader :config
+    attr_accessor :config
 
     def initialize
       @config = ControllerConfig.new
@@ -12,8 +12,7 @@ module Moonshot
     end
 
     def list
-      Moonshot::StackLister.new(
-        @config.app_name, log: @config.logger).list
+      Moonshot::StackLister.new(@config.app_name).list
     end
 
     def create
@@ -90,14 +89,13 @@ module Moonshot
       cb = SSHCommandBuilder.new(@config.ssh_config, @config.ssh_instance)
       result = cb.build(@config.ssh_command)
 
-      puts "Opening SSH connection to #{@config.ssh_instance} (#{result.ip})..."
+      warn "Opening SSH connection to #{@config.ssh_instance} (#{result.ip})..."
       exec(result.cmd)
     end
 
     def stack
       @stack ||= Stack.new(stack_name,
                            app_name: @config.app_name,
-                           log: @config.logger,
                            ilog: @config.interactive_logger) do |config|
         config.parent_stacks = @config.parent_stacks
         config.show_all_events = @config.show_all_stack_events
@@ -131,15 +129,13 @@ module Moonshot
 
     def resources
       @resources ||=
-        Resources.new(stack: stack, log: @config.logger,
-                      ilog: @config.interactive_logger)
+        Resources.new(stack: stack, ilog: @config.interactive_logger)
     end
 
     def run_hook(type, name, *args)
       mech = get_mechanism(type)
       name = name.to_s << '_hook'
 
-      @config.logger.debug("Calling hook=#{name} on mech=#{mech.class}")
       return unless mech && mech.respond_to?(name)
 
       mech.resources = resources

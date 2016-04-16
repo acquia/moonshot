@@ -41,7 +41,7 @@ class Moonshot::BuildMechanism::Script
 
   def post_build_hook(_version)
     unless File.exist?(@output_file) # rubocop:disable GuardClause
-      raise Thor::Error, 'Build command did not produce output file!'
+      raise 'Build command did not produce output file!'
     end
   end
 

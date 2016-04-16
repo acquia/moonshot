@@ -3,16 +3,15 @@ module Moonshot
   class StackLister
     include CredsHelper
 
-    def initialize(app_name, log:)
+    def initialize(app_name)
       @app_name = app_name
-      @log = log
     end
 
     def list
       all_stacks = cf_client.describe_stacks.stacks
       app_stacks = all_stacks.reject { |s| s.stack_name !~ /^#{@app_name}/ }
 
-      app_stacks.each do |stack|
+      app_stacks.sort_by(&:stack_name).each do |stack|
         puts stack.stack_name
       end
     end

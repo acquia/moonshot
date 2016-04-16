@@ -6,10 +6,8 @@ module Moonshot
     include described_class
 
     let(:resources) do
-      log = instance_double(Logger).as_null_object
       Resources.new(
         ilog: InteractiveLoggerProxy.new(log),
-        log: log,
         stack: double(Stack).as_null_object
       )
     end

@@ -18,11 +18,11 @@ describe 'Moonshot SSH features' do
 
         expect_any_instance_of(Moonshot::SSHCommandBuilder).to receive(:instance_ip).exactly(2)
           .and_return('123.123.123.123')
-        expect(STDOUT).to receive(:puts)
-          .with('Opening SSH connection to i-04683a82f2dddcc04 (123.123.123.123)...')
         expect(subject).to receive(:exec)
           .with('ssh -t -i /Users/joeuser/.ssh/thegoods.key -l joeuser 123.123.123.123 cat\ /etc/passwd') # rubocop:disable LineLength
-        subject.ssh
+        expect { subject.ssh }
+          .to output("Opening SSH connection to i-04683a82f2dddcc04 (123.123.123.123)...\n")
+          .to_stderr
       end
     end
 
@@ -36,11 +36,10 @@ describe 'Moonshot SSH features' do
       it 'should execute an ssh command with proper parameters' do
         expect_any_instance_of(Moonshot::SSHCommandBuilder).to receive(:instance_ip).exactly(2)
           .and_return('123.123.123.123')
-        expect(STDOUT).to receive(:puts)
-          .with('Opening SSH connection to i-012012012012012 (123.123.123.123)...')
         expect(subject).to receive(:exec)
           .with('ssh -t -i /Users/joeuser/.ssh/thegoods.key -l joeuser 123.123.123.123 cat\ /etc/passwd') # rubocop:disable LineLength
-        subject.ssh
+        expect { subject.ssh }
+          .to output("Opening SSH connection to i-012012012012012 (123.123.123.123)...\n").to_stderr
       end
     end
   end

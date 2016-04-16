@@ -6,27 +6,6 @@ class MockPlugin
   end
 end
 
-describe 'the Moonshot::CLI interface to plugins' do
-  let(:controller) { instance_double('Moonshot::Controller') }
-
-  subject do
-    Class.new(Moonshot::CLI) do
-      self.application_name = 'my-app'
-      plugin MockPlugin.new
-      plugin MockPlugin.new
-    end
-  end
-
-  it 'sets the plugins provided to Moonshot::Controller' do
-    config = Moonshot::ControllerConfig.new
-    expect(Moonshot::Controller).to receive(:new).and_yield(config).and_return(controller)
-    expect(controller).to receive(:status)
-
-    subject.start(['status'])
-    expect(config.plugins.size).to eq(2)
-  end
-end
-
 describe 'Plugins support' do
   let(:plugin1) { MockPlugin.new }
   let(:plugin2) { MockPlugin.new }
@@ -37,7 +16,6 @@ describe 'Plugins support' do
     Moonshot::Controller.new do |config|
       config.app_name = 'my-app'
       config.plugins = [plugin1, plugin2]
-      config.logger = Logger.new(nil)
     end
   end
 

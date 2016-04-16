@@ -1,0 +1,10 @@
+#!/usr/bin/env ruby
+require 'moonshot'
+
+# This is the main entry point for the `moonshot` command-line tool.
+begin
+  Moonshot::CommandLine.run!
+rescue => e
+  warn "#{e} (at #{e.backtrace.first})"
+  exit 1
+end

@@ -16,7 +16,7 @@ List stacks for this application.
 
 Example:
 ```shell
-./bin/environment list
+moonshot list
 ```
 
 Output:
@@ -43,7 +43,7 @@ Create a new environment.
 Example:
 
 ```shell
-./bin/environment create --name my-service-staging
+moonshot create --name my-service-staging
 ```
 
 Output:
@@ -55,14 +55,14 @@ Output:
 [ ✓ ] [ 0m 0s ]    AvailabilityZone1: us-east-1a
 [ ✓ ] [ 0m 0s ]    AvailabilityZone2: us-east-1d
 [ ✓ ] [ 0m 0s ]    DesiredCapacity: 1
-[ ✓ ] [ 0m 1s ] Created CloudFormation Stack my-service-staging. 
-[ ✓ ] [ 4m 49s ] CloudFormation Stack my-service-staging successfully created.                        
-[ ✓ ] [ 0m 0s ] Created CodeDeploy Application my-service-staging. 
-[ ✓ ] [ 0m 1s ] Created CodeDeploy Deployment Group my-service-staging. 
-[ ✓ ] [ 0m 1s ] AutoScaling Group up to capacity!                 
+[ ✓ ] [ 0m 1s ] Created CloudFormation Stack my-service-staging.
+[ ✓ ] [ 4m 49s ] CloudFormation Stack my-service-staging successfully created.
+[ ✓ ] [ 0m 0s ] Created CodeDeploy Application my-service-staging.
+[ ✓ ] [ 0m 1s ] Created CodeDeploy Deployment Group my-service-staging.
+[ ✓ ] [ 0m 1s ] AutoScaling Group up to capacity!
 [ ✓ ] [ 0m 0s ] Build script bin/build.sh exited successfully!
-[ ✓ ] [ 0m 1s ] Uploaded s3://my-service-staging/my-service-staging-1457657945.tar.gz successfully.    
-[ ✓ ] [ 0m 49s ] Deployment d-UNF7JW2KE completed successfully!    
+[ ✓ ] [ 0m 1s ] Uploaded s3://my-service-staging/my-service-staging-1457657945.tar.gz successfully.
+[ ✓ ] [ 0m 49s ] Deployment d-UNF7JW2KE completed successfully!
 ```
 
 
@@ -85,17 +85,17 @@ Options:
 Example:
 
 ```shell
-./bin/environment update --name my-service-staging
+moonshot update --name my-service-staging
 ```
 
 Output:
 
 ```shell
 [ ✓ ] [ 0m 1s ] Initiated update for CloudFormation Stack my-service-staging.
-[ ✓ ] [ 6m 11s ] CloudFormation Stack my-service-staging successfully updated.                                         
+[ ✓ ] [ 6m 11s ] CloudFormation Stack my-service-staging successfully updated.
 [ ✓ ] [ 0m 0s ] CodeDeploy Application my-service-staging already exists.
 [ ✓ ] [ 0m 0s ] CodeDeploy CodeDeploy Deployment Group my-service-staging already exists.
-[ ✓ ] [ 0m 1s ] AutoScaling Group up to capacity!   
+[ ✓ ] [ 0m 1s ] AutoScaling Group up to capacity!
 ```
 
 ## Status
@@ -111,53 +111,53 @@ Get the status of an existing environment.
 Example:
 
 ```shell
-./bin/environment status --name my-service-staging
+moonshot status --name my-service-staging
 ```
 
 Output:
 
 ```shell
 ┌─ CodeDeploy Application: my-service-staging
-│ 
+│
 │ Application and Deployment Group are configured correctly.
-│ 
+│
 └──
 CloudFormation Stack my-service-staging exists.
 ┌─ Stack Parameters
-│ 
+│
 │ ArtifactBucket:    my-service-bucket  (overridden)
 │ AvailabilityZone1: us-east-1a               (overridden)
 │ AvailabilityZone2: us-east-1d               (overridden)
 │ DesiredCapacity:   1                        (overridden)
-│ 
+│
 ├─ Stack Outputs
-│ 
+│
 │ URL: http://sample-LoadBala-VA232FB9FWFZ-1573168493.us-east-1.elb.amazonaws.com
-│ 
+│
 ├─ ASG: AutoScalingGroup
-│ 
+│
 │ Name: my-service-staging-AutoScalingGroup-104IA9X5MF7GH
 │ Using ELB health checks, with a 600s health check grace period.
 │ Desired Capacity is 1 (Min: 1, Max: 5).
 │ Has 1 Load Balancer(s): sample-LoadBala-VA232FB9FWFZ
-│ 
+│
 ├── Instances
-│  
+│
 │  i-5607c6cd 52.90.68.26 InService Healthy 0d 0h 8m 11s (launch config up to date)
-│  
+│
 ├── Recent Activity
-│  
+│
 │  2016-03-11 01:07:59 UTC Terminating EC2 instance: i-73fe99f7     Successful 100%
 │  2016-03-11 01:03:26 UTC Launching a new EC2 instance: i-5607c6cd Successful 100%
 │  2016-03-11 00:58:03 UTC Launching a new EC2 instance: i-73fe99f7 Successful 100%
-│  
+│
 └──
 ```
 
 
-## Deploy Code
+## Push
 
-Create a build from the working directory, and deploy it.
+Create a development build from the working directory, and deploy it.
 
 |Description|Long Form|Short Form|Type|Example|Default|
 |---|---|---|---|---|---|
@@ -168,18 +168,18 @@ Create a build from the working directory, and deploy it.
 Example:
 
 ```shell
-./bin/environment deploy-code --name my-service-staging
+moonshot deploy-code --name my-service-staging
 ```
 
 Output:
 
 ```shell
 [ ✓ ] [ 0m 1s ] Build script bin/build.sh exited successfully!
-[ ✓ ] [ 0m 1s ] Uploaded s3://my-service-staging/my-service-staging-1457658789.tar.gz successfully.    
-[ ✓ ] [ 1m 28s ] Deployment d-PFMNSB5KE completed successfully! 
+[ ✓ ] [ 0m 1s ] Uploaded s3://my-service-staging/my-service-staging-1457658789.tar.gz successfully.
+[ ✓ ] [ 1m 28s ] Deployment d-PFMNSB5KE completed successfully!
 ```
 
-## Build Version
+## Build
 
 Build a tarball of the software, ready for deployment.
 Requires a version name parameter.
@@ -193,19 +193,19 @@ Requires a version name parameter.
 Example:
 
 ```shell
-./bin/environment build-version 1.0.0 --name my-service-staging
+moonshot build 1.0.0
 ```
 
 Output:
 
 ```shell
 [ ✓ ] [ 0m 0s ] Build script bin/build.sh exited successfully!
-[ ✓ ] [ 0m 1s ] Uploaded s3://my-service-staging/1.0.0.tar.gz successfully.  
+[ ✓ ] [ 0m 1s ] Uploaded s3://my-service-staging/1.0.0.tar.gz successfully.
 ```
 
-## Deploy Version
+## Deploy
 
-Deploy a versioned release to both Elastic Beanstalk environments in an environment.
+Deploy a versioned release created with the `build` command.
 Requires a version name parameter.
 
 |Description|Long Form|Short Form|Type|Example|Default|
@@ -217,13 +217,13 @@ Requires a version name parameter.
 Example:
 
 ```shell
-./bin/environment deploy-version 1.0.0 --name my-service-staging
+moonshot deploy 1.0.0
 ```
 
 Output:
 
 ```shell
-[ ✓ ] [ 1m 0s ] Deployment d-M4FY304KE completed successfully!   
+[ ✓ ] [ 1m 0s ] Deployment d-M4FY304KE completed successfully!
 ```
 
 ## Delete
@@ -240,20 +240,23 @@ Delete an existing environment.
 Example:
 
 ```shell
-./bin/environment delete --name my-service-staging
+moonshot delete --name my-service-staging
 ```
 
 Output:
 
 ```shell
 [ ✓ ] [ 0m 1s ] Initiated deletion of CloudFormation Stack my-service-staging.
-[ ✓ ] [ 11m 50s ] CloudFormation Stack my-service-staging successfully deleted.                                    
+[ ✓ ] [ 11m 50s ] CloudFormation Stack my-service-staging successfully deleted.
 [ ✓ ] [ 0m 0s ] Deleted CodeDeploy Application 'my-service-staging'.
 ```
 
 ## Doctor
-Run configuration checks against current environment. Throws an error if one or more checks failed.
-For example, if you are using a deployment_mechanism that is using S3, it will check if the bucket actually exists and that you have access to. Each mechanism is able to add checks themselves that will be recognized and run.
+Run configuration checks against current environment. Throws an error
+if one or more checks failed.  For example, if you are using a
+deployment_mechanism that is using S3, it will check if the bucket
+actually exists and that you have access to. Each mechanism is able to
+add checks themselves that will be recognized and run.
 
 |Description|Long Form|Short Form|Type|Example|Default|
 |---|---|---|---|---|---|
@@ -264,7 +267,7 @@ For example, if you are using a deployment_mechanism that is using S3, it will c
 Example:
 
 ```shell
-./bin/environment doctor --name my-service-staging
+moonshot doctor
 ```
 
 Output:
@@ -304,7 +307,7 @@ SSH into the first or specified instance on the stack.
 Example:
 
 ```shell
-./bin/environment ssh --name my-service-staging -i ~/.ssh/whatever -c "cat /etc/redhat-release"
+moonshot ssh --name my-service-staging -i ~/.ssh/whatever -c "cat /etc/redhat-release"
 ```
 
 Output:

@@ -8,7 +8,6 @@ module Moonshot # rubocop:disable ModuleLength
     let(:resources) do
       Resources.new(
         ilog: instance_double(InteractiveLogger).as_null_object,
-        log: instance_double(Logger).as_null_object,
         stack: instance_double(Stack).as_null_object
       )
     end
