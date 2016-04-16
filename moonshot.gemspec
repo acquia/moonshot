@@ -8,7 +8,9 @@ Gem::Specification.new do |s|
     'Cloud Engineering <engineering@acquia.com>'
   ]
   s.email       = 'engineering@acquia.com'
-  s.files       = Dir['lib/**/*.rb']
+  s.files       = Dir['lib/**/*.rb'] + Dir['bin/*']
+  s.bindir      = 'bin'
+  s.executables = ['moonshot']
   s.homepage    = 'https://github.com/acquia/moonshot'
 
   s.add_dependency('aws-sdk', '~> 2.2.0')

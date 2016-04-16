@@ -1,3 +1,0 @@
-source 'https://rubygems.org'
-
-gem 'moonshot', git: 'git@github.com:acquia/moonshot', ref: 'master'

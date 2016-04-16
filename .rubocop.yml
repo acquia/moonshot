@@ -2,9 +2,10 @@
 AllCops:
   TargetRubyVersion: 2.2
   Exclude:
-    - '*.gemspec'
+    - 'moonshot.gemspec'
     - 'vendor/**/*'
     - 'sample/bin/aws-codedeploy-samples/**/*'
+    - 'sample/gems/**/*'
 Metrics/AbcSize:
   Max: 20
 Metrics/MethodLength:

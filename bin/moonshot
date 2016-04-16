@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby
+require 'moonshot'
+
+# This is the main entry point for the `moonshot` command-line tool.
+Moonshot::CommandLine.run!

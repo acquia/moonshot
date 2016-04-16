@@ -3,7 +3,12 @@ require 'aws-sdk'
 require 'logger'
 require 'thor'
 
-module Moonshot
+module Moonshot # rubocop:disable Documentation
+  def self.config
+    @config ||= Moonshot::ControllerConfig.new
+    block_given? ? yield(@config) : @config
+  end
+
   module ArtifactRepository # rubocop:disable Documentation
   end
   module BuildMechanism # rubocop:disable Documentation
@@ -22,6 +27,7 @@ end
 
   # Core
   'interactive_logger_proxy',
+  'command_line',
   'controller',
   'controller_config',
   'cli',

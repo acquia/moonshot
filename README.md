@@ -35,23 +35,22 @@ should aspire to meet them with each iteration.
 
 ## Installation
 
-Add this line to your application's Gemfile:
+Install the Moonshot gem:
 
-    gem 'moonshot'
-
-And then execute:
-
-    $ bundle install
-
-Or install it yourself as:
-
-    $ gem install moonshot
+```shell
+$ gem install moonshot
+```
 
 After installation, there is still some work required. Follow the [example documentation](docs/example.md) as described below to dig in!
 
 ## Getting started
 
-The Moonshot tool has been designed to be an extensible library for your specific use-case. Interested in how it can be used? See our [example documentation](http://moonshot.readthedocs.org/en/latest/example). The example doc uses the files shown in the [sample directory](https://github.com/acquia/moonshot/tree/master/sample) so you can figure out how to modify this for your own deployment strategy.
+The Moonshot tool has been designed to be an extensible library for your
+specific use-case. Interested in how it can be used? See our [example
+documentation](http://moonshot.readthedocs.org/en/latest/example). The example
+doc uses the files shown in the [sample
+directory](https://github.com/acquia/moonshot/tree/master/sample) so you can
+figure out how to modify this for your own deployment strategy.
 
 We also want to [help you contribute and answer all your questions](http://moonshot.readthedocs.org/en/latest/about/contribute) on how Moonshot is maintained.
 

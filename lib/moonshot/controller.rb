@@ -1,6 +1,8 @@
 module Moonshot
   # The Controller coordinates and performs all Moonshot actions.
   class Controller # rubocop:disable ClassLength
+    attr_accessor :config
+
     def initialize
       @config = ControllerConfig.new
       yield @config if block_given?
