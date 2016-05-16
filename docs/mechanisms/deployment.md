@@ -22,9 +22,9 @@ class MoonshotSampleApp < Moonshot::CLI
 ```
 Parameters
 
-### asg | string
+### asg | string,array
 
-The logical name of the AutoScalingGroup to create and manage a Deployment
+The logical name of one or more Auto Scaling Groups to create and manage a Deployment
 Group for in CodeDeploy.
 
 ### role | string

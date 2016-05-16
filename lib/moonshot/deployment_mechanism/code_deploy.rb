@@ -13,7 +13,7 @@ class Moonshot::DeploymentMechanism::CodeDeploy # rubocop:disable ClassLength
   include Moonshot::CredsHelper
   include Moonshot::DoctorHelper
 
-  # @param asg [String]
+  # @param asg [Array, String]
   #   The logical name of the AutoScalingGroup to create and manage a Deployment
   #   Group for in CodeDeploy.
   # @param role [String]
@@ -24,14 +24,14 @@ class Moonshot::DeploymentMechanism::CodeDeploy # rubocop:disable ClassLength
   #   this is the same as the stack name, and probably what you want. If you
   #   have multiple deployments in a single Stack, they must have unique names.
   # @param config_name [String]
-  #   Name of the Deployment Config to use for COdeDeploy,  By default we use
+  #   Name of the Deployment Config to use for CodeDeploy,  By default we use
   #   CodeDeployDefault.OneAtATime.
   def initialize(
-      asg:,
+      asg: [],
       role: 'CodeDeployRole',
       app_name: nil,
       config_name: 'CodeDeployDefault.OneAtATime')
-    @asg_logical_id = asg
+    @asg_logical_ids = asg.is_a?(Array) ? asg : [asg]
     @app_name = app_name
     @codedeploy_role = role
     @codedeploy_config = config_name
@@ -139,27 +139,35 @@ class Moonshot::DeploymentMechanism::CodeDeploy # rubocop:disable ClassLength
     end
   end
 
-  def auto_scaling_group
-    @auto_scaling_group ||= load_auto_scaling_group
+  def auto_scaling_groups
+    @auto_scaling_groups ||= load_auto_scaling_groups
   end
 
-  def load_auto_scaling_group
-    asg_name = stack.physical_id_for(@asg_logical_id)
-    unless asg_name
-      raise Thor::Error, "Could not find #{@asg_logical_id} resource in Stack."
-    end
+  def load_auto_scaling_groups
+    autoscaling_groups = []
+    @asg_logical_ids.each do |asg_logical_id|
+      asg_name = stack.physical_id_for(asg_logical_id)
+      unless asg_name
+        raise Thor::Error, "Could not find #{asg_logical_id} resource in Stack."
+      end
 
-    groups = as_client.describe_auto_scaling_groups(
-      auto_scaling_group_names: [asg_name])
-    if groups.auto_scaling_groups.empty?
-      raise Thor::Error, "Could not find ASG #{asg_name}."
-    end
+      groups = as_client.describe_auto_scaling_groups(
+        auto_scaling_group_names: [asg_name])
+      if groups.auto_scaling_groups.empty?
+        raise Thor::Error, "Could not find ASG #{asg_name}."
+      end
 
-    groups.auto_scaling_groups.first
+      autoscaling_groups.push(groups.auto_scaling_groups.first)
+    end
+    autoscaling_groups
   end
 
-  def asg_name
-    auto_scaling_group.auto_scaling_group_name
+  def asg_names
+    names = []
+    auto_scaling_groups.each do |auto_scaling_group|
+      names.push(auto_scaling_group.auto_scaling_group_name)
+    end
+    names
   end
 
   def application_exists?
@@ -186,9 +194,15 @@ class Moonshot::DeploymentMechanism::CodeDeploy # rubocop:disable ClassLength
 
   def deployment_group_ok?
     return false unless deployment_group_exists?
-    asg = deployment_group.auto_scaling_groups.first
-    return false unless asg
-    asg.name == auto_scaling_group.auto_scaling_group_name
+    asgs = deployment_group.auto_scaling_groups
+    return false unless asgs
+    return false unless asgs.count == auto_scaling_groups.count
+    asgs.each do |asg|
+      if (auto_scaling_groups.find_index { |a| a.auto_scaling_group_name == asg.name }).nil?
+        return false
+      end
+    end
+    true
   end
 
   def role
@@ -211,20 +225,26 @@ class Moonshot::DeploymentMechanism::CodeDeploy # rubocop:disable ClassLength
       application_name: app_name,
       deployment_group_name: app_name,
       service_role_arn: role.arn,
-      auto_scaling_groups: [asg_name])
+      auto_scaling_groups: asg_names)
   end
 
   def wait_for_asg_capacity
     ilog.start 'Waiting for AutoScaling Group to reach capacity...' do |s|
       loop do
-        asg = load_auto_scaling_group
-        count = asg.instances.count { |i| i.lifecycle_state == 'InService' }
-        break if asg.desired_capacity == count
-        s.continue "DesiredCapacity is #{asg.desired_capacity}, currently #{count} instance(s) are InService." # rubocop:disable LineLength
+        asgs_at_capacity = 0
+        asgs = load_auto_scaling_groups
+        asgs.each do |asg|
+          count = asg.instances.count { |i| i.lifecycle_state == 'InService' }
+          if asg.desired_capacity == count
+            asgs_at_capacity += 1
+            s.continue "#{asg.auto_scaling_group_name} DesiredCapacity is #{asg.desired_capacity}, currently #{count} instance(s) are InService." # rubocop:disable LineLength
+          end
+        end
+        break if asgs.count == asgs_at_capacity
         sleep 5
       end
 
-      s.success 'AutoScaling Group up to capacity!'
+      s.success 'AutoScaling Group(s) up to capacity!'
     end
   end
 
