@@ -10,7 +10,11 @@ module Moonshot
   end
   module DeploymentMechanism # rubocop:disable Documentation
   end
+  module Plugins # rubocop:disable Documentation
+  end
 end
+
+require_relative 'plugins/backup'
 
 [
   # Helpers

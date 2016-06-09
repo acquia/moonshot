@@ -13,6 +13,8 @@ pages:
   - 'Build': 'mechanisms/build.md'
   - 'Deployment': 'mechanisms/deployment.md'
 - Plugins: plugins.md
+- Bundled plugins:
+  - 'Backup plugin': 'plugins/backup.md'
 - About:
   - 'How to Contribute': 'about/contribute.md'
   - 'License': 'about/license.md'
