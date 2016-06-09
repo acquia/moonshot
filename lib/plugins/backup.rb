@@ -117,7 +117,6 @@ module Moonshot
             render f
           end
         file[:name] = render file[:name]
-        p file
         file
       end
     end

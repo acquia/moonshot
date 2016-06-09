@@ -14,8 +14,6 @@ module Moonshot
   end
 end
 
-require_relative 'plugins/backup'
-
 [
   # Helpers
   'creds_helper',
@@ -43,3 +41,8 @@ require_relative 'plugins/backup'
   'build_mechanism/version_proxy',
   'deployment_mechanism/code_deploy'
 ].each { |f| require_relative "moonshot/#{f}" }
+
+# Bundled plugins
+[
+  'backup'
+].each { |p| require_relative "plugins/#{p}" }

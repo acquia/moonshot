@@ -45,8 +45,8 @@ plugin(
   Backup.new do |b|
     b.bucket = 'acquia-cloud-database-test'
     b.files = [
-      { path: ['cloud_formation'], name: '%{app_name}.json' },
-      { path: ['cloud_formation', 'parameters'], name: '%{stack_name}.yml' }
+      { path: %w(cloud_formation), name: '%{app_name}.json' },
+      { path: %w(cloud_formation, parameters), name: '%{stack_name}.yml' }
     ]
     b.hooks = [:post_create, :post_update]
   end
