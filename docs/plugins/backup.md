@@ -17,7 +17,6 @@ present in the same account and region as your deployment.
 When instantiating a class, you need to set the following options
 in a block, where the object is provided as a block argument:
 
-- `base_path`: the absolute path of your project directory
 - `bucket`: the name of the S3 bucket you wish to upload the tarball
 - `files`: a hash with two mandatory and one mandatory value:
   - `path` (mandatory): file path as an array, relative to the base path
@@ -31,10 +30,10 @@ in a block, where the object is provided as a block argument:
 You can use the following placeholders both in your filenames
 and tarball target names (meanings are pretty self explaining):
 
-- `<app_name>`
-- `<stack_name>`
-- `<timestamp>`
-- `<user>`
+- `%{app_name}`
+- `%{stack_name}`
+- `%{timestamp}`
+- `%{user}`
 
 ## Example
 
@@ -44,11 +43,10 @@ parameter file after create or update.
 ```ruby
 plugin(
   Backup.new do |b|
-    b.base_path = File.expand_path("..", __dir__)
     b.bucket = 'acquia-cloud-database-test'
     b.files = [
-      { path: ['cloud_formation'], name: "<app_name>.json" },
-      { path: ['cloud_formation', 'parameters'], name: "<stack_name>.yml" }
+      { path: ['cloud_formation'], name: '%{app_name}.json' },
+      { path: ['cloud_formation', 'parameters'], name: '%{stack_name}.yml' }
     ]
     b.hooks = [:post_create, :post_update]
   end
