@@ -33,28 +33,49 @@ module Moonshot
 
       def initialize
         yield self if block_given?
-        raise ArgumentError if @bucket.nil? || @files.nil? || @hooks.nil?
+        raise ArgumentError if @bucket.nil? || @files.nil? || @files.empty? || @hooks.nil?
+        @target_name ||= '%{app_name}_%{timestamp}_%{user}.tar.gz'
       end
 
-      def backup(resources)
+      def self.to_bucket(bucket:)
+        raise ArgumentError if bucket.nil?
+        Moonshot::Plugins::Backup.new do |b|
+          b.bucket = bucket
+          b.files = [
+            { path: %w(cloud_formation), name: '%{app_name}.json' },
+            { path: %w(cloud_formation parameters), name: '%{stack_name}.yml' }
+          ]
+          b.hooks = [:post_create, :post_update]
+        end
+      end
+
+      def backup(resources) # rubocop:disable Metrics/AbcSize
+        raise ArgumentError if resources.nil?
+
         @app_name = resources.stack.app_name
         @stack_name = resources.stack.name
-        @target_name ||= '%{app_name}_%{timestamp}_%{user}.tar.gz'
+        @target_name = render(@target_name)
 
-        tar_out = tar @files
-        zip_out = zip tar_out
-        upload zip_out
-      rescue StandardError => e
-        raise e
-      ensure
-        tar_out.close unless tar_out.nil?
-        zip_out.close unless zip_out.nil?
+        resources.ilog.start log_message.clone << ' in progress.' do |s|
+          begin
+            tar_out = tar @files
+            zip_out = zip tar_out
+            upload zip_out
+
+            s.success log_message.clone << ' succeeded.'
+          rescue StandardError => e
+            s.failure log_message.clone << " failed: #{e}"
+          ensure
+            tar_out.close unless tar_out.nil?
+            zip_out.close unless zip_out.nil?
+          end
+        end
       end
 
       # dynamically responding to hooks
       # supplied in the constructor
       def method_missing(method_name, *args, &block)
-        backup(*args) if @hooks.include?(method_name) || super
+        @hooks.include?(method_name) ? backup(*args) : super
       end
 
       def respond_to?(method_name, include_private = false)
@@ -96,7 +117,7 @@ module Moonshot
         s3_client.put_object(
           acl: 'private',
           bucket: @bucket,
-          key: render(@target_name),
+          key: @target_name,
           body: io_zip
         )
       end
@@ -118,6 +139,10 @@ module Moonshot
           end
         file[:name] = render file[:name]
         file
+      end
+
+      def log_message
+        "Uploading '#{@target_name}' to '#{@bucket}'"
       end
     end
   end
