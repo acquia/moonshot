@@ -18,12 +18,18 @@ When instantiating a class, you need to set the following options
 in a block, where the object is provided as a block argument:
 
 - `bucket`: the name of the S3 bucket you wish to upload the tarball
-- `files`: a hash with two mandatory and one mandatory value:
-  - `path` (mandatory): file path as an array, relative to the base path
-  - `name` (mandatory): name of the file
-  - `permission` (optional): permission in the target tarball, defaults to `0644`
+- `files`: an array of relative path names as strings
 - `hooks`: which hooks to run the backup logic, works with all valid Moonshot hooks
 - `target_name`: tarball archive name, default: `<app_name>_<timestamp>_<user>.tar.gz`
+
+## Default method
+
+If you wish to back up only the current template and parameter files, you can simply
+use the factory method provided:
+
+```ruby
+plugin(Moonshot::Plugins::Backup.to_bucket('your-bucket-name'))
+```
 
 ## Placeholders
 
@@ -43,10 +49,10 @@ parameter file after create or update.
 ```ruby
 plugin(
   Backup.new do |b|
-    b.bucket = 'acquia-cloud-database-test'
+    b.bucket = 'your-bucket-name'
     b.files = [
-      { path: %w(cloud_formation), name: '%{app_name}.json' },
-      { path: %w(cloud_formation parameters), name: '%{stack_name}.yml' }
+      'cloud_formation/%{app_name}.json',
+      'cloud_formation/parameters/%{stack_name}.yml'
     ]
     b.hooks = [:post_create, :post_update]
   end

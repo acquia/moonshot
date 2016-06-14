@@ -18,13 +18,14 @@ describe Moonshot::Plugins::Backup do
     subject { Moonshot::Plugins::Backup }
 
     it 'should yield self' do
-      expect do |b|
-        # must silence ArgumentError, since RSpec provides
-        # its own block without the proper arguments
-        begin
-          subject.new(&b)
-        end.to yield_with_args
+      backup = subject.new do |b|
+        b.bucket = 'test'
+        b.files = %w(sample files)
+        b.hooks = [:sample, :hooks]
       end
+      expect(backup.bucket).to eq('test')
+      expect(backup.files).to eq(%w(sample files))
+      expect(backup.hooks).to eq([:sample, :hooks])
     end
 
     it 'should raise ArgumentError if insufficient parameters are provided' do
@@ -48,7 +49,7 @@ describe Moonshot::Plugins::Backup do
     let(:registered_hooks) { [:post_create, :post_update] }
     let(:unregistered_hooks) { hooks - registered_hooks }
 
-    subject { Moonshot::Plugins::Backup.to_bucket bucket: test_bucket_name }
+    subject { Moonshot::Plugins::Backup.to_bucket(test_bucket_name) }
 
     it 'should return a Backup object' do
       expect(subject).to be_a Moonshot::Plugins::Backup
@@ -60,8 +61,8 @@ describe Moonshot::Plugins::Backup do
     it 'should set default config values' do
       expect(subject.bucket).to eq test_bucket_name
       expect(subject.files).to eq [
-        { path: %w(cloud_formation), name: '%{app_name}.json' },
-        { path: %w(cloud_formation parameters), name: '%{stack_name}.yml' }
+        'cloud_formation/%{app_name}.json',
+        'cloud_formation/parameters/%{stack_name}.yml'
       ]
       expect(subject.hooks).to eq [:post_create, :post_update]
     end
@@ -85,14 +86,6 @@ describe Moonshot::Plugins::Backup do
 
     it 'should raise ArgumentError if resources not injected' do
       expect { subject.backup }.to raise_error(ArgumentError)
-    end
-
-    it 'should retrieve values from resources' do
-      expect(resources).to receive(:stack)
-      expect(resources.stack).to receive(:app_name)
-      expect(resources.stack).to receive(:name)
-      expect(resources.ilog).to receive(:start)
-      subject.backup(resources)
     end
   end
 end
