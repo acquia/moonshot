@@ -32,6 +32,17 @@ describe Moonshot::Plugins::Backup do
       expect { subject.new }.to raise_error(ArgumentError)
     end
 
+    it 'should raise ArgumentError if redundant parameters are provided' do
+      expect do
+        subject.new do |b|
+          b.bucket = 'test'
+          b.buckets = {}
+          b.files = %w(sample files)
+          b.hooks = [:sample, :hooks]
+        end
+      end.to raise_error(ArgumentError)
+    end
+
     let(:backup) do
       subject.new do |b|
         b.bucket = 'testbucket'

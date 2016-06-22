@@ -17,10 +17,13 @@ present in the same account and region as your deployment.
 When instantiating a class, you need to set the following options
 in a block, where the object is provided as a block argument:
 
-- `bucket`: the name of the S3 bucket you wish to upload the tarball
+- `bucket`: the name of the S3 bucket you wish to upload the tarball (optional)
+- `buckets`: a hash map containing account aliases as keys, and target buckets as values (optional)
 - `files`: an array of relative path names as strings
 - `hooks`: which hooks to run the backup logic, works with all valid Moonshot hooks
 - `target_name`: tarball archive name, default: `<app_name>_<timestamp>_<user>.tar.gz`
+
+You must provide either `bucket` or `buckets`, but **not both**.
 
 ## Default method
 
@@ -50,10 +53,30 @@ parameter file after create or update.
 plugin(
   Backup.new do |b|
     b.bucket = 'your-bucket-name'
+
     b.files = [
       'cloud_formation/%{app_name}.json',
       'cloud_formation/parameters/%{stack_name}.yml'
     ]
+
+    b.hooks = [:post_create, :post_update]
+  end
+)
+```
+
+```ruby
+plugin(
+  Backup.new do |b|
+    b.buckets = {
+      'dev_account' => 'dev_bucket',
+      'prod_account' => 'prod_bucket'
+    }
+
+    b.files = [
+      'cloud_formation/%{app_name}.json',
+      'cloud_formation/parameters/%{stack_name}.yml'
+    ]
+
     b.hooks = [:post_create, :post_update]
   end
 )

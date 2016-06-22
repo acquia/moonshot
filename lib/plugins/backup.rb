@@ -5,17 +5,20 @@ require_relative '../moonshot/creds_helper'
 module Moonshot
   module Plugins
     # Moonshot plugin class for deflating and uploading files on given hooks
-    class Backup
+    class Backup # rubocop:disable Metrics/ClassLength
       include Moonshot::CredsHelper
 
       attr_accessor :bucket,
+                    :buckets,
                     :files,
                     :hooks,
                     :target_name
 
       def initialize
         yield self if block_given?
-        raise ArgumentError if @bucket.nil? || @files.nil? || @files.empty? || @hooks.nil?
+        raise ArgumentError \
+          if @files.nil? || @files.empty? || @hooks.nil? || !(@bucket.nil? ^ @buckets.nil?)
+
         @target_name ||= '%{app_name}_%{timestamp}_%{user}.tar.gz'
       end
 
@@ -45,6 +48,9 @@ module Moonshot
         @app_name = resources.stack.app_name
         @stack_name = resources.stack.name
         @target_name = render(@target_name)
+        @target_bucket = define_bucket
+
+        return if @target_bucket.nil?
 
         resources.ilog.start("#{log_message} in progress.") do |s|
           begin
@@ -74,7 +80,8 @@ module Moonshot
       private
 
       attr_accessor :app_name,
-                    :stack_name
+                    :stack_name,
+                    :target_bucket
 
       # Create a tar archive in memory, returning the IO object pointing at the
       # beginning of the archive.
@@ -117,7 +124,7 @@ module Moonshot
       def upload(io_zip)
         s3_client.put_object(
           acl: 'private',
-          bucket: @bucket,
+          bucket: @target_bucket,
           key: @target_name,
           body: io_zip
         )
@@ -138,7 +145,29 @@ module Moonshot
       end
 
       def log_message
-        "Uploading '#{@target_name}' to '#{@bucket}'"
+        "Uploading '#{@target_name}' to '#{@target_bucket}'"
+      end
+
+      def iam_account
+        iam_client.list_account_aliases.account_aliases.first
+      end
+
+      def define_bucket
+        case
+        # returning already calculated bucket name
+        when !@target_bucket.nil?
+          @target_bucket
+        # single bucket for all accounts
+        when !@bucket.nil?
+          @bucket
+        # calculating bucket based on account name
+        when !@buckets.nil?
+          bucket_by_account(iam_account)
+        end
+      end
+
+      def bucket_by_account(account)
+        @buckets[account] if @buckets.include?(account)
       end
     end
   end
