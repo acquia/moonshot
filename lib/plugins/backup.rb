@@ -155,19 +155,19 @@ module Moonshot
       def define_bucket
         case
         # returning already calculated bucket name
-        when !@target_bucket.nil?
+        when @target_bucket
           @target_bucket
         # single bucket for all accounts
-        when !@bucket.nil?
+        when @bucket
           @bucket
         # calculating bucket based on account name
-        when !@buckets.nil?
+        when @buckets
           bucket_by_account(iam_account)
         end
       end
 
       def bucket_by_account(account)
-        @buckets[account] if @buckets.include?(account)
+        @buckets[account]
       end
     end
   end
