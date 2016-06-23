@@ -1,3 +1,15 @@
+class MockInteractiveLogger
+  def start(_)
+    yield self
+  end
+
+  def success(_)
+  end
+
+  def failure(_)
+  end
+end
+
 describe Moonshot::Plugins::Backup do
   let(:hooks) do
     [
@@ -85,18 +97,44 @@ describe Moonshot::Plugins::Backup do
   end
 
   describe '#backup' do
-    subject { Moonshot::Plugins::Backup.to_bucket bucket: 'bucket' }
+    subject do
+      Moonshot::Plugins::Backup.new do |b|
+        b.buckets = {
+          'dev_account' => 'dev_bucket'
+        }
+        b.files = ['test_file']
+        b.hooks = %i(post_create post_update)
+      end
+    end
 
     let(:resources) do
       instance_double(
         Moonshot::Resources,
-        stack: instance_double(Moonshot::Stack),
+        stack: instance_double(Moonshot::Stack, app_name: 'test_app_name', name: 'test_name'),
         ilog: instance_double(Moonshot::InteractiveLoggerProxy)
       )
     end
 
-    it 'should raise ArgumentError if resources not injected' do
+    it 'should raise ArgumentError if resources are not injected' do
       expect { subject.backup }.to raise_error(ArgumentError)
+    end
+
+    it 'should return silent if account not found in buckets hash' do
+      allow(subject).to receive(:iam_account).and_return('prod_account')
+      expect(resources).not_to receive(:ilog)
+      subject.backup(resources)
+    end
+
+    it 'should upload' do
+      allow(subject).to receive(:iam_account).and_return('dev_account')
+      expect(resources).to receive(:ilog).and_return(MockInteractiveLogger.new)
+
+      %i(tar zip upload).each do |s|
+        allow(subject).to receive(s)
+        expect(subject).to receive(s)
+      end
+
+      subject.backup(resources)
     end
   end
 end
