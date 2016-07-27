@@ -23,10 +23,18 @@ class Moonshot::DeploymentMechanism::CodeDeploy # rubocop:disable ClassLength
   #   The name of the CodeDeploy Application and Deployment Group. By default,
   #   this is the same as the stack name, and probably what you want. If you
   #   have multiple deployments in a single Stack, they must have unique names.
-  def initialize(asg:, role: 'CodeDeployRole', app_name: nil)
+  # @param config_name [String]
+  #   Name of the Deployment Config to use for COdeDeploy,  By default we use
+  #   CodeDeployDefault.OneAtATime.
+  def initialize(
+      asg:,
+      role: 'CodeDeployRole',
+      app_name: nil,
+      config_name: 'CodeDeployDefault.OneAtATime')
     @asg_logical_id = asg
     @app_name = app_name
     @codedeploy_role = role
+    @codedeploy_config = config_name
   end
 
   def post_create_hook
@@ -58,7 +66,7 @@ class Moonshot::DeploymentMechanism::CodeDeploy # rubocop:disable ClassLength
         application_name: app_name,
         deployment_group_name: app_name,
         revision: revision_for_artifact_repo(artifact_repo, version_name),
-        deployment_config_name: 'CodeDeployDefault.OneAtATime',
+        deployment_config_name: @codedeploy_config,
         description: "Deploying version #{version_name}"
       )
       deployment_id = res.deployment_id
