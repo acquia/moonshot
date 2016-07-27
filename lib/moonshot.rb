@@ -44,5 +44,6 @@ end
 
 # Bundled plugins
 [
-  'backup'
+  'backup',
+  'cleaner'
 ].each { |p| require_relative "plugins/#{p}" }
