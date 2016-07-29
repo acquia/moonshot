@@ -43,6 +43,8 @@ end
 ].each { |f| require_relative "moonshot/#{f}" }
 
 # Bundled plugins
+# rubocop:disable Style/WordArray
 [
-  'backup'
+  'backup',
+  'cleaner'
 ].each { |p| require_relative "plugins/#{p}" }
