@@ -229,7 +229,7 @@ class Moonshot::DeploymentMechanism::CodeDeploy # rubocop:disable ClassLength
   end
 
   def wait_for_asg_capacity
-    ilog.start 'Waiting for AutoScaling Group to reach capacity...' do |s|
+    ilog.start 'Waiting for AutoScaling Group(s) to reach capacity...' do |s|
       loop do
         asgs_at_capacity = 0
         asgs = load_auto_scaling_groups
