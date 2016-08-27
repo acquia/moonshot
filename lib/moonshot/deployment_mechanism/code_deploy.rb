@@ -20,9 +20,12 @@ class Moonshot::DeploymentMechanism::CodeDeploy # rubocop:disable ClassLength
   #   IAM role with AWSCodeDeployRole policy. CodeDeployRole is considered as
   #   default role if its not specified.
   # @param app_name [String, nil] (nil)
-  #   The name of the CodeDeploy Application and Deployment Group. By default,
-  #   this is the same as the stack name, and probably what you want. If you
-  #   have multiple deployments in a single Stack, they must have unique names.
+  #   The name of the CodeDeploy Application. By default, this is the same as
+  #   the stack name, and probably what you want. If you have multiple
+  #   deployments in a single Stack, they must have unique names.
+  # @param group_name [String, nil] (nil)
+  #   The name of the CodeDeploy Deployment Group. By default, this is the same
+  #   as app_name.
   # @param config_name [String]
   #   Name of the Deployment Config to use for CodeDeploy,  By default we use
   #   CodeDeployDefault.OneAtATime.
@@ -30,9 +33,11 @@ class Moonshot::DeploymentMechanism::CodeDeploy # rubocop:disable ClassLength
       asg: [],
       role: 'CodeDeployRole',
       app_name: nil,
+      group_name: nil,
       config_name: 'CodeDeployDefault.OneAtATime')
     @asg_logical_ids = asg.is_a?(Array) ? asg : [asg]
     @app_name = app_name
+    @group_name = group_name
     @codedeploy_role = role
     @codedeploy_config = config_name
   end
@@ -64,7 +69,7 @@ class Moonshot::DeploymentMechanism::CodeDeploy # rubocop:disable ClassLength
     ilog.start_threaded 'Creating Deployment' do |s|
       res = cd_client.create_deployment(
         application_name: app_name,
-        deployment_group_name: app_name,
+        deployment_group_name: group_name,
         revision: revision_for_artifact_repo(artifact_repo, version_name),
         deployment_config_name: @codedeploy_config,
         description: "Deploying version #{version_name}"
@@ -88,10 +93,16 @@ class Moonshot::DeploymentMechanism::CodeDeploy # rubocop:disable ClassLength
 
   private
 
-  # By default, use the stack name as the application and deployment group
-  # names, unless one has been provided.
+  # By default, use the stack name as the application name, unless one has been
+  # provided.
   def app_name
     @app_name || stack.name
+  end
+
+  # By default, use the stack name as the geployment group name, unless one has
+  # been provided.
+  def group_name
+    @group_name || stack.name
   end
 
   def pretty_app_name
@@ -179,13 +190,13 @@ class Moonshot::DeploymentMechanism::CodeDeploy # rubocop:disable ClassLength
 
   def deployment_group
     cd_client.get_deployment_group(
-      application_name: app_name, deployment_group_name: app_name)
+      application_name: app_name, deployment_group_name: group_name)
              .deployment_group_info
   end
 
   def deployment_group_exists?
     cd_client.get_deployment_group(
-      application_name: app_name, deployment_group_name: app_name)
+      application_name: app_name, deployment_group_name: group_name)
     true
   rescue Aws::CodeDeploy::Errors::ApplicationDoesNotExistException,
          Aws::CodeDeploy::Errors::DeploymentGroupDoesNotExistException
@@ -215,7 +226,7 @@ class Moonshot::DeploymentMechanism::CodeDeploy # rubocop:disable ClassLength
     ilog.start "Deleting #{pretty_deploy_group}." do |s|
       cd_client.delete_deployment_group(
         application_name: app_name,
-        deployment_group_name: app_name)
+        deployment_group_name: group_name)
       s.success
     end
   end
@@ -223,7 +234,7 @@ class Moonshot::DeploymentMechanism::CodeDeploy # rubocop:disable ClassLength
   def create_deployment_group
     cd_client.create_deployment_group(
       application_name: app_name,
-      deployment_group_name: app_name,
+      deployment_group_name: group_name,
       service_role_arn: role.arn,
       auto_scaling_groups: asg_names)
   end
