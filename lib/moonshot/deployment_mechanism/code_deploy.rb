@@ -99,7 +99,7 @@ class Moonshot::DeploymentMechanism::CodeDeploy # rubocop:disable ClassLength
     @app_name || stack.name
   end
 
-  # By default, use the stack name as the geployment group name, unless one has
+  # By default, use the stack name as the deployment group name, unless one has
   # been provided.
   def group_name
     @group_name || stack.name
