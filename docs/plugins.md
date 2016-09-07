@@ -4,7 +4,7 @@
 to plugins may change dramatically in future versions.**
 
 Moonshot supports adding plugins (implemented as a Ruby class) to the controller
-that can perform actions before and after the `create`, `update`, `delete`,
+that can perform actions before and after the `create`, `update`, `delete`, `deploy-code`,
 `status` and `doctor` actions.
 
 ## Writing a Moonshot Plugin
@@ -18,6 +18,8 @@ methods:
 - post_update
 - pre_delete
 - post_delete
+- pre_deploy
+- post_deploy
 - pre_status
 - post_status
 - pre_doctor
