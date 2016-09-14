@@ -6,7 +6,7 @@ module Moonshot
       @stack = stack
     end
 
-    def choose! # rubocop:disable AbcSize
+    def choose!
       groups = @stack.resources_of_type('AWS::AutoScaling::AutoScalingGroup')
 
       asg = if groups.count == 1

@@ -47,7 +47,7 @@ class Moonshot::BuildMechanism::Script
 
   private
 
-  def run_script(step, env: {}) # rubocop:disable AbcSize
+  def run_script(step, env: {})
     popen2e(env, @script) do |_, out, wait|
       output = []
 

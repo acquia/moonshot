@@ -39,7 +39,10 @@ end
   'build_mechanism/github_release',
   'build_mechanism/travis_deploy',
   'build_mechanism/version_proxy',
-  'deployment_mechanism/code_deploy'
+  'deployment_mechanism/code_deploy',
+
+  # Core Tools
+  'tools/asg_rollout'
 ].each { |f| require_relative "moonshot/#{f}" }
 
 # Bundled plugins

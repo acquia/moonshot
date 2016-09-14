@@ -15,7 +15,7 @@ module Moonshot
       cmd << "-i #{@config.ssh_identity_file}" if @config.ssh_identity_file
       cmd << "-l #{@config.ssh_user}" if @config.ssh_user
       cmd << instance_ip
-      cmd << command if command
+      cmd << Shellwords.escape(command) if command
       Result.new(cmd.join(' '), instance_ip)
     end
 

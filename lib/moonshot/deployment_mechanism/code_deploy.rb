@@ -278,7 +278,7 @@ class Moonshot::DeploymentMechanism::CodeDeploy # rubocop:disable ClassLength
     end
   end
 
-  def handle_deployment_failure(deployment_id) # rubocop:disable AbcSize
+  def handle_deployment_failure(deployment_id)
     instances = cd_client.list_deployment_instances(deployment_id: deployment_id)
                          .instances_list.map do |instance_id|
       cd_client.get_deployment_instance(deployment_id: deployment_id,

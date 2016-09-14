@@ -14,7 +14,7 @@ Gem::Specification.new do |s|
   s.add_dependency('aws-sdk', '~> 2.0', '>= 2.2.0')
   s.add_dependency('colorize')
   s.add_dependency('highline', '~> 1.7.2')
-  s.add_dependency('interactive-logger', '~> 0.1.1')
+  s.add_dependency('interactive-logger', '~> 0.1.2')
   s.add_dependency('rotp', '~> 2.1.1')
   s.add_dependency('ruby-duration', '~> 3.2.3')
   # Pin back activesupport (ruby-duration dependency) until we only support

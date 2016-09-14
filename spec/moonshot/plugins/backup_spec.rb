@@ -1,15 +1,3 @@
-class MockInteractiveLogger
-  def start(_)
-    yield self
-  end
-
-  def success(_)
-  end
-
-  def failure(_)
-  end
-end
-
 describe Moonshot::Plugins::Backup do
   let(:hooks) do
     [

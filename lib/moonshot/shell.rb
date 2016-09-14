@@ -2,7 +2,7 @@
 module Moonshot::Shell
   # Run a command, returning stdout. Stderr is suppressed unless the command
   # returns non-zero.
-  def sh_out(cmd, fail: true, stdin: '') # rubocop:disable AbcSize
+  def sh_out(cmd, fail: true, stdin: '')
     r_in, w_in = IO.pipe
     r_out, w_out = IO.pipe
     r_err, w_err = IO.pipe

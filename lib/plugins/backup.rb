@@ -5,7 +5,7 @@ require_relative '../moonshot/creds_helper'
 module Moonshot
   module Plugins
     # Moonshot plugin class for deflating and uploading files on given hooks
-    class Backup # rubocop:disable Metrics/ClassLength
+    class Backup
       include Moonshot::CredsHelper
 
       attr_accessor :bucket,
@@ -42,7 +42,7 @@ module Moonshot
       # to an S3 bucket.
       #
       # @param resources [Resources] injected Moonshot resources
-      def backup(resources) # rubocop:disable Metrics/AbcSize
+      def backup(resources)
         raise ArgumentError if resources.nil?
 
         @app_name = resources.stack.app_name

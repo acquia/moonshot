@@ -5,7 +5,7 @@ require 'ruby-duration'
 module Moonshot
   # Display information about the AutoScaling Groups, associated ELBs, and
   # managed instances to the user.
-  class StackASGPrinter # rubocop:disable ClassLength
+  class StackASGPrinter
     include CredsHelper
 
     def initialize(stack, table)
@@ -79,7 +79,7 @@ module Moonshot
       data
     end
 
-    def add_asg_info(table, asg_info) # rubocop:disable AbcSize
+    def add_asg_info(table, asg_info)
       name = asg_info.auto_scaling_group_name.blue
       table.add_line "Name: #{name}"
 
