@@ -1,3 +1,4 @@
+# coding: utf-8
 module Moonshot # rubocop:disable Metrics/ModuleLength
   describe BuildMechanism::TravisDeploy do
     let(:resources) do
@@ -125,10 +126,11 @@ module Moonshot # rubocop:disable Metrics/ModuleLength
 
       it 'should fail if the job does not complete within the time limit' do
         expect(resources.ilog).to receive(:start_threaded).and_yield(step)
-        expect(step).to receive(:continue)
+        expect(step).to receive(:continue).at_least(9)
         expect(step).to receive(:failure)
+        expect(subject).to receive(:sleep).at_least(:once) { sleep 0.1 }
 
-        subject.instance_variable_set(:@timeout, 5)
+        subject.instance_variable_set(:@timeout, 1)
         subject.send(:wait_for_job, job_number)
       end
     end

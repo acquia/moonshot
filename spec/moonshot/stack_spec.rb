@@ -9,10 +9,6 @@ describe Moonshot::Stack do
   subject do
     described_class.new('test', app_name: 'rspec-app', log: log, ilog: ilog) do |c|
       c.parent_stacks = parent_stacks
-      c.ssh_instance = 'i-04683a82f2dddcc04'
-      c.ssh_identity_file = '~/.ssh/whatever'
-      c.ssh_user = 'username'
-      c.ssh_command = 'uname -a'
     end
   end
 
@@ -141,17 +137,6 @@ describe Moonshot::Stack do
     it 'should return the parameters file path' do
       path = File.join(Dir.pwd, 'cloud_formation', 'parameters', 'test.yml')
       expect(subject.parameters_file).to eq(path)
-    end
-  end
-
-  describe '#ssh' do
-    it 'should execute an ssh command with proper parameters' do
-      allow(subject).to receive(:instance_ip).and_return('123.123.123.123')
-      expect(STDOUT).to receive(:puts).with('Opening SSH connection to i-04683a82f2dddcc04 '\
-                                            '(123.123.123.123)...')
-      expect(subject).to receive('exec').with('ssh -t -i ~/.ssh/whatever -l username '\
-                                              '123.123.123.123 uname -a')
-      subject.ssh
     end
   end
 end

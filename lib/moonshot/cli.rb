@@ -110,8 +110,8 @@ module Moonshot
           config.parameter_strategy = parameter_strategy_factory(parameter_strategy) \
             unless parameter_strategy.nil?
 
-          config.ssh_user = options[:user]
-          config.ssh_identity_file = options[:identity_file]
+          config.ssh_config.ssh_user = options[:user]
+          config.ssh_config.ssh_identity_file = options[:identity_file]
           config.ssh_instance = options[:instance]
           config.ssh_command = options[:command]
           config.ssh_auto_scaling_group_name = options[:auto_scaling_group]

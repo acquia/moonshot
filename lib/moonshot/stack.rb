@@ -93,18 +93,6 @@ module Moonshot
       end
     end
 
-    def ssh
-      box_id = @config.ssh_instance || instances.sort.first
-      box_ip = instance_ip(box_id)
-      cmd = ['ssh', '-t']
-      cmd << "-i #{@config.ssh_identity_file}" if @config.ssh_identity_file
-      cmd << "-l #{@config.ssh_user}" if @config.ssh_user
-      cmd << box_ip
-      cmd << @config.ssh_command if @config.ssh_command
-      puts "Opening SSH connection to #{box_id} (#{box_ip})..."
-      exec(cmd.join(' '))
-    end
-
     def parameters
       get_stack(@name)
         .parameters
@@ -187,37 +175,6 @@ module Moonshot
     end
 
     private
-
-    def asgs
-      resources_of_type('AWS::AutoScaling::AutoScalingGroup')
-    end
-
-    def instance_ip(instance_id)
-      Aws::EC2::Client.new.describe_instances(instance_ids: [instance_id])
-                      .reservations.first.instances.first.public_ip_address
-    rescue
-      raise "Failed to determine public IP address for instance #{instance_id}."
-    end
-
-    def instances # rubocop:disable Metrics/AbcSize
-      groups = asgs
-      asg = if groups.count == 1
-              groups.first
-            elsif asgs.count > 1
-              unless @config.ssh_auto_scaling_group_name
-                raise 'Multiple Auto Scaling Groups found in the stack. Please specify which '\
-                      'one to SSH into using the --auto-scaling-group (-g) option.'
-              end
-              groups.detect { |x| x.logical_resource_id == @config.ssh_auto_scaling_group_name }
-            end
-      raise 'Failed to find the Auto Scaling Group.' unless asg
-
-      Aws::AutoScaling::Client.new.describe_auto_scaling_groups(
-        auto_scaling_group_names: [asg.physical_resource_id]
-      ).auto_scaling_groups.first.instances.map(&:instance_id)
-    rescue
-      raise 'Failed to find instances in the Auto Scaling Group.'
-    end
 
     def stack_name
       "CloudFormation Stack #{@name.blue}"
