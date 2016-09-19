@@ -25,6 +25,8 @@ Gem::Specification.new do |s|
   s.add_dependency('travis')
   s.add_dependency('vandamme')
 
+  s.add_development_dependency('aruba', '~> 0.13')
+  s.add_development_dependency('cucumber')
   s.add_development_dependency('rspec')
   s.add_development_dependency('simplecov')
   s.add_development_dependency('fakefs')

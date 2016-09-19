@@ -1,0 +1,14 @@
+{
+    "AWSTemplateFormatVersion" : "2010-09-09",
+    "Parameters" : {
+        "ArtifactBucket" : {
+            "Type" : "String",
+            "Description" : "The S3 bucket that contains the build artifacts that CodeDeploy will deploy."
+        }
+    },
+    "Resources" : {
+        "AutoScalingGroup" : {
+              "Type" : "AWS::AutoScaling::AutoScalingGroup"
+        }
+    }
+}

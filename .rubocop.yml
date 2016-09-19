@@ -2,7 +2,7 @@
 AllCops:
   TargetRubyVersion: 2.2
   Exclude:
-    - '*.gemspec'
+    - '**/*.gemspec'
     - 'vendor/**/*'
     - 'sample/bin/aws-codedeploy-samples/**/*'
 Metrics/AbcSize:
