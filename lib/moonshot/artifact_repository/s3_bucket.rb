@@ -48,6 +48,7 @@ class Moonshot::ArtifactRepository::S3Bucket
     )
   end
 
+  add_doctor_check :doctor_check_bucket_exists
   def doctor_check_bucket_exists
     s3_client.get_bucket_location(bucket: @bucket_name)
     success "Bucket '#{@bucket_name}' exists."
@@ -59,6 +60,7 @@ class Moonshot::ArtifactRepository::S3Bucket
     warning(str, e.message)
   end
 
+  add_doctor_check :doctor_check_bucket_writable
   def doctor_check_bucket_writable
     s3_client.put_object(
       key: 'test-object',

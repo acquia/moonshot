@@ -70,13 +70,13 @@ module Moonshot
       run_plugins(:post_delete)
     end
 
-    def doctor
+    def doctor(options)
       # @todo use #run_hook when Stack becomes an InfrastructureProvider
       success = true
-      success &&= stack.doctor_hook
-      success &&= run_hook(:build, :doctor)
-      success &&= run_hook(:repo, :doctor)
-      success &&= run_hook(:deploy, :doctor)
+      success &&= stack.doctor_hook(options)
+      success &&= run_hook(:build, :doctor, options)
+      success &&= run_hook(:repo, :doctor, options)
+      success &&= run_hook(:deploy, :doctor, options)
       results = run_plugins(:doctor)
 
       success = false if results.value?(false)

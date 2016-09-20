@@ -333,6 +333,7 @@ module Moonshot
       str
     end
 
+    add_doctor_check :doctor_check_template_exists, is_config: true
     def doctor_check_template_exists
       if File.exist?(template_file)
         success "CloudFormation template found at '#{template_file}'."
@@ -341,6 +342,7 @@ module Moonshot
       end
     end
 
+    add_doctor_check :doctor_check_template_exists, is_config: true
     def doctor_check_template_against_aws
       cf_client.validate_template(template_body: template.body)
       success('CloudFormation template is valid.')

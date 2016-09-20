@@ -8,19 +8,44 @@ module Moonshot
   # A series of methods for adding "doctor" checks to a mechanism.
   #
   module DoctorHelper
-    def doctor_hook
-      run_all_checks
+    def self.included(klass)
+      class << klass
+        attr_accessor :doctor_checks
+      end
+      klass.doctor_checks = {}
+      klass.extend ClassMethods
+    end
+
+    def doctor_hook(options = {})
+      checks = self.class.doctor_checks
+      checks.delete_if { |_k, v| v[:is_local] == false } if options[:local]
+      checks.delete_if { |_k, v| v[:is_config] == false } if options[:config]
+      run_checks(checks)
+    end
+
+    # Contains class methods
+    module ClassMethods
+      def add_doctor_check(method, flags = {})
+        default_flags = {
+          is_local: false,
+          is_config: false
+        }
+        doctor_checks[method] = default_flags.merge(flags)
+      end
     end
 
     private
 
-    def run_all_checks
+    def run_checks(checks)
+      return true if checks.empty?
       success = true
+
       puts
       puts self.class.name.split('::').last
-      private_methods.each do |meth|
+
+      checks.each do |meth, _|
         begin
-          send(meth) if meth =~ /^doctor_check_/
+          send(meth)
         rescue DoctorCritical
           # Stop running checks in this Mechanism.
           success = false

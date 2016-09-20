@@ -14,9 +14,9 @@ class Moonshot::BuildMechanism::VersionProxy
     @dev = dev
   end
 
-  def doctor_hook
-    @release.doctor_hook
-    @dev.doctor_hook
+  def doctor_hook(options = {})
+    @release.doctor_hook(options)
+    @dev.doctor_hook(options)
   end
 
   def resources=(r)

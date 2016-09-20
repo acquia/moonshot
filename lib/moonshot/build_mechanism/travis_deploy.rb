@@ -132,12 +132,22 @@ module Moonshot::BuildMechanism
       end
     end
 
+    add_doctor_check :doctor_check_travis_installed, is_local: true
+    def doctor_check_travis_installed
+      sh_out('bundle exec travis version')
+    rescue => e
+      critical "`travis` not installed.\n#{e.message}"
+    else
+      success '`travis` installed.'
+    end
+
+    add_doctor_check :doctor_check_travis_auth
     def doctor_check_travis_auth
       sh_out("bundle exec travis raw #{@endpoint} repos/#{@slug}")
     rescue => e
-      critical "`travis` not available or not authorized.\n#{e.message}"
+      critical "`travis` not installed or not authorized.\n#{e.message}"
     else
-      success '`travis` installed and authorized.'
+      success '`travis` authorized.'
     end
   end
 end

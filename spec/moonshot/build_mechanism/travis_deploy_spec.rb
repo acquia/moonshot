@@ -20,11 +20,30 @@ module Moonshot # rubocop:disable Metrics/ModuleLength
       it 'should call our hooks' do
         allow(subject).to receive(:puts)
         expect(subject).to receive(:puts).with('we did it')
-        expect(subject).to receive(:print).with('  ✓ '.green)
+        expect(subject).to receive(:print).with('  ✓ '.green).twice
         expect(subject).to receive(:doctor_check_travis_auth) do
           subject.send(:success, 'we did it')
         end
         subject.doctor_hook
+      end
+
+      describe '#doctor_check_travis_installed' do
+        it 'should pass if travis exits 0' do
+          expect(subject).to receive(:sh_out)
+            .with('bundle exec travis version')
+          expect(subject).to receive(:success)
+            .with('`travis` installed.')
+          subject.send(:doctor_check_travis_installed)
+        end
+
+        it 'should pass fail travis exits 1' do
+          expect(subject).to receive(:sh_out)
+            .with('bundle exec travis version')
+            .and_raise(RuntimeError, 'stuffs broke man')
+          expect(subject).to receive(:critical)
+            .with("`travis` not installed.\nstuffs broke man")
+          subject.send(:doctor_check_travis_installed)
+        end
       end
 
       describe '#doctor_check_travis_auth' do
@@ -32,7 +51,7 @@ module Moonshot # rubocop:disable Metrics/ModuleLength
           expect(subject).to receive(:sh_out)
             .with('bundle exec travis raw --org repos/myorg/myrepo')
           expect(subject).to receive(:success)
-            .with('`travis` installed and authorized.')
+            .with('`travis` authorized.')
           subject.send(:doctor_check_travis_auth)
         end
 
@@ -41,7 +60,7 @@ module Moonshot # rubocop:disable Metrics/ModuleLength
             .with('bundle exec travis raw --org repos/myorg/myrepo')
             .and_raise(RuntimeError, 'stuffs broke man')
           expect(subject).to receive(:critical)
-            .with("`travis` not available or not authorized.\nstuffs broke man")
+            .with("`travis` not installed or not authorized.\nstuffs broke man")
           subject.send(:doctor_check_travis_auth)
         end
       end

@@ -21,9 +21,9 @@ module Moonshot::BuildMechanism
       @build_mechanism = build_mechanism
     end
 
-    def doctor_hook
+    def doctor_hook(options = {})
       super
-      @build_mechanism.doctor_hook
+      @build_mechanism.doctor_hook(options)
     end
 
     def resources=(r)
@@ -174,6 +174,7 @@ module Moonshot::BuildMechanism
       `hub browse -u -- releases`.chomp
     end
 
+    add_doctor_check :doctor_check_upstream
     def doctor_check_upstream
       sh_out('git remote | grep ^upstream$')
     rescue => e
@@ -182,12 +183,22 @@ module Moonshot::BuildMechanism
       success 'git remote `upstream` exists.'
     end
 
+    add_doctor_check :doctor_check_hub_installed, is_local: true
+    def doctor_check_hub_installed
+      sh_out('hub version')
+    rescue => e
+      critical "`hub` is not installed.\n#{e.message}"
+    else
+      success '`hub` installed.'
+    end
+
+    add_doctor_check :doctor_check_hub_auth
     def doctor_check_hub_auth
       sh_out('hub ci-status 0.0.0')
     rescue => e
-      critical "`hub` failed, install hub and authorize it.\n#{e.message}"
+      critical "`hub` not installed or not authorized.\n#{e.message}"
     else
-      success '`hub` installed and authorized.'
+      success '`hub` authorized.'
     end
   end
 end

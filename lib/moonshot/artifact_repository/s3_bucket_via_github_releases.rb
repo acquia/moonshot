@@ -10,6 +10,7 @@ module Moonshot::ArtifactRepository
   class S3BucketViaGithubReleases < S3Bucket
     include Moonshot::BuildMechanism
     include Moonshot::Shell
+    include Moonshot::DoctorHelper
 
     # @override
     # If release version, transfer from GitHub to S3.
@@ -77,6 +78,7 @@ module Moonshot::ArtifactRepository
       end
     end
 
+    add_doctor_check :doctor_check_hub_release_download
     def doctor_check_hub_release_download
       sh_out('hub release download --help')
     rescue

@@ -26,51 +26,71 @@ module Moonshot # rubocop:disable ModuleLength
         allow(subject).to receive(:puts)
         allow(subject).to receive(:print)
         expect(subject).to receive(:doctor_check_hub_auth)
+        expect(subject).to receive(:doctor_check_hub_installed)
         expect(subject).to receive(:doctor_check_upstream)
         subject.doctor_hook
       end
+    end
 
-      describe '#doctor_check_upstream' do
-        around do |example|
-          Dir.mktmpdir do |path|
-            Dir.chdir(path) do
-              `git init`
-              example.run
-            end
+    describe '#doctor_check_upstream' do
+      around do |example|
+        Dir.mktmpdir do |path|
+          Dir.chdir(path) do
+            `git init`
+            example.run
           end
-        end
-
-        it 'should fail without upstream.' do
-          expect(subject).to receive(:critical)
-            .with(/git remote `upstream` not found/)
-          subject.send(:doctor_check_upstream)
-        end
-
-        it 'should succeed with upstream remote.' do
-          `git remote add upstream https://example.com/my/repo.git`
-          expect(subject).to receive(:success)
-            .with('git remote `upstream` exists.')
-          subject.send(:doctor_check_upstream)
         end
       end
 
-      describe '#doctor_check_hub_auth' do
-        it 'should succeed with 0 exit status.' do
-          expect(subject).to receive(:sh_out)
-            .with('hub ci-status 0.0.0')
-          expect(subject).to receive(:success)
-            .with('`hub` installed and authorized.')
-          subject.send(:doctor_check_hub_auth)
-        end
+      it 'should fail without upstream.' do
+        expect(subject).to receive(:critical)
+          .with(/git remote `upstream` not found/)
+        subject.send(:doctor_check_upstream)
+      end
 
-        it 'should critical with non-zero exit status.' do
-          expect(subject).to receive(:sh_out)
-            .with('hub ci-status 0.0.0')
-            .and_raise(RuntimeError, 'oops')
-          expect(subject).to receive(:critical)
-            .with("`hub` failed, install hub and authorize it.\noops")
-          subject.send(:doctor_check_hub_auth)
-        end
+      it 'should succeed with upstream remote.' do
+        `git remote add upstream https://example.com/my/repo.git`
+        expect(subject).to receive(:success)
+          .with('git remote `upstream` exists.')
+        subject.send(:doctor_check_upstream)
+      end
+    end
+
+    describe '#doctor_check_hub_installed' do
+      it 'should succeed with 0 exit status.' do
+        expect(subject).to receive(:sh_out)
+          .with('hub version')
+        expect(subject).to receive(:success)
+          .with('`hub` installed.')
+        subject.send(:doctor_check_hub_installed)
+      end
+
+      it 'should critical with non-zero exit status.' do
+        expect(subject).to receive(:sh_out)
+          .with('hub version')
+          .and_raise(RuntimeError, 'oops')
+        expect(subject).to receive(:critical)
+          .with("`hub` is not installed.\noops")
+        subject.send(:doctor_check_hub_installed)
+      end
+    end
+
+    describe '#doctor_check_hub_auth' do
+      it 'should succeed with 0 exit status.' do
+        expect(subject).to receive(:sh_out)
+          .with('hub ci-status 0.0.0')
+        expect(subject).to receive(:success)
+          .with('`hub` authorized.')
+        subject.send(:doctor_check_hub_auth)
+      end
+
+      it 'should critical with non-zero exit status.' do
+        expect(subject).to receive(:sh_out)
+          .with('hub ci-status 0.0.0')
+          .and_raise(RuntimeError, 'oops')
+        expect(subject).to receive(:critical)
+          .with("`hub` not installed or not authorized.\noops")
+        subject.send(:doctor_check_hub_auth)
       end
     end
 

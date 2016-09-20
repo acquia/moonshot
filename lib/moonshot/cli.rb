@@ -206,8 +206,10 @@ module Moonshot
     end
 
     desc :doctor, 'Run configuration checks against current environment.'
+    option :local, aliases: 'l', type: :boolean, default: false
+    option :config, aliases: 'c', type: :boolean, default: false
     def doctor
-      success = controller.doctor
+      success = controller.doctor(options)
       raise Thor::Error, 'One or more checks failed.' unless success
     end
 

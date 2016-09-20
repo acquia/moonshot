@@ -323,6 +323,7 @@ class Moonshot::DeploymentMechanism::CodeDeploy # rubocop:disable ClassLength
     }
   end
 
+  add_doctor_check :doctor_check_code_deploy_role
   def doctor_check_code_deploy_role
     iam_client.get_role(role_name: @codedeploy_role).role
     success("#{@codedeploy_role} exists.")
@@ -336,6 +337,7 @@ http://docs.aws.amazon.com/codedeploy/latest/userguide/how-to-create-service-rol
     critical("Could not find #{@codedeploy_role}, ", help)
   end
 
+  add_doctor_check :doctor_check_auto_scaling_resource_defined, is_config: true
   def doctor_check_auto_scaling_resource_defined
     @asg_logical_ids.each do |asg_logical_id|
       if stack.template.resource_names.include?(asg_logical_id)
