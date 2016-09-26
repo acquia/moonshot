@@ -1,7 +1,8 @@
 require_relative 'creds_helper'
 require_relative 'doctor_helper'
 
-require_relative 'stack_template'
+require_relative 'yaml_stack_template'
+require_relative 'json_stack_template'
 require_relative 'stack_parameter_printer'
 require_relative 'stack_output_printer'
 require_relative 'stack_asg_printer'
@@ -154,12 +155,20 @@ module Moonshot
     end
 
     def template
-      @template ||= StackTemplate.new(template_file, log: @log)
+      @template ||= load_template_file
     end
 
     # @return [String] the path to the template file.
     def template_file
-      File.join(Dir.pwd, 'cloud_formation', "#{@app_name}.json")
+      json = json_template_path
+      yaml = yaml_template_path
+
+      @template_file ||= Dir[json].first || Dir[yaml].first
+
+      raise 'CloudFormation template not found at'\
+            "#{json} or #{yaml}!" unless @template_file
+
+      @template_file
     end
 
     # @return [String] the path to the parameters file.
@@ -192,6 +201,33 @@ module Moonshot
       @ilog.msg 'Setting stack parameter overrides:'
       result.each do |e|
         @ilog.msg "   #{e[:parameter_key]}: #{e[:parameter_value]}"
+      end
+    end
+
+    def json_template_path
+      "#{raw_template_file_name}.json"
+    end
+
+    def yaml_template_path
+      "#{raw_template_file_name}.yml"
+    end
+
+    # @return [String] the path to the template file without extension.
+    def raw_template_file_name
+      @raw_template_file_name ||= File.join(Dir.pwd, 'cloud_formation', @app_name)
+    end
+
+    def load_template_file
+      json_template = JsonStackTemplate.new(json_template_path, log: @log)
+      yaml_template = YamlStackTemplate.new(yaml_template_path, log: @log)
+      case
+      when json_template.exist?
+        json_template
+      when yaml_template.exist?
+        yaml_template
+      else
+        raise "CloudFormation template not found at #{json_template_path} "\
+              "or #{yaml_template_path}!" unless @template_file
       end
     end
 

@@ -1,0 +1,6 @@
+---
+- Resources:
+- Parameters:
+  - Parent1:
+    - Type: String
+    - Description: This is imported from the parent stack on create.
