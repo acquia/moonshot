@@ -148,8 +148,8 @@ module Moonshot
     # Return a Hash of the default values defined in the stack template.
     def default_values
       h = {}
-      JSON.parse(template.body).fetch('Parameters', {}).map do |k, v|
-        h[k] = v['Default']
+      template.parameters.each do |p|
+        h[p.name] = h.default
       end
       h
     end
@@ -238,7 +238,7 @@ module Moonshot
     end
 
     def stack_parameters
-      @stack_parameters ||= JSON.parse(template.body).fetch('Parameters', {}).keys
+      template.parameters.map(&:name)
     end
 
     def import_parent_parameters
