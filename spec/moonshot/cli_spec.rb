@@ -16,7 +16,6 @@ end
 describe AppWithAutoPrefix do
   let(:stack) { instance_double(Moonshot::Stack) }
   before(:each) do
-    expect(Moonshot::EnvironmentParser).to receive(:parse)
     expect(stack).to receive(:status)
     stub_const('ENV', 'USER' => 'rspec')
   end
@@ -37,7 +36,6 @@ end
 describe AppWithoutAutoPrefix do
   let(:stack) { instance_double(Moonshot::Stack) }
   before(:each) do
-    expect(Moonshot::EnvironmentParser).to receive(:parse)
     expect(stack).to receive(:status)
     stub_const('ENV', 'USER' => 'rspec')
   end
@@ -56,7 +54,6 @@ end
 
 describe AppToTest do
   before(:each) do
-    expect(Moonshot::EnvironmentParser).to receive(:parse)
     stub_const('ENV', 'USER' => 'rspec')
   end
 

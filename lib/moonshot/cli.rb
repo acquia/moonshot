@@ -75,7 +75,6 @@ module Moonshot
       end
       @log.level = options[:verbose] ? Logger::DEBUG : Logger::INFO
 
-      EnvironmentParser.parse(@log)
       self.class.check_class_configuration
     end
 

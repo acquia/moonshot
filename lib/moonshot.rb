@@ -20,7 +20,6 @@ end
   'doctor_helper',
   'resources',
   'resources_helper',
-  'environment_parser',
 
   # Core
   'interactive_logger_proxy',

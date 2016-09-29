@@ -17,10 +17,6 @@ describe 'the Moonshot::CLI interface to plugins' do
     end
   end
 
-  before(:each) do
-    expect(Moonshot::EnvironmentParser).to receive(:parse)
-  end
-
   it 'sets the plugins provided to Moonshot::Controller' do
     config = Moonshot::ControllerConfig.new
     expect(Moonshot::Controller).to receive(:new).and_yield(config).and_return(controller)
