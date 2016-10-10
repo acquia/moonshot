@@ -66,6 +66,9 @@ class Moonshot::DeploymentMechanism::CodeDeploy # rubocop:disable ClassLength
   end
 
   def deploy_hook(artifact_repo, version_name)
+    success = true
+    deployment_id = nil
+
     ilog.start_threaded 'Creating Deployment' do |s|
       res = cd_client.create_deployment(
         application_name: app_name,
@@ -76,8 +79,10 @@ class Moonshot::DeploymentMechanism::CodeDeploy # rubocop:disable ClassLength
       )
       deployment_id = res.deployment_id
       s.continue "Created Deployment #{deployment_id.blue}."
-      wait_for_deployment(deployment_id, s)
+      success = wait_for_deployment(deployment_id, s)
     end
+
+    handle_deployment_failure(deployment_id) unless success
   end
 
   def post_delete_hook
@@ -260,6 +265,8 @@ class Moonshot::DeploymentMechanism::CodeDeploy # rubocop:disable ClassLength
   end
 
   def wait_for_deployment(id, step)
+    success = true
+
     loop do
       sleep 5
       info = cd_client.get_deployment(deployment_id: id).deployment_info
@@ -273,9 +280,12 @@ class Moonshot::DeploymentMechanism::CodeDeploy # rubocop:disable ClassLength
         break
       when 'Failed', 'Stopped'
         step.failure "Deployment #{id.blue} failed with status '#{status}'"
-        handle_deployment_failure(id)
+        success = false
+        break
       end
     end
+
+    success
   end
 
   def handle_deployment_failure(deployment_id)
