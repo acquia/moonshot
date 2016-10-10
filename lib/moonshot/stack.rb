@@ -171,7 +171,7 @@ module Moonshot
 
     # @return [String] the path to the parameters file.
     def parameters_file
-      File.join(Dir.pwd, 'cloud_formation', 'parameters', "#{@name}.yml")
+      File.join(@config.project_root, 'cloud_formation', 'parameters', "#{@name}.yml")
     end
 
     def add_parameter_overrides(hash)
@@ -212,7 +212,8 @@ module Moonshot
 
     # @return [String] the path to the template file without extension.
     def raw_template_file_name
-      @raw_template_file_name ||= File.join(Dir.pwd, 'cloud_formation', @config.app_name)
+      @raw_template_file_name ||=
+        File.join(@config.project_root, 'cloud_formation', @config.app_name)
     end
 
     def load_template_file

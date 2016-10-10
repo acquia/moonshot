@@ -28,6 +28,8 @@ module Moonshot
       Object.include(Moonshot::DeploymentMechanism)
       load(File.join(moonfile_dir, 'Moonfile.rb'))
 
+      Moonshot.config.project_root = moonfile_dir
+
       load_commands
 
       # Determine what command is being run, which should be the first argument.

@@ -20,14 +20,16 @@ module Moonshot
     attr_accessor :ssh_command
     attr_accessor :ssh_auto_scaling_group_name
     attr_accessor :ssh_instance
+    attr_accessor :project_root
 
     def initialize
-      @interactive_logger = InteractiveLogger.new
-      @parent_stacks = []
-      @plugins = []
+      @interactive_logger    = InteractiveLogger.new
+      @parameter_strategy    = Moonshot::ParameterStrategy::DefaultStrategy.new
+      @parent_stacks         = []
+      @plugins               = []
+      @project_root          = Dir.pwd
       @show_all_stack_events = false
-      @parameter_strategy = Moonshot::ParameterStrategy::DefaultStrategy.new
-      @ssh_config = SSHConfig.new
+      @ssh_config            = SSHConfig.new
 
       user = ENV.fetch('USER', 'default-user').gsub(/\W/, '')
       @environment_name = "dev-#{user}"
