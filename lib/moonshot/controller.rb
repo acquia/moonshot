@@ -3,7 +3,7 @@ require_relative 'ssh_command_builder'
 
 module Moonshot
   # The Controller coordinates and performs all Moonshot actions.
-  class Controller # rubocop:disable ClassLength
+  class Controller
     attr_accessor :config
 
     def initialize
@@ -94,38 +94,10 @@ module Moonshot
     end
 
     def stack
-      @stack ||= Stack.new(stack_name,
-                           app_name: @config.app_name,
-                           ilog: @config.interactive_logger) do |config|
-        config.parent_stacks = @config.parent_stacks
-        config.show_all_events = @config.show_all_stack_events
-        config.parameter_strategy = @config.parameter_strategy
-      end
+      @stack ||= Stack.new(@config)
     end
 
     private
-
-    def default_stack_name
-      user = ENV.fetch('USER').gsub(/\W/, '')
-      "#{@config.app_name}-dev-#{user}"
-    end
-
-    def ensure_prefix(name)
-      if name.start_with?(@config.app_name + '-')
-        name
-      else
-        @config.app_name + "-#{name}"
-      end
-    end
-
-    def stack_name
-      name = @config.environment_name || default_stack_name
-      if @config.auto_prefix_stack == false
-        name
-      else
-        ensure_prefix(name)
-      end
-    end
 
     def resources
       @resources ||=

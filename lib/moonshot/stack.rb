@@ -21,12 +21,11 @@ module Moonshot
     attr_reader :app_name
     attr_reader :name
 
-    # TODO: Refactor more of these parameters into the config object.
-    def initialize(name, app_name:, ilog:, config: StackConfig.new)
-      @name = name
-      @app_name = app_name
-      @ilog = ilog
+    def initialize(config)
       @config = config
+      @ilog = config.interactive_logger
+      @name = [@config.app_name, @config.environment_name].join('-')
+
       yield @config if block_given?
     end
 
@@ -213,7 +212,7 @@ module Moonshot
 
     # @return [String] the path to the template file without extension.
     def raw_template_file_name
-      @raw_template_file_name ||= File.join(Dir.pwd, 'cloud_formation', @app_name)
+      @raw_template_file_name ||= File.join(Dir.pwd, 'cloud_formation', @config.app_name)
     end
 
     def load_template_file
@@ -280,9 +279,7 @@ module Moonshot
         template_body: template.body,
         capabilities: ['CAPABILITY_IAM'],
         parameters: load_parameters_file,
-        tags: [
-          { key: 'ah_stage', value: @name }
-        ]
+        tags: make_tags
       )
     rescue Aws::CloudFormation::Errors::AccessDenied
       raise 'You are not authorized to perform create_stack calls.'
@@ -299,7 +296,8 @@ module Moonshot
           overrides,
           parameters,
           template
-        )
+        ),
+        tags: make_tags
       )
       true
     rescue Aws::CloudFormation::Errors::ValidationError => e
@@ -315,7 +313,7 @@ module Moonshot
       stack_id = get_stack(@name).stack_id
 
       events = StackEventsPoller.new(cf_client, stack_id)
-      events.show_only_errors unless @config.show_all_events
+      events.show_only_errors unless @config.show_all_stack_events
 
       @ilog.start_threaded "Waiting for #{stack_name} to be successfully #{past_tense_verb}." do |s|
         begin
@@ -351,6 +349,19 @@ module Moonshot
       end
 
       result
+    end
+
+    def make_tags
+      default_tags = [
+        { key: 'moonshot_application', value: @config.app_name },
+        { key: 'moonshot_environment', value: @config.environment_name }
+      ]
+
+      if @config.additional_tag
+        default_tags << { key: @config.additional_tag, value: @name }
+      end
+
+      default_tags
     end
 
     def format_event(event)

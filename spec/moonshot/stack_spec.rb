@@ -6,15 +6,17 @@ describe Moonshot::Stack do
   let(:parent_stacks) { [] }
   let(:cf_client) { instance_double(Aws::CloudFormation::Client) }
 
-  subject do
-    described_class.new('test', app_name: 'rspec-app', ilog: ilog) do |c|
-      c.parent_stacks = parent_stacks
-    end
-  end
-
+  let(:config) { Moonshot::ControllerConfig.new }
   before(:each) do
+    config.app_name = 'rspec-app'
+    config.environment_name = 'staging'
+    config.interactive_logger = ilog
+    config.parent_stacks = parent_stacks
+
     allow(Aws::CloudFormation::Client).to receive(:new).and_return(cf_client)
   end
+
+  subject { described_class.new(config) }
 
   describe '#create' do
     let(:step) { instance_double('InteractiveLogger::Step') }
@@ -53,6 +55,46 @@ describe Moonshot::Stack do
       end
     end
 
+    context 'under normal circumstances' do
+      let(:parent_stacks) { [] }
+      let(:expected_create_stack_options) do
+        {
+          stack_name: 'rspec-app-staging',
+          template_body: an_instance_of(String),
+          tags: [
+            { key: 'moonshot_application', value: 'rspec-app' },
+            { key: 'moonshot_environment', value: 'staging' },
+            { key: 'ah_stage', value: 'rspec-app-staging' }
+          ],
+          parameters: [],
+          capabilities: ['CAPABILITY_IAM']
+        }
+      end
+
+      let(:cf_client) do
+        stubs = {
+          describe_stacks: {
+            stacks: [
+              {
+                stack_name: 'rspec-app-staging',
+                creation_time: Time.now,
+                stack_status: 'CREATE_COMPLETE',
+                outputs: []
+              }
+            ]
+          }
+        }
+        Aws::CloudFormation::Client.new(stub_responses: stubs)
+      end
+
+      it 'should call CreateStack, then wait for completion' do
+        config.additional_tag = 'ah_stage'
+        expect(cf_client).to receive(:create_stack)
+          .with(hash_including(expected_create_stack_options))
+        subject.create
+      end
+    end
+
     context 'when a parent stack is specified' do
       let(:parent_stacks) { ['myappdc-dc1'] }
       let(:cf_client) do
@@ -75,10 +117,11 @@ describe Moonshot::Stack do
       end
       let(:expected_create_stack_options) do
         {
-          stack_name: 'test',
+          stack_name: 'rspec-app-staging',
           template_body: an_instance_of(String),
           tags: [
-            { key: 'ah_stage', value: 'test' }
+            { key: 'moonshot_application', value: 'rspec-app' },
+            { key: 'moonshot_environment', value: 'staging' }
           ],
           parameters: [
             { parameter_key: 'Parent1', parameter_value: 'parents value' }
@@ -93,7 +136,7 @@ describe Moonshot::Stack do
             .with(hash_including(expected_create_stack_options))
           subject.create
 
-          expect(File.exist?('/cloud_formation/parameters/test.yml')).to eq(true)
+          expect(File.exist?('/cloud_formation/parameters/rspec-app-staging.yml')).to eq(true)
           yaml_data = subject.overrides
           expected_data = {
             'Parent1' => 'parents value'
@@ -104,7 +147,7 @@ describe Moonshot::Stack do
 
       context 'when the local yml file does not contain the override' do
         it 'should import outputs as paramters for this stack' do
-          File.open('/cloud_formation/parameters/test.yml', 'w') do |fp|
+          File.open('/cloud_formation/parameters/rspec-app-staging.yml', 'w') do |fp|
             data = {
               'Parent1' => 'Existing Value!'
             }
@@ -115,7 +158,7 @@ describe Moonshot::Stack do
             .with(hash_including(expected_create_stack_options))
           subject.create
 
-          expect(File.exist?('/cloud_formation/parameters/test.yml')).to eq(true)
+          expect(File.exist?('/cloud_formation/parameters/rspec-app-staging.yml')).to eq(true)
           yaml_data = subject.overrides
           expected_data = {
             'Parent1' => 'Existing Value!'
@@ -135,7 +178,7 @@ describe Moonshot::Stack do
 
   describe '#parameters_file' do
     it 'should return the parameters file path' do
-      path = File.join(Dir.pwd, 'cloud_formation', 'parameters', 'test.yml')
+      path = File.join(Dir.pwd, 'cloud_formation', 'parameters', 'rspec-app-staging.yml')
       expect(subject.parameters_file).to eq(path)
     end
   end

@@ -5,9 +5,9 @@ require_relative 'task'
 module Moonshot
   # Holds configuration for Moonshot::Controller
   class ControllerConfig
+    attr_accessor :additional_tag
     attr_accessor :app_name
     attr_accessor :artifact_repository
-    attr_accessor :auto_prefix_stack
     attr_accessor :build_mechanism
     attr_accessor :deployment_mechanism
     attr_accessor :environment_name
@@ -22,13 +22,15 @@ module Moonshot
     attr_accessor :ssh_instance
 
     def initialize
-      @auto_prefix_stack = true
       @interactive_logger = InteractiveLogger.new
       @parent_stacks = []
       @plugins = []
       @show_all_stack_events = false
       @parameter_strategy = Moonshot::ParameterStrategy::DefaultStrategy.new
       @ssh_config = SSHConfig.new
+
+      user = ENV.fetch('USER', 'default-user').gsub(/\W/, '')
+      @environment_name = "dev-#{user}"
     end
   end
 end
