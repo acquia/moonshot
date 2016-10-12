@@ -1,0 +1,12 @@
+version: 
+os: 
+files:
+  - source: 
+    destination: 
+hooks:
+  ApplicationStop:
+    - location: 
+  BeforeInstall:
+    - location: 
+  ApplicationStart:
+    - location: 

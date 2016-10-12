@@ -20,7 +20,11 @@ module Moonshot
 
       loop do
         break if File.exist?('Moonfile.rb')
-        raise 'Could not find Moonfile.rb!' if Dir.pwd == '/'
+
+        if Dir.pwd == '/'
+          raise 'No Moonfile.rb found, are you in a project? Maybe you need to '\
+	        			'create one with `moonshot new <app_name>`?'
+        end
 
         Dir.chdir('..')
       end
@@ -122,6 +126,7 @@ module Moonshot
       word
     end
 
+<<<<<<< 0c51452e2a612c9758a410c433bab67fb2fdd456
     def handle_early_commands
       # If this is a legacy (Thor) help command, re-write it as
       # OptionParser format.
@@ -132,6 +137,20 @@ module Moonshot
 
       # Proceed to processing commands normally.
       false
+=======
+    def self.handle_early_commands(args)
+      command = args.first
+      case command
+      when 'new'
+        require_relative 'commands/new'
+        app_name = args[1]
+        ::Moonshot::Commands::New.run!(app_name)
+      when '--help'
+        warn 'Usage: moonshot new <app_name>'
+      else
+        throw(:regular_command)
+      end
+>>>>>>> Introduced 'new' command.
     end
   end
 end
