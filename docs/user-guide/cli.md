@@ -1,6 +1,7 @@
 # Global Options
 
 ## `--[no-]interactive-logger`
+## List
 
 *Default: Enabled*
 
@@ -36,6 +37,15 @@ is used to configure the CloudFormation Stack name. Not all commands
 make use of this option.
 
 # Core Commands
+
+## `moonshot new`
+
+Creates a new Moonshot application with the necessary directory structure and sample files.
+
+Example:
+```shell
+moonshot new my_application
+```
 
 ## `moonshot list`
 
