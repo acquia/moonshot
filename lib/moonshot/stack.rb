@@ -30,8 +30,6 @@ module Moonshot
     end
 
     def create
-      import_parent_parameters
-
       should_wait = true
       @ilog.start "Creating #{stack_name}." do |s|
         if stack_exists?
@@ -174,32 +172,10 @@ module Moonshot
       File.join(@config.project_root, 'cloud_formation', 'parameters', "#{@name}.yml")
     end
 
-    def add_parameter_overrides(hash)
-      new_overrides = hash.merge(overrides)
-      File.open(parameters_file, 'w') do |f|
-        YAML.dump(new_overrides, f)
-      end
-    end
-
     private
 
     def stack_name
       "CloudFormation Stack #{@name.blue}"
-    end
-
-    def load_parameters_file
-      @ilog.msg "Loading stack parameters file '#{parameters_file}'."
-      result = stack_parameter_overrides
-
-      if result.empty?
-        @ilog.msg "No parameters file for #{@name.blue}, using defaults."
-        return result
-      end
-
-      @ilog.msg 'Setting stack parameter overrides:'
-      result.each do |e|
-        @ilog.msg "   #{e[:parameter_key]}: #{e[:parameter_value]}"
-      end
     end
 
     def json_template_path
@@ -230,38 +206,8 @@ module Moonshot
       end
     end
 
-    def stack_parameter_overrides
-      overrides.map do |k, v|
-        { parameter_key: k, parameter_value: v.to_s }
-      end
-    end
-
     def stack_parameters
       template.parameters.map(&:name)
-    end
-
-    def import_parent_parameters
-      add_parameter_overrides(parent_stack_outputs)
-    end
-
-    # Return a Hash of parent stack outputs that match parameter names for this
-    # stack.
-    def parent_stack_outputs
-      result = {}
-
-      @config.parent_stacks.each do |stack_name|
-        resp = cf_client.describe_stacks(stack_name: stack_name)
-        raise "Parent Stack #{stack_name} not found!" unless resp.stacks.size == 1
-
-        # If there is an input parameters matching a stack output, pass it.
-        resp.stacks[0].outputs.each do |output|
-          if stack_parameters.include?(output.output_key)
-            result[output.output_key] = output.output_value
-          end
-        end
-      end
-
-      result
     end
 
     # @return [Aws::CloudFormation::Types::Stack]
@@ -279,7 +225,7 @@ module Moonshot
         stack_name: @name,
         template_body: template.body,
         capabilities: ['CAPABILITY_IAM'],
-        parameters: load_parameters_file,
+        parameters: @config.parameters.values.map(&:to_cf),
         tags: make_tags
       )
     rescue Aws::CloudFormation::Errors::AccessDenied
@@ -293,11 +239,7 @@ module Moonshot
         stack_name: @name,
         template_body: template.body,
         capabilities: ['CAPABILITY_IAM'],
-        parameters: @config.parameter_strategy.parameters(
-          overrides,
-          parameters,
-          template
-        ),
+        parameters: @config.parameters.values.map(&:to_cf),
         tags: make_tags
       )
       true
@@ -308,7 +250,7 @@ module Moonshot
     end
 
     # TODO: Refactor this into it's own class.
-    def wait_for_stack_state(wait_target, past_tense_verb) # rubocop:disable AbcSize
+    def wait_for_stack_state(wait_target, past_tense_verb)
       result = true
 
       stack_id = get_stack(@name).stack_id

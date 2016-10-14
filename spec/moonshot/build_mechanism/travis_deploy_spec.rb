@@ -4,7 +4,8 @@ module Moonshot # rubocop:disable Metrics/ModuleLength
     let(:resources) do
       Resources.new(
         ilog: double(InteractiveLogger).as_null_object,
-        stack: double(Stack).as_null_object
+        stack: double(Stack).as_null_object,
+        controller: instance_double(Moonshot::Controller).as_null_object
       )
     end
     let(:slug) { 'myorg/myrepo' }

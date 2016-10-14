@@ -8,7 +8,8 @@ module Moonshot
     let(:resources) do
       Resources.new(
         ilog: InteractiveLoggerProxy.new(log),
-        stack: double(Stack).as_null_object
+        stack: double(Stack).as_null_object,
+        controller: instance_double(Moonshot::Controller).as_null_object
       )
     end
 

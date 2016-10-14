@@ -1,8 +1,14 @@
+require_relative 'parameter_arguments'
+
 module Moonshot
   module Commands
     class Create < Moonshot::Command
+      include ParameterArguments
+
       self.usage = 'create [options]'
       self.description = 'Create a new environment'
+
+      attr_reader :version, :deploy
 
       def parser
         @deploy = true

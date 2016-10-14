@@ -6,8 +6,9 @@ AllCops:
     - 'vendor/**/*'
     - 'sample/bin/aws-codedeploy-samples/**/*'
     - 'sample/gems/**/*'
+    - 'spec/**/*'
 Metrics/AbcSize:
-  Max: 30
+  Max: 35
 Metrics/MethodLength:
   Max: 30
 Metrics/LineLength:

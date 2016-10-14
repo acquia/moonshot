@@ -80,3 +80,20 @@ shared_examples 'with a working moonshot application' do
     FakeFS::FileSystem.clone(File.join(File.dirname(__FILE__), 'fs_fixtures'), '/')
   end
 end
+
+shared_examples 'with a CloudFormation stubbed client' do
+  let(:cf_client_stubs) { {} }
+  let(:cf_client) { Aws::CloudFormation::Client.new(stub_responses: cf_client_stubs) }
+
+  before(:each) do
+    allow(Aws::CloudFormation::Client).to receive(:new).and_return(cf_client)
+  end
+end
+
+def fixture_path(path)
+  File.join(File.dirname(__FILE__), 'fixtures', path)
+end
+
+def fixture(path)
+  File.read(fixture_path(path))
+end

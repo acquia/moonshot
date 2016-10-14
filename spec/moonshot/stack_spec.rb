@@ -56,7 +56,6 @@ describe Moonshot::Stack do
     end
 
     context 'under normal circumstances' do
-      let(:parent_stacks) { [] }
       let(:expected_create_stack_options) do
         {
           stack_name: 'rspec-app-staging',
@@ -92,79 +91,6 @@ describe Moonshot::Stack do
         expect(cf_client).to receive(:create_stack)
           .with(hash_including(expected_create_stack_options))
         subject.create
-      end
-    end
-
-    context 'when a parent stack is specified' do
-      let(:parent_stacks) { ['myappdc-dc1'] }
-      let(:cf_client) do
-        stubs = {
-          describe_stacks: {
-            stacks: [
-              {
-                stack_name: 'myappdc-dc1',
-                creation_time: Time.now,
-                stack_status: 'CREATE_COMPLETE',
-                outputs: [
-                  { output_key: 'Parent1', output_value: 'parents value' },
-                  { output_key: 'Parent2', output_value: 'other value' }
-                ]
-              }
-            ]
-          }
-        }
-        Aws::CloudFormation::Client.new(stub_responses: stubs)
-      end
-      let(:expected_create_stack_options) do
-        {
-          stack_name: 'rspec-app-staging',
-          template_body: an_instance_of(String),
-          tags: [
-            { key: 'moonshot_application', value: 'rspec-app' },
-            { key: 'moonshot_environment', value: 'staging' }
-          ],
-          parameters: [
-            { parameter_key: 'Parent1', parameter_value: 'parents value' }
-          ],
-          capabilities: ['CAPABILITY_IAM']
-        }
-      end
-
-      context 'when local yml file contains the override already' do
-        it 'should import outputs as paramters for this stack' do
-          expect(cf_client).to receive(:create_stack)
-            .with(hash_including(expected_create_stack_options))
-          subject.create
-
-          expect(File.exist?('/cloud_formation/parameters/rspec-app-staging.yml')).to eq(true)
-          yaml_data = subject.overrides
-          expected_data = {
-            'Parent1' => 'parents value'
-          }
-          expect(yaml_data).to match(expected_data)
-        end
-      end
-
-      context 'when the local yml file does not contain the override' do
-        it 'should import outputs as paramters for this stack' do
-          File.open('/cloud_formation/parameters/rspec-app-staging.yml', 'w') do |fp|
-            data = {
-              'Parent1' => 'Existing Value!'
-            }
-            YAML.dump(data, fp)
-          end
-          expected_create_stack_options[:parameters][0][:parameter_value] = 'Existing Value!'
-          expect(cf_client).to receive(:create_stack)
-            .with(hash_including(expected_create_stack_options))
-          subject.create
-
-          expect(File.exist?('/cloud_formation/parameters/rspec-app-staging.yml')).to eq(true)
-          yaml_data = subject.overrides
-          expected_data = {
-            'Parent1' => 'Existing Value!'
-          }
-          expect(yaml_data).to match(expected_data)
-        end
       end
     end
   end

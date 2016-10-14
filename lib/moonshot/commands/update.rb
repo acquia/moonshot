@@ -1,15 +1,12 @@
+require_relative 'parameter_arguments'
+
 module Moonshot
   module Commands
     class Update < Moonshot::Command
+      include ParameterArguments
+
       self.usage = 'update [options]'
       self.description = 'Update the CloudFormation stack within an environment.'
-
-      def parser
-        parser = super
-        parser.on('--parameter-strategy default,merge', 'Override default parameter strategy') do |v| # rubocop:disable LineLength
-          Moonshot.config.parameter_strategy = parameter_strategy_factory(v)
-        end
-      end
 
       def execute
         controller.update

@@ -5,6 +5,10 @@ require 'thor'
 require 'interactive-logger'
 
 module Moonshot
+  class << self
+    attr_writer :config
+  end
+
   def self.config
     @config ||= Moonshot::ControllerConfig.new
     block_given? ? yield(@config) : @config

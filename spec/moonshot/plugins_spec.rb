@@ -21,6 +21,8 @@ describe 'Plugins support' do
 
   before(:each) do
     expect(Moonshot::Stack).to receive(:new).and_return(stack)
+    template = Moonshot::YamlStackTemplate.new(fixture_path('empty1.yml'))
+    allow(stack).to receive(:template).and_return(template)
   end
 
   it 'calls defined methods on plugins in order, providing them with a Moonshot::Resources' do

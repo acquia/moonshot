@@ -1,0 +1,13 @@
+---
+Resources:
+Parameters:
+  InputParameter1:
+    Type: String
+    Default: 'Default1'
+  InputParameter2:
+    Type: String
+    Default: 'Default2'
+  InputParameter3:
+    Type: String
+Outputs:
+  Output1: !Ref "ResourceName"

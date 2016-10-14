@@ -1,20 +1,16 @@
+require_relative 'stack_parameter'
+
 module Moonshot
   # A StackTemplate loads the template from disk and stores information
   # about it.
   class StackTemplate
-    Parameter = Struct.new(:name, :default) do
-      def required?
-        default.nil?
-      end
-    end
-
     def initialize(filename)
       @filename = filename
     end
 
     def parameters
       template_body.fetch('Parameters', {}).map do |k, v|
-        Parameter.new(k, v['Default'])
+        StackParameter.new(k, default: v['Default'])
       end
     end
 
