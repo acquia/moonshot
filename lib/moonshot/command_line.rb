@@ -4,6 +4,13 @@ module Moonshot
   # This class implements the command-line `moonshot` tool.
   class CommandLine
     def self.run! # rubocop:disable AbcSize, CyclomaticComplexity, MethodLength, PerceivedComplexity
+      # If this is a legacy (Thor) help command, re-write it as
+      # OptionParser format.
+      if ARGV[0] == 'help'
+        ARGV.delete_at(0)
+        ARGV.push('-h')
+      end
+
       # Find the Moonfile in this project.
       orig_dir = Dir.pwd
 
