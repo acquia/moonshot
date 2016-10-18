@@ -1,3 +1,6 @@
+require_relative '../stack_lister'
+require_relative '../stack_list_printer'
+
 module Moonshot
   module Commands
     class List < Moonshot::Command
@@ -5,7 +8,8 @@ module Moonshot
       self.description = 'List stacks for this application'
 
       def execute
-        controller.list
+        stacks = StackLister.new(controller.config.app_name).list
+        StackListPrinter.new(stacks).print
       end
     end
   end
