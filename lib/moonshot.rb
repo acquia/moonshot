@@ -47,6 +47,7 @@ end
   'commands/ssh',
   'commands/status',
   'commands/update',
+  'commands/version',
   'controller',
   'controller_config',
   'stack',

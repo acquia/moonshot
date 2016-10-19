@@ -3,8 +3,9 @@ require 'moonshot'
 
 # This is the main entry point for the `moonshot` command-line tool.
 begin
-  Moonshot::CommandLine.run!
+  Moonshot::CommandLine.new.run!
 rescue => e
   warn "#{e} (at #{e.backtrace.first})"
+  raise e if ENV['MOONSHOT_BACKTRACE']
   exit 1
 end
