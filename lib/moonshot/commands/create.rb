@@ -27,7 +27,7 @@ module Moonshot
         controller.create
 
         if @deploy && @version.nil?
-          controller.deploy_code
+          controller.push
         elsif @deploy
           controller.deploy_version(@version)
         end

@@ -5,7 +5,7 @@ module Moonshot
       self.description = 'Build and deploy a development artifact from the working directory'
 
       def execute
-        controller.deploy_code
+        controller.push
       end
     end
   end

@@ -117,9 +117,8 @@ module Moonshot
       run_plugins(:post_status)
     end
 
-    def deploy_code
-      version = [@config.app_name, @config.environment_name, Time.now.to_i]
-                .join('-')
+    def push
+      version = @config.dev_build_name_proc.call(@config)
       build_version(version)
       deploy_version(version)
     end
