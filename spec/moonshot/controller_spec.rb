@@ -4,6 +4,7 @@ describe 'create' do
   subject { Moonshot::Controller.new }
 
   let(:stack) { instance_double(Moonshot::Stack) }
+  let(:ask_user_source) { instance_double(Moonshot::AskUserSource) }
 
   let(:cf_client_stubs) do
     {
@@ -28,6 +29,8 @@ describe 'create' do
 
     expect(stack).to receive(:template)
       .and_return(Moonshot::YamlStackTemplate.new(fixture_path('create1.yml')))
+
+    subject.config.default_parameter_source = ask_user_source
   end
 
   # Scenario:
@@ -44,7 +47,12 @@ describe 'create' do
       subject.config.parent_stacks = ['parent-stack-1']
       subject.config.answer_file   = fixture_path('answer1.yml')
       subject.config.parameter_overrides['InputParameter4'] = 'Override4'
-      expect(stack).to receive(:create)
+
+      expect(ask_user_source).to receive(:get) do |sp|
+        expect(sp.name).to eq('InputParameter1')
+      end
+
+      expect(stack).to receive(:create).and_return(true)
 
       subject.create
 
@@ -73,6 +81,13 @@ describe 'create' do
       subject.config.parent_stacks = ['parent-stack-1']
       subject.config.interactive = false
       expect(stack).not_to receive(:create)
+
+      expect(ask_user_source).to receive(:get).ordered do |sp|
+        expect(sp.name).to eq('InputParameter1')
+      end
+      expect(ask_user_source).to receive(:get).ordered do |sp|
+        expect(sp.name).to eq('InputParameter4')
+      end
 
       expect { subject.create }
         .to raise_error(RuntimeError, 'The following parameters were not provided: InputParameter4')

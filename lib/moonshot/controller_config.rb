@@ -1,6 +1,7 @@
 require_relative 'default_strategy'
 require_relative 'ssh_config'
 require_relative 'task'
+require_relative 'ask_user_source'
 
 module Moonshot
   # Holds configuration for Moonshot::Controller
@@ -18,6 +19,8 @@ module Moonshot
     attr_accessor :parameter_overrides
     attr_accessor :parameters
     attr_accessor :parent_stacks
+    attr_accessor :default_parameter_source
+    attr_accessor :parameter_sources
     attr_accessor :plugins
     attr_accessor :project_root
     attr_accessor :show_all_stack_events
@@ -27,15 +30,17 @@ module Moonshot
     attr_accessor :ssh_instance
 
     def initialize
-      @interactive           = true
-      @interactive_logger    = InteractiveLogger.new
-      @parameters            = ParameterCollection.new
-      @parameter_overrides   = {}
-      @parent_stacks         = []
-      @plugins               = []
-      @project_root          = Dir.pwd
-      @show_all_stack_events = false
-      @ssh_config            = SSHConfig.new
+      @default_parameter_source = AskUserSource.new
+      @interactive              = true
+      @interactive_logger       = InteractiveLogger.new
+      @parameter_overrides      = {}
+      @parameter_sources        = {}
+      @parameters               = ParameterCollection.new
+      @parent_stacks            = []
+      @plugins                  = []
+      @project_root             = Dir.pwd
+      @show_all_stack_events    = false
+      @ssh_config               = SSHConfig.new
 
       @dev_build_name_proc = lambda do |c|
         ['dev', c.app_name, c.environment_name, Time.now.to_i].join('/')

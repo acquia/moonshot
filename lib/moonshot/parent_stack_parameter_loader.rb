@@ -6,6 +6,8 @@ module Moonshot
 
     def load!
       @config.parent_stacks.each do |stack_name|
+        count = 0
+
         resp = cf_client.describe_stacks(stack_name: stack_name)
         raise "Parent Stack #{stack_name} not found!" unless resp.stacks.size == 1
 
@@ -14,8 +16,11 @@ module Moonshot
           next unless @config.parameters.key?(output.output_key)
           # Our Stack has a Parameter matching this output. Set it's
           # value to the Output's value.
+          count += 1
           @config.parameters.fetch(output.output_key).set(output.output_value)
         end
+
+        puts "Imported #{count} parameters from parent stack #{stack_name.blue}!" if count > 0
       end
     end
 

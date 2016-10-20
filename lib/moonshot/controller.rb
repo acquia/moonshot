@@ -19,7 +19,7 @@ module Moonshot
       Moonshot::StackLister.new(@config.app_name).list
     end
 
-    def create
+    def create # rubocop:disable AbcSize
       # Scan the template for all required parameters and configure
       # the ParameterCollection.
       @config.parameters = ParameterCollection.from_template(stack.template)
@@ -42,7 +42,13 @@ module Moonshot
 
       # Interview the user for missing parameters, using the
       # appropriate prompts.
-      # TODO See #148
+      @config.parameters.values.each do |sp|
+        next if sp.set?
+
+        parameter_source = @config.parameter_sources.fetch(sp.name,
+                                                           @config.default_parameter_source)
+        parameter_source.get(sp)
+      end
 
       # Plugins get the final say on parameters before create,
       # allowing them to manipulate user supplied input and answers
@@ -60,17 +66,19 @@ module Moonshot
       if stack_ok # rubocop:disable GuardClause
         run_hook(:deploy, :post_create)
         run_plugins(:post_create)
+      else
+        raise 'Stack creation failed!'
       end
     end
 
-    def update
+    def update # rubocop:disable AbcSize
       # Scan the template for all required parameters and configure
       # the ParameterCollection.
       @config.parameters = ParameterCollection.from_template(stack.template)
 
       # Set all values already provided by the stack to UsePreviousValue.
-      stack.parameters.each do |key, _|
-        @config.parameters[key].use_previous! if @config.parameters.key?(key)
+      stack.parameters.each do |key, value|
+        @config.parameters[key].use_previous!(value) if @config.parameters.key?(key)
       end
 
       # Import all Outputs from parent stacks as Parameters on this
@@ -91,7 +99,13 @@ module Moonshot
 
       # Interview the user for missing parameters, using the
       # appropriate prompts.
-      # TODO See #148
+      @config.parameters.values.each do |sp|
+        next if sp.set?
+
+        parameter_source = @config.parameter_sources.fetch(sp.name,
+                                                           @config.default_parameter_source)
+        parameter_source.get(sp)
+      end
 
       # Plugins get the final say on parameters before create,
       # allowing them to manipulate user supplied input and answers
@@ -139,6 +153,12 @@ module Moonshot
     end
 
     def delete
+      # Populate the current values of parameters, for use by plugins.
+      @config.parameters = ParameterCollection.from_template(stack.template)
+      stack.parameters.each do |key, value|
+        @config.parameters[key].use_previous!(value) if @config.parameters.key?(key)
+      end
+
       run_plugins(:pre_delete)
       run_hook(:deploy, :pre_delete)
       stack.delete
@@ -147,7 +167,6 @@ module Moonshot
     end
 
     def doctor
-      # @todo use #run_hook when Stack becomes an InfrastructureProvider
       success = true
       success &&= stack.doctor_hook
       success &&= run_hook(:build, :doctor)

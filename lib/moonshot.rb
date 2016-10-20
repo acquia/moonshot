@@ -56,6 +56,8 @@ end
   'stack_events_poller',
   'merge_strategy',
   'default_strategy',
+  'ask_user_source',
+  'always_use_default_source',
 
   # Built-in mechanisms
   'artifact_repository/s3_bucket',

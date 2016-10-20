@@ -10,7 +10,9 @@ module Moonshot
 
     def parameters
       template_body.fetch('Parameters', {}).map do |k, v|
-        StackParameter.new(k, default: v['Default'])
+        StackParameter.new(k,
+                           default: v['Default'],
+                           description: v.fetch('Description', ''))
       end
     end
 
