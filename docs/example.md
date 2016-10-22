@@ -1,7 +1,8 @@
 # Example usage of the Moonshot Library
 
-In this example we are going to use the resources in the sample directory.
-This example assumes you have access to an Amazon AWS account and have sufficient permissions to create roles and resources.
+In this example we are going to use the resources in the sample
+directory.  This example assumes you have access to an Amazon AWS
+account and have sufficient permissions to create roles and resources.
 
 ## So, what's in it for me?
 
@@ -70,16 +71,6 @@ $ aws s3api create-bucket --bucket moonshot-sample-your-name
 
 Then update `Moonfile.rb` to refer to that bucket in the `S3Bucket` configuration.
 
-### Create a configuration for your stack.
-
-We'll have to copy the base stack configuration and modify the ArtifactBucket
-parameter so that the instance has access to the release bucket (via the
-IAM Role in the CloudFormation stack).
-
-```shell
-$ cp cloud_formation/parameters/moonshot-sample-app.yml cloud_formation/parameters/moonshot-sample-app-dev-$USER.yml
-```
-
 ## Usage of the CLI
 
 Run the following commands to create your environment and deploy code to it.
@@ -95,12 +86,13 @@ You can now deploy your software to a new stack with:
 $ moonshot create
 ```
 
-By default, you'll get a development environment named `moonshot-sample-app`. If you want to provision test or production
+By default, you'll get a development environment named
+`moonshot-sample-app`. If you want to provision test or production
 named environment, use:
 
 ```shell
-$ moonshot create -n my-service-staging
-$ moonshot create -n my-service-production
+$ moonshot create -n staging
+$ moonshot create -n production
 ```
 
 By default, create launches the stack and deploys code. If you want to only

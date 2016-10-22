@@ -1,92 +1,175 @@
-# CLI Commands
+# Global Options
 
-## List
+## `--[no-]interactive-logger`
 
-List stacks for this application.
+*Default: Enabled*
 
-|Description|Long Form|Short Form|Type|Example|Default|
-|---|---|---|---|---|---|
-|Parent stack to import parameters from|--parent|-p|string|moonshot-database-sample-app|None|
-|Choose if code should be deployed after stack is created|deploy|d|boolean||true|
-|Show all stack events during update. When present, it will show all events|show_all_events||boolean||Errors only|
-|Environment Name|name|n|string|moonshot-sample-app|None|
-|Interactive Logger|interactive_logger||boolean||true|
-|Verbose|verbose|v|boolean||false|
+Use this option to disable the animated logger. The logger is also
+disabed automatically in environments where STDIN is not a tty, such
+as Jenkins.
 
+## `--[no-]show-all-events`
 
-Example:
+*Default: Disabled*
+
+By default, Moonshot show only error CloudFormation events during the
+`create`, `update`, and `delete` actions. With this enabled, all
+events are displayed to the screen. This can be quite noisy, but also
+helpful if you want to see where your stack updates are taking the
+most time, for example.
+
+## `--[no-]verbose / -v`
+
+*Default: Disabled*
+
+Display debug logging. The types of things logged here are mostly
+useful only for core Moonshot developers, or if you are working on
+custom plugins.
+
+#### `--environment=NAME / -n NAME`
+
+*Default: dev-$USER, or as specified in the `environment_name`
+configuration option in `Moonfile.rb`.*
+
+Set the application's environment, such as jsmith1 or production. This
+is used to configure the CloudFormation Stack name. Not all commands
+make use of this option.
+
+# Core Commands
+
+## `moonshot list`
+
+List stacks for this application. At this time, there are no
+additional options for this command. All stacks in the current region
+are displayed.
+
+### Example Output
+
 ```shell
-moonshot list
+┌─ Environment List
+│
+│ dev-johnsmith  2016-08-03 13:38:43 UTC UPDATE_COMPLETE
+│ dev-johnsmith2 2016-10-19 21:00:47 UTC ROLLBACK_COMPLETE
+│ dev-johnsmith3 2016-10-19 22:34:35 UTC UPDATE_COMPLETE
+│ dev-johnsmith4 2016-10-22 13:10:36 UTC ROLLBACK_COMPLETE
+│ peter1         2016-10-10 00:01:29 UTC UPDATE_COMPLETE
+│ peter2         2016-10-14 01:56:33 UTC UPDATE_COMPLETE
+│
+└──
 ```
 
-Output:
+## `moonshot create`
+
+Create a new environment. The user is prompted for any missing
+parameters, or for any parameters not set by parent stacks, answer
+files or on the command line that they may want to change the default
+value of.
+
+### Options
+
+#### `--parent=STACK_NAME / -p STACK_NAME`
+
+*Default: `parents_stacks` configuration option in `Moonfile.rb`,
+which defaults to no parent stacks.*
+
+If set, this CloudFormation Stack will be used as a source of Stack
+Parameters, where each Output is mapped to an input Parameter on this
+CloudFormation Stack. As with all command-line options this will
+overwrite any configuration in `Moonfile.rb`.
+
+#### `--[no-]interactive`
+
+*Default: Interactive prompting enabled.*
+
+If `--no-interactive` is specified, the user will not be prompted for
+any unspecified stack parameters. If any stack parameters are missing,
+an error message will be displayed at Moonshot will exit with status
+code 1. This is a useful option for continuous integration
+environments.
+
+#### `--answer-file=FILE / -a FILE`
+
+*Default: No answer file is used.*
+
+This can be used to reference a YAML file containing values which
+should be used for stack parameters. This overrides default values,
+but has a lower precedent than the `-P` option (below). This is a
+useful option for automated environments, such as end-to-end test
+suites.
+
+#### `--parameter=KEY=VALUE / -P KEY=VALUE`
+
+*Default: None.*
+
+*Note: May be specified multiple times.*
+
+This can be used to set stack parameters on the command line. They
+have a higher priority than parameters found in the answer file
+specified with the `--answer-file` option.
+
+#### `--[no-]deploy / -d`
+
+*Default: Run deployment immediately after stack creation.*
+
+If disabled, no deployment will be run after stack creation. Note that
+depending on your stack configuration, this may trigger, for example,
+ELB failures which will result in instance replacements.
+
+### Example Output
 
 ```shell
-my-service-staging
-my-service-dev-user1
-my-service-dev-user2
-my-service-prod
-```
-
-## Create
-Create a new environment.
-
-|Description|Long Form|Short Form|Type|Example|Default|
-|---|---|---|---|---|---|
-|Parent stack to import parameters from|parent|p|string|moonshot-database-sample-app|None|
-|Choose if code should be deployed after stack is created|deploy|d|boolean||true|
-|Show all stack events during update. When present, it will show all events|show_all_events||boolean||Errors only|
-|Environment Name|name|n|string|moonshot-sample-app|None|
-|Interactive Logger|interactive_logger||boolean||true|
-|Verbose|verbose|v|boolean||false|
-
-Example:
-
-```shell
-moonshot create --name my-service-staging
-```
-
-Output:
-
-```shell
-[ ✓ ] [ 0m 0s ] Loading stack parameters file '/home/user/project/cloud_formation/parameters/my-service-staging.yml'.
-[ ✓ ] [ 0m 0s ] Setting stack parameter overrides:
-[ ✓ ] [ 0m 0s ]    ArtifactBucket: my-service-staging
-[ ✓ ] [ 0m 0s ]    AvailabilityZone1: us-east-1a
-[ ✓ ] [ 0m 0s ]    AvailabilityZone2: us-east-1d
-[ ✓ ] [ 0m 0s ]    DesiredCapacity: 1
-[ ✓ ] [ 0m 1s ] Created CloudFormation Stack my-service-staging.
-[ ✓ ] [ 4m 49s ] CloudFormation Stack my-service-staging successfully created.
-[ ✓ ] [ 0m 0s ] Created CodeDeploy Application my-service-staging.
-[ ✓ ] [ 0m 1s ] Created CodeDeploy Deployment Group my-service-staging.
+[ ✓ ] [ 0m 1s ] Created CloudFormation Stack my-service-jsmith1.
+[ ✓ ] [ 4m 49s ] CloudFormation Stack my-service-jsmith1 successfully created.
+[ ✓ ] [ 0m 0s ] Created CodeDeploy Application my-service-jsmith1.
+[ ✓ ] [ 0m 1s ] Created CodeDeploy Deployment Group my-service-jsmith1.
 [ ✓ ] [ 0m 1s ] AutoScaling Group up to capacity!
 [ ✓ ] [ 0m 0s ] Build script bin/build.sh exited successfully!
-[ ✓ ] [ 0m 1s ] Uploaded s3://my-service-staging/my-service-staging-1457657945.tar.gz successfully.
+[ ✓ ] [ 0m 1s ] Uploaded s3://my-service-builds/my-service-jsmith1-1457657945.tar.gz successfully.
 [ ✓ ] [ 0m 49s ] Deployment d-UNF7JW2KE completed successfully!
 ```
 
+## `moonshot update`
 
-## Update
+Update an environment with the latest local CloudFormation template,
+and any Parameter updates specified via `--answer-file` or
+`--parameter`. If there are new parameters in the template and they
+are not specified, the user will be prompted for their values, unless
+`--no-interactive` is specified, in which case an error will be
+displayed.
 
-Update the CloudFormation stack within an environment.
+### Options
 
-@todo: Add more description here as to what it exactly does.
+#### `--answer-file=FILE / -a FILE`
 
-Options:
+See [create][#moonshot-create].
 
-|Description|Long Form|Short Form|Type|Example|Default|
-|---|---|---|---|---|---|
-|Parent stack to import parameters from|--parent|-p|string|moonshot-database-sample-app|None|
-|Show all stack events during update. When present, it will show all events|show_all_events||boolean||Errors only|
-|Environment Name|name|n|string|moonshot-sample-app|None|
-|Interactive Logger|interactive_logger||boolean||true|
-|Verbose|verbose|v|boolean||false|
+#### `--parent=STACK_NAME / -p STACK_NAME`
 
-Example:
+See [create][#moonshot-create].
+
+#### `--parameter=KEY=VALUE / -P KEY=VALUE`
+
+See [create][#moonshot-create].
+
+#### `--[no-]show-all-events`
+
+See [create][#moonshot-create].
+
+### Examples
+
+Update a single Stack parameter, using the latest template:
 
 ```shell
-moonshot update --name my-service-staging
+moonshot update -n env-name -P NumInstances=4
 ```
+
+Update multiple Stack parameters using a YAML-formatted answer file:
+
+```shell
+moonshot update -n prod --answer-file updates.yml
+```
+
+### Example Output
 
 Output:
 
@@ -98,23 +181,15 @@ Output:
 [ ✓ ] [ 0m 1s ] AutoScaling Group up to capacity!
 ```
 
-## Status
+## `moonshot status`
 
-Get the status of an existing environment.
-
-|Description|Long Form|Short Form|Type|Example|Default|
-|---|---|---|---|---|---|
-|Environment Name|name|n|string|moonshot-sample-app|None|
-|Interactive Logger|interactive_logger||boolean||true|
-|Verbose|verbose|v|boolean||false|
-
-Example:
+### Example
 
 ```shell
-moonshot status --name my-service-staging
+moonshot status --name staging
 ```
 
-Output:
+### Example Output
 
 ```shell
 ┌─ CodeDeploy Application: my-service-staging
@@ -125,10 +200,10 @@ Output:
 CloudFormation Stack my-service-staging exists.
 ┌─ Stack Parameters
 │
-│ ArtifactBucket:    my-service-bucket  (overridden)
-│ AvailabilityZone1: us-east-1a               (overridden)
-│ AvailabilityZone2: us-east-1d               (overridden)
-│ DesiredCapacity:   1                        (overridden)
+│ ArtifactBucket:    my-service-bucket
+│ AvailabilityZone1: us-east-1a
+│ AvailabilityZone2: us-east-1d
+│ DesiredCapacity:   1
 │
 ├─ Stack Outputs
 │
@@ -154,24 +229,17 @@ CloudFormation Stack my-service-staging exists.
 └──
 ```
 
-
-## Push
+## `moonshot push`
 
 Create a development build from the working directory, and deploy it.
 
-|Description|Long Form|Short Form|Type|Example|Default|
-|---|---|---|---|---|---|
-|Environment Name|name|n|string|moonshot-sample-app|None|
-|Interactive Logger|interactive_logger||boolean||true|
-|Verbose|verbose|v|boolean||false|
-
-Example:
+### Example
 
 ```shell
 moonshot deploy-code --name my-service-staging
 ```
 
-Output:
+### Example Output
 
 ```shell
 [ ✓ ] [ 0m 1s ] Build script bin/build.sh exited successfully!
@@ -179,71 +247,52 @@ Output:
 [ ✓ ] [ 1m 28s ] Deployment d-PFMNSB5KE completed successfully!
 ```
 
-## Build
+## `moonshot build VERSION`
 
-Build a tarball of the software, ready for deployment.
-Requires a version name parameter.
+Build a tarball of the software, ready for deployment. Requires a
+version name parameter.
 
-|Description|Long Form|Short Form|Type|Example|Default|
-|---|---|---|---|---|---|
-|Environment Name|name|n|string|moonshot-sample-app|None|
-|Interactive Logger|interactive_logger||boolean||true|
-|Verbose|verbose|v|boolean||false|
-
-Example:
+### Example
 
 ```shell
 moonshot build 1.0.0
 ```
 
-Output:
+### Example Output
 
 ```shell
 [ ✓ ] [ 0m 0s ] Build script bin/build.sh exited successfully!
 [ ✓ ] [ 0m 1s ] Uploaded s3://my-service-staging/1.0.0.tar.gz successfully.
 ```
 
-## Deploy
+## `moonshot deploy VERSION`
 
-Deploy a versioned release created with the `build` command.
-Requires a version name parameter.
+Deploy a versioned release created with the `build` command. Requires
+a version name parameter.
 
-|Description|Long Form|Short Form|Type|Example|Default|
-|---|---|---|---|---|---|
-|Environment Name|name|n|string|moonshot-sample-app|None|
-|Interactive Logger|interactive_logger||boolean||true|
-|Verbose|verbose|v|boolean||false|
-
-Example:
+### Example
 
 ```shell
 moonshot deploy 1.0.0
 ```
 
-Output:
+### Example Output
 
 ```shell
 [ ✓ ] [ 1m 0s ] Deployment d-M4FY304KE completed successfully!
 ```
 
-## Delete
+## `moonshot delete`
 
 Delete an existing environment.
 
-|Description|Long Form|Short Form|Type|Example|Default|
-|---|---|---|---|---|---|
-|Show all stack events during update. When present, it will show all events|show_all_events||boolean||Errors only|
-|Environment Name|name|n|string|moonshot-sample-app|None|
-|Interactive Logger|interactive_logger||boolean||true|
-|Verbose|verbose|v|boolean||false|
-
-Example:
+### Example
 
 ```shell
-moonshot delete --name my-service-staging
+moonshot delete --name staging
 ```
 
-Output:
+### Example Output
 
 ```shell
 [ ✓ ] [ 0m 1s ] Initiated deletion of CloudFormation Stack my-service-staging.
@@ -251,26 +300,15 @@ Output:
 [ ✓ ] [ 0m 0s ] Deleted CodeDeploy Application 'my-service-staging'.
 ```
 
-## Doctor
+## `moonshot doctor`
+
 Run configuration checks against current environment. Throws an error
 if one or more checks failed.  For example, if you are using a
 deployment_mechanism that is using S3, it will check if the bucket
 actually exists and that you have access to. Each mechanism is able to
 add checks themselves that will be recognized and run.
 
-|Description|Long Form|Short Form|Type|Example|Default|
-|---|---|---|---|---|---|
-|Environment Name|name|n|string|moonshot-sample-app|None|
-|Interactive Logger|interactive_logger||boolean||true|
-|Verbose|verbose|v|boolean||false|
-
-Example:
-
-```shell
-moonshot doctor
-```
-
-Output:
+### Example Output
 
 ```shell
 Stack
@@ -289,28 +327,60 @@ CodeDeploy
   ✓ Resource 'AutoScalingGroup' exists in the CloudFormation template.
 ```
 
-## SSH
+## `moonshot ssh`
 
-SSH into the first or specified instance on the stack.
+SSH into the first or specified instance on the stack. If your
+environment has more than one Auto Scaling Group, the target Auto
+Scaling Group must be specified with the `--auto-scaling-group`
+option.
 
-|Description|Long Form|Short Form|Type|Example|Default|
-|---|---|---|---|---|---|
-|SSH user name|user|l|string|someuser|Environment variable: MOONSHOT_SSH_USER or USER|
-|Private key file for SSH|identity-file|i|string|~/.ssh/whatever|Environment variable: MOONSHOT_SSH_KEY_FILE|
-|Instance ID|instance|s|string|i-04683a82f2dddcc04|(first)|
-|Command to execute|command|c|string|uname -a|open a shell|
-|Auto Scaling Group|auto-scaling-group|g|string|ExampleAppAsg||
-|Environment Name|name|n|string|moonshot-sample-app|None|
-|Interactive Logger|interactive_logger||boolean||true|
-|Verbose|verbose|v|boolean||false|
+### Options
 
-Example:
+#### `--user USERNAME / -l USERNAME`
+
+*Default: None, uses SSH commands default behavior.*
+
+*Environment Variable: MOONSHOT_SSH_USER.*
+
+The user to authenticate to the remote host as.
+
+#### `--identity-file FILE / -i FILE`
+
+*Default: None, uses SSH commands default behavior.*
+
+*Environment Variable: MOONSHOT_SSH_KEY_FILE.*
+
+An SSH private key to use for authentication.
+
+#### `--instance INSTANCE_ID / -s INSTANCE_ID`
+
+*Default: Use the first instance in the Auto Scaling Group.*
+
+If specified, the instance ID will be used instead of determining the
+first available instance automatically.
+
+#### `--command COMMAND / -c COMMAND`
+
+*Default: Open an interactive SSH session.*
+
+If specified, run the command instead of opening an interactive SSH
+session.
+
+#### `--auto-scaling-group NAME / -g NAME`
+
+*Default: Use only Auto Scaling Group, or fail if multiple Auto
+Scaling Groups are present in Stack.*
+
+This option is **required** if there is more than one Auto Scaling
+Group in your environment.
+
+### Example
 
 ```shell
-moonshot ssh --name my-service-staging -i ~/.ssh/whatever -c "cat /etc/redhat-release"
+moonshot ssh --name staging -i ~/.ssh/whatever -c "cat /etc/redhat-release"
 ```
 
-Output:
+### Example Output
 
 ```shell
 Opening SSH connection to i-04683a82f2dddcc04 (123.123.123.123)...
