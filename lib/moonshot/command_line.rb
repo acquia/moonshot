@@ -13,6 +13,9 @@ module Moonshot
     end
 
     def run! # rubocop:disable AbcSize, CyclomaticComplexity, MethodLength, PerceivedComplexity
+      # Commands defined as Moonshot::Commands require a properly
+      # configured Moonshot.rb and supporting files. Without them, we only
+      # support `--help` and `new`.
       return if handle_early_commands
 
       # Find the Moonfile in this project.
@@ -22,8 +25,9 @@ module Moonshot
         break if File.exist?('Moonfile.rb')
 
         if Dir.pwd == '/'
-          raise 'No Moonfile.rb found, are you in a project? Maybe you need to '\
+          warn 'No Moonfile.rb found, are you in a project? Maybe you need to '\
 	        			'create one with `moonshot new <app_name>`?'
+          raise 'No Moonfile found'
         end
 
         Dir.chdir('..')
@@ -126,31 +130,21 @@ module Moonshot
       word
     end
 
-<<<<<<< 0c51452e2a612c9758a410c433bab67fb2fdd456
     def handle_early_commands
       # If this is a legacy (Thor) help command, re-write it as
       # OptionParser format.
       if ARGV[0] == 'help'
         ARGV.delete_at(0)
         ARGV.push('-h')
+      elsif ARGV[0] == 'new'
+        require_relative 'commands/new'
+        app_name = ARGV[1]
+        ::Moonshot::Commands::New.run!(app_name)
+        return true
       end
 
       # Proceed to processing commands normally.
       false
-=======
-    def self.handle_early_commands(args)
-      command = args.first
-      case command
-      when 'new'
-        require_relative 'commands/new'
-        app_name = args[1]
-        ::Moonshot::Commands::New.run!(app_name)
-      when '--help'
-        warn 'Usage: moonshot new <app_name>'
-      else
-        throw(:regular_command)
-      end
->>>>>>> Introduced 'new' command.
     end
   end
 end

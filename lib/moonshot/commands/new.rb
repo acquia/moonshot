@@ -19,6 +19,7 @@ module Moonshot
           create_file(parameter_path)
           create_file(template_path)
           fill_moonfile
+          print_success_message
         end
 
         private
@@ -68,13 +69,29 @@ module Moonshot
 
         def generate_moonfile
           <<-EOF
-Moonshot.config do |m|
-  m.app_name = '#{@application_name}'
-  m.artifact_repository = S3Bucket.new('<your_bucket>')
-  m.build_mechanism = Script.new('bin/build.sh')
-  m.deployment_mechanism = CodeDeploy.new(asg: 'AutoScalingGroup')
-end
+            Moonshot.config do |m|
+              m.app_name = '#{@application_name}'
+              m.artifact_repository = S3Bucket.new('<your_bucket>')
+              m.build_mechanism = Script.new('bin/build.sh')
+              m.deployment_mechanism = CodeDeploy.new(asg: 'AutoScalingGroup')
+            end
         	EOF
+        end
+
+        def print_success_message
+          warn 'Your application is configured, the following changes have '\
+               'been made to your project directory:'
+          warn ''
+          warn '- Created a Moonfile.rb where you can configure your project.'
+          warn '- Created moonshot/plugins where you can add hooks to core '\
+               'Moonshot actions.'
+          warn '- Created moonshot/cli_extensions where you can create '\
+               'project-specific commands.'
+          warn ''
+          warn 'You will also need to ensure your Amazon account is configured'\
+               ' for CodeDeploy, by creating a role that allows deployments. '\
+               'See: http://moonshot.readthedocs.io/en/latest/mechanisms/'\
+               'deployment/'
         end
       end
     end
