@@ -1,3 +1,5 @@
+require 'pry'
+
 module Moonshot
   module Commands
     class Console < Moonshot::Command
