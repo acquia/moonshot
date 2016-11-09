@@ -20,7 +20,7 @@ module Moonshot
         o.banner = "Usage: moonshot #{self.class.usage}"
 
         o.on('-v', '--[no-]verbose', 'Show debug logging') do |v|
-          Moonshot.config.interactive_logger.debug = true if v
+          Moonshot.config.interactive_logger = InteractiveLogger.new(debug: true) if v
         end
 
         o.on('-nNAME', '--environment=NAME', 'Which environment to operate on.') do |v|
