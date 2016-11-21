@@ -39,7 +39,7 @@ module Moonshot
     def draw(depth = 1, first = true)
       print first ? '┌' : '├'
       print '─' * depth
-      puts ' ' << @name.light_black
+      puts ' ' << @name
       @lines = [''] + @lines + ['']
       @lines.each do |line|
         puts '│' << (' ' * depth) << line

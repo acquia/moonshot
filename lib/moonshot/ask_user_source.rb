@@ -29,9 +29,9 @@ module Moonshot
     private
 
     def prompt
-      print "(#{@sp.name})".light_black
+      print "(#{@sp.name})"
       print " #{@sp.description}" unless @sp.description.empty?
-      print " [#{@sp.default}]".light_black if @sp.default?
+      print " [#{@sp.default}]" if @sp.default?
       print ': '
     end
   end
