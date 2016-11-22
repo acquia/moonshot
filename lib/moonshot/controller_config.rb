@@ -28,6 +28,8 @@ module Moonshot
     attr_accessor :ssh_command
     attr_accessor :ssh_config
     attr_accessor :ssh_instance
+    # Custom configuration for custom commands
+    attr_accessor :custom
 
     def initialize
       @default_parameter_source = AskUserSource.new
@@ -41,6 +43,7 @@ module Moonshot
       @project_root             = Dir.pwd
       @show_all_stack_events    = false
       @ssh_config               = SSHConfig.new
+      @custom                   = {}
 
       @dev_build_name_proc = lambda do |c|
         ['dev', c.app_name, c.environment_name, Time.now.to_i].join('/')
