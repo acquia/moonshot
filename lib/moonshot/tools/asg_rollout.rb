@@ -1,6 +1,6 @@
 module Moonshot
   module Tools
-    class ASGRollout
+    class ASGRollout # rubocop:disable ClassLength
       attr_accessor :config
 
       def initialize(controller:, logical_id:)
@@ -12,9 +12,15 @@ module Moonshot
 
       def run!
         increase_max_and_desired
-        new_instance = wait_for_new_instance
-        wait_for_in_service(new_instance)
-
+        loop do
+          new_instance = wait_for_new_instance
+          begin
+            wait_for_in_service(new_instance)
+          rescue
+            next
+          end
+          break
+        end
         targets = asg.non_conforming_instances
         last_instance = targets.last
 
@@ -34,7 +40,6 @@ module Moonshot
       ensure
         log.start_threaded 'Restoring MaxSize/DesiredCapacity values to normal...' do |s|
           asg.set_max_and_desired(@max, @desired)
-
           s.success 'Restored MaxSize/DesiredCapacity values to normal!'
         end
       end
@@ -44,7 +49,6 @@ module Moonshot
       def increase_max_and_desired
         log.start_threaded 'Increasing MaxSize/DesiredCapacity by 1.' do |s|
           @max, @desired = asg.current_max_and_desired
-
           asg.set_max_and_desired(@max + 1, @desired + 1)
           s.success 'Increased MaxSize/DesiredCapacity by 1.'
         end
@@ -65,10 +69,12 @@ module Moonshot
 
           loop do
             instance_health = asg.instance_health(new_instance)
+            if instance_health.out_of_service?
+              s.failure "Instance #{new_instance.blue} went OutOfService while waiting to join..."
+              raise "Instance #{new_instance.blue} went OutOfService while waiting to join..."
+            end
             break if instance_health.in_service?
-
             s.continue "Instance #{new_instance.blue} is #{instance_health}..."
-
             sleep @config.instance_health_delay
           end
 
@@ -109,9 +115,7 @@ module Moonshot
           loop do
             instance_health = asg.instance_health(instance)
             break if instance_health.out_of_service?
-
             s.continue "Instance #{instance.blue} is #{instance_health}..."
-
             sleep @config.instance_health_delay
           end
 
@@ -128,7 +132,6 @@ module Moonshot
           loop do
             break if @config.terminate_when.call(he)
             sleep @config.terminate_when_delay
-
             if Time.now.to_f - start > timeout
               s.failure "TerminateWhen for #{instance.blue} did not complete in #{timeout} seconds!"
               raise "TerminateWhen for #{instance.blue} did not complete in #{timeout} seconds!"
