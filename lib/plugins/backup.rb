@@ -1,23 +1,24 @@
 require 'rubygems/package'
 require 'zlib'
+require 'yaml'
 
 module Moonshot
   module Plugins
     # Moonshot plugin class for deflating and uploading files on given hooks
-    class Backup
+    class Backup # rubocop:disable Metrics/ClassLength
       include Moonshot::CredsHelper
 
       attr_accessor :bucket,
                     :buckets,
                     :files,
                     :hooks,
-                    :target_name
+                    :target_name,
+                    :backup_parameters,
+                    :backup_template
 
       def initialize
         yield self if block_given?
-        raise ArgumentError \
-          if @files.nil? || @files.empty? || @hooks.nil? || !(@bucket.nil? ^ @buckets.nil?)
-
+        validate_configuration
         @target_name ||= '%{app_name}_%{timestamp}_%{user}.tar.gz'
       end
 
@@ -29,10 +30,8 @@ module Moonshot
         raise ArgumentError if bucket.nil? || bucket.empty?
         Moonshot::Plugins::Backup.new do |b|
           b.bucket = bucket
-          b.files = [
-            'cloud_formation/%{app_name}.json',
-            'cloud_formation/parameters/%{stack_name}.yml'
-          ]
+          b.backup_parameters = true
+          b.backup_template = true
           b.hooks = [:post_create, :post_update]
         end
       end
@@ -44,10 +43,11 @@ module Moonshot
       def backup(resources)
         raise ArgumentError if resources.nil?
 
-        @app_name = resources.stack.app_name
+        @app_name = resources.controller.config.app_name
         @stack_name = resources.stack.name
         @target_name = render(@target_name)
         @target_bucket = define_bucket
+        @parameters = resources.stack.parameters
 
         return if @target_bucket.nil?
 
@@ -58,7 +58,7 @@ module Moonshot
             upload(zip_out)
 
             s.success("#{log_message} succeeded.")
-          rescue StandardError => e
+          rescue => e
             s.failure("#{log_message} failed: #{e}")
           ensure
             tar_out.close unless tar_out.nil?
@@ -90,16 +90,57 @@ module Moonshot
       def tar(target_files)
         tar_stream = StringIO.new
         Gem::Package::TarWriter.new(tar_stream) do |writer|
-          target_files.each do |file|
-            file = render(file)
-
-            writer.add_file(File.basename(file), 0644) do |io|
-              File.open(file, 'r') { |f| io.write(f.read) }
+          # adding user files
+          unless target_files.nil? || target_files.empty?
+            target_files.each do |file|
+              file = render(file)
+              add_file_to_tar(writer, file)
             end
+          end
+
+          # adding parameters
+          if @backup_parameters
+            add_str_to_tar(
+              writer,
+              render('%{stack_name}-parameters.yml'),
+              @parameters
+            )
+          end
+
+          # adding template file
+          if @backup_template
+            template_file_path = render('cloud_formation/%{app_name}.json')
+            add_file_to_tar(writer, template_file_path)
           end
         end
         tar_stream.seek(0)
         tar_stream
+      end
+
+      # Helper method to add a file to an inmemory tar archive.
+      #
+      # @param writer [TarWriter]
+      # @param file_name [String]
+      def add_file_to_tar(writer, file_name)
+        writer.add_file(File.basename(file_name), 0644) do |io|
+          begin
+            File.open(file_name, 'r') { |f| io.write(f.read) }
+          rescue Errno::ENOENT
+            warn "'#{file_name}' was not found."
+          end
+        end
+      end
+
+      # Helper method to add a file based on an input String as content
+      # to an inmemory tar archive.
+      #
+      # @param writer [TarWriter]
+      # @param target_filename [String]
+      # @param content [String]
+      def add_str_to_tar(writer, target_filename, content)
+        writer.add_file(File.basename(target_filename), 0644) do |io|
+          io.write(content.to_yaml)
+        end
       end
 
       # Create a zip archive in memory, returning the IO object pointing at the
@@ -167,6 +208,38 @@ module Moonshot
 
       def bucket_by_account(account)
         @buckets[account]
+      end
+
+      def validate_configuration
+        validate_buckets
+        validate_redundant_configuration
+        validate_targets
+        validate_hooks
+      end
+
+      def validate_buckets
+        raise ArgumentError, 'You must specify a target bucket.' \
+          if (@bucket.nil? || @bucket.empty?) \
+          && (@buckets.nil? || @buckets.empty?)
+      end
+
+      def validate_redundant_configuration
+        raise ArgumentError, 'You can not specify both `bucket` and `buckets`.' \
+          if @bucket && @buckets
+      end
+
+      def validate_targets
+        raise ArgumentError, 'You must specify files to back up.' \
+          if (@files.nil? || @files.empty?) \
+          && (!@backup_parameters && !@backup_template)
+      end
+
+      def validate_hooks
+        raise ArgumentError, 'You must specify a hook / hooks to run the backup on.' \
+          if hooks.nil? || hooks.empty?
+
+        raise ArgumentError, '`pre_create` and `post_delete` hooks are not supported.' \
+          if hooks.include?(:pre_create) || hooks.include?(:post_delete)
       end
     end
   end

@@ -18,12 +18,18 @@ When instantiating a class, you need to set the following options
 in a block, where the object is provided as a block argument:
 
 - `bucket`: the name of the S3 bucket you wish to upload the tarball (optional)
-- `buckets`: a hash map containing account aliases as keys, and target buckets as values (optional)
-- `files`: an array of relative path names as strings
+- `buckets`: a hash map containing account aliases as keys, and target buckets as values (optional).
+- `files`: an array of relative path names as strings.
+- `backup_parameters`: boolean value for backing up all parameters into a YAML file (optional, defaults to `false`).
+- `backup_template`: boolean value for backing up the current CloudFormation template (optional, defaults to `false`).
 - `hooks`: which hooks to run the backup logic, works with all valid Moonshot hooks
-- `target_name`: tarball archive name, default: `<app_name>_<timestamp>_<user>.tar.gz`
+- `target_name`: tarball archive name (optional, defaults to `<app_name>_<timestamp>_<user>.tar.gz`).
 
 You must provide either `bucket` or `buckets`, but **not both**.
+
+If you provide either `backup_parameters` or `backup_template` you may not provide `files` additionally.
+
+`pre_create` and `post_delete` hooks are **not** allowed to use due to certain implementation restrictions.
 
 ## Default method
 
@@ -71,10 +77,8 @@ parameter file after create or update.
       'prod_account' => 'prod_bucket'
     }
 
-    b.files = [
-      'cloud_formation/%{app_name}.json',
-      'cloud_formation/parameters/%{stack_name}.yml'
-    ]
+    b.backup_template = true
+    b.backup_parameters = true
 
     b.hooks = [:post_create, :post_update]
   end

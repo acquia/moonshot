@@ -71,10 +71,8 @@ describe Moonshot::Plugins::Backup do
 
     it 'should set default config values' do
       expect(subject.bucket).to eq test_bucket_name
-      expect(subject.files).to eq [
-        'cloud_formation/%{app_name}.json',
-        'cloud_formation/parameters/%{stack_name}.yml'
-      ]
+      expect(subject.backup_parameters).to eq true
+      expect(subject.backup_template).to eq true
       expect(subject.hooks).to eq [:post_create, :post_update]
     end
 
@@ -98,8 +96,16 @@ describe Moonshot::Plugins::Backup do
     let(:resources) do
       instance_double(
         Moonshot::Resources,
-        stack: instance_double(Moonshot::Stack, app_name: 'test_app_name', name: 'test_name'),
-        ilog: instance_double(Moonshot::InteractiveLoggerProxy)
+        stack: instance_double(
+          Moonshot::Stack,
+          name: 'test_name',
+          parameters: {}
+        ),
+        ilog: instance_double(Moonshot::InteractiveLoggerProxy),
+        controller: instance_double(
+            Moonshot::Controller,
+            config: instance_double(Moonshot::ControllerConfig, app_name: 'test')
+          )
       )
     end
 
