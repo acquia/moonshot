@@ -16,7 +16,8 @@ module Moonshot
       parser = build_parser(handler)
       parser.parse!
 
-      unless @args.size == handler.method(:execute).arity
+      req_arguments = handler.method(:execute).parameters.select { |arg| arg[0] == :req }
+      if ARGV.size < req_arguments.size
         warn handler.parser.help
         raise "Invalid command line for '#{@command}'."
       end
