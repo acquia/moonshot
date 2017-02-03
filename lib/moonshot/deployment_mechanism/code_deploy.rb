@@ -307,9 +307,13 @@ class Moonshot::DeploymentMechanism::CodeDeploy # rubocop:disable ClassLength
       inst_summary.lifecycle_events.each do |event|
         next unless event.status == 'Failed'
 
-        ilog.error(event.diagnostics.message)
-        event.diagnostics.log_tail.each_line do |line|
-          ilog.error(line)
+        if event.diagnostics.nil?
+          ilog.error('Lifecycle event chain is not available.')
+        else
+          ilog.error(event.diagnostics.message)
+          event.diagnostics.log_tail.each_line do |line|
+            ilog.error(line)
+          end
         end
       end
     end
