@@ -1,4 +1,4 @@
-require 'thor'
+require 'optparse'
 
 module Moonshot
   # A Command that is automatically registered with the Moonshot::CommandLine

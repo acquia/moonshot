@@ -1,3 +1,5 @@
+require 'thor'
+
 # Mixin providing the Thor::Shell methods and other shell execution helpers.
 module Moonshot::Shell
   # Run a command, returning stdout. Stderr is suppressed unless the command
