@@ -111,13 +111,22 @@ module Moonshot
     end
 
     def instance_row(asg_instance, ec2_instance)
+      public_ip = if ec2_instance
+                    if ec2_instance.public_ip_address
+                      ec2_instance.public_ip_address
+                    else
+                      "#{ec2_instance.private_ip_address} (PRV)"
+                    end
+                  else
+                    'offline'
+                  end
+      uptime = ec2_instance.nil? ? 'offline' : uptime_format(ec2_instance.launch_time)
       [
         asg_instance.instance_id,
-        # @todo What about ASGs with only private IPs?
-        ec2_instance.public_ip_address,
+        public_ip,
         lifecycle_color(asg_instance.lifecycle_state),
         health_color(asg_instance.health_status),
-        uptime_format(ec2_instance.launch_time)
+        uptime
       ]
     end
 
