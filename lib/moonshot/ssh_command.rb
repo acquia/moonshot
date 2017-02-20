@@ -14,7 +14,7 @@ module Moonshot
         Moonshot.config.ssh_config.ssh_identity_file = v
       end
 
-      parser.on('-s', '--instance INSTANCE_ID', 'Specific AWS EC2 ID to connect through') do |v|
+      parser.on('-s', '--instance INSTANCE_ID', 'Specific AWS EC2 ID to connect to') do |v|
         Moonshot.config.ssh_instance = v
       end
 

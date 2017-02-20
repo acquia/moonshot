@@ -11,20 +11,20 @@ module Moonshot
 
       asg = if groups.count == 1
               groups.first
-            elsif asgs.count > 1
+            elsif groups.count > 1
               unless @asg_name
                 raise 'Multiple Auto Scaling Groups found in the stack. Please specify which '\
                       'one to SSH into using the --auto-scaling-group (-g) option.'
               end
-              groups.detect { |x| x.logical_resource_id == @config.ssh_auto_scaling_group_name }
+              groups.detect { |x| x.logical_resource_id == @asg_name }
             end
       raise 'Failed to find the Auto Scaling Group.' unless asg
 
       Aws::AutoScaling::Client.new.describe_auto_scaling_groups(
         auto_scaling_group_names: [asg.physical_resource_id]
       ).auto_scaling_groups.first.instances.map(&:instance_id).first
-    rescue
-      raise 'Failed to find instances in the Auto Scaling Group!'
+    rescue => e
+      raise "Failed to select an instance from the Auto Scaling Group: #{e.message}"
     end
   end
 end
