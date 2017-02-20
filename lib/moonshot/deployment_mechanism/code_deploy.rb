@@ -16,6 +16,10 @@ class Moonshot::DeploymentMechanism::CodeDeploy # rubocop:disable ClassLength
   # @param asg [Array, String]
   #   The logical name of the AutoScalingGroup to create and manage a Deployment
   #   Group for in CodeDeploy.
+  # @param optional_asg [Array, String]
+  #   The logical name of the AutoScalingGroup to create and manage a Deployment
+  #   Group for in CodeDeploy. This ASG doesn't have to exist. If it does, it
+  #   will be added to the Deployment Group.
   # @param role [String]
   #   IAM role with AWSCodeDeployRole policy. CodeDeployRole is considered as
   #   default role if its not specified.
@@ -29,13 +33,16 @@ class Moonshot::DeploymentMechanism::CodeDeploy # rubocop:disable ClassLength
   # @param config_name [String]
   #   Name of the Deployment Config to use for CodeDeploy,  By default we use
   #   CodeDeployDefault.OneAtATime.
+  # rubocop:disable Metrics/ParameterLists
   def initialize(
       asg: [],
+      optional_asg: [],
       role: 'CodeDeployRole',
       app_name: nil,
       group_name: nil,
       config_name: 'CodeDeployDefault.OneAtATime')
-    @asg_logical_ids = asg.is_a?(Array) ? asg : [asg]
+    @asg_logical_ids = [*asg]
+    @optional_asg_logical_ids = [*optional_asg]
     @app_name = app_name
     @group_name = group_name
     @codedeploy_role = role
@@ -180,6 +187,16 @@ class Moonshot::DeploymentMechanism::CodeDeploy # rubocop:disable ClassLength
       end
 
       autoscaling_groups.push(groups.auto_scaling_groups.first)
+    end
+    @optional_asg_logical_ids.each do |asg_logical_id|
+      asg_name = stack.physical_id_for(asg_logical_id)
+      next unless asg_name
+      groups = as_client.describe_auto_scaling_groups(
+        auto_scaling_group_names: [asg_name]
+      )
+      unless groups.auto_scaling_groups.empty?
+        autoscaling_groups.push(groups.auto_scaling_groups.first)
+      end
     end
     autoscaling_groups
   end

@@ -33,6 +33,12 @@ Parameters
 The logical name of one or more Auto Scaling Groups to create and
 manage a Deployment Group for in CodeDeploy.
 
+### optional_asg | string,array
+
+The logical name of one or more Auto Scaling Groups to create and
+manage a Deployment Group for in CodeDeploy. This ASG doesn't have
+to exist. If it does, it will be added to the Deployment Group.
+
 ### role | string
 
 IAM role with AWSCodeDeployRole policy. CodeDeployRole is considered
