@@ -111,19 +111,18 @@ module Moonshot
     end
 
     def instance_row(asg_instance, ec2_instance)
-      public_ip = if ec2_instance
-                    if ec2_instance.public_ip_address
-                      ec2_instance.public_ip_address
-                    else
-                      "#{ec2_instance.private_ip_address} (PRV)"
-                    end
-                  else
-                    'offline'
-                  end
-      uptime = ec2_instance.nil? ? 'offline' : uptime_format(ec2_instance.launch_time)
+      if ec2_instance
+        ip_address = ec2_instance.public_ip_address || "#{ec2_instance.private_ip_address} (PRV)"
+        uptime = uptime_format(ec2_instance.launch_time)
+      else
+        # We've seen race conditions where ASG tells us about instances that EC2 is no longer
+        # aware of.
+        ip_address = 'unknown'
+        uptime = 'unknown'
+      end
       [
         asg_instance.instance_id,
-        public_ip,
+        ip_address,
         lifecycle_color(asg_instance.lifecycle_state),
         health_color(asg_instance.health_status),
         uptime
