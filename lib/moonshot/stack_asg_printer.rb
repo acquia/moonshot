@@ -100,8 +100,10 @@ module Moonshot
       current_lc = asg_info.launch_configuration_name
       ec2_info = get_addl_info(asg_info.instances.map(&:instance_id))
       asg_info.instances.map do |asg_instance|
+        elb_instance_state = elb_instance_health(asg_info, asg_instance.instance_id)
         row = instance_row(asg_instance,
-                           ec2_info[asg_instance.instance_id])
+                           ec2_info[asg_instance.instance_id],
+                           elb_instance_state)
         row << if current_lc == asg_instance.launch_configuration_name
                  '(launch config up to date)'.green
                else
@@ -110,15 +112,29 @@ module Moonshot
       end
     end
 
-    def instance_row(asg_instance, ec2_instance)
+    def instance_row(asg_instance, ec2_instance, instance_elb_state)
       [
         asg_instance.instance_id,
         # @todo What about ASGs with only private IPs?
         ec2_instance.public_ip_address,
+        '(ASG):',
         lifecycle_color(asg_instance.lifecycle_state),
+        '(ELB):',
+        lifecycle_color(instance_elb_state),
         health_color(asg_instance.health_status),
         uptime_format(ec2_instance.launch_time)
       ]
+    end
+
+    def elb_instance_health(asg_info, instance_id)
+      asg_info.load_balancer_names.map do |load_balancer_name|
+        elb_client.describe_instance_health(
+          load_balancer_name: load_balancer_name,
+          instances: [{
+            instance_id: instance_id
+          }]
+        ).instance_states.first.state
+      end.compact.first
     end
 
     def uptime_format(launch_time)

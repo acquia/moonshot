@@ -24,5 +24,9 @@ module Moonshot
     def s3_client
       Aws::S3::Client.new
     end
+
+    def elb_client
+      Aws::ElasticLoadBalancing::Client.new
+    end
   end
 end
