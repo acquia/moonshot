@@ -23,4 +23,11 @@ describe Moonshot::Commands::Create do
     expect(subject.deploy).to eq(false)
     expect(Moonshot.config.parameter_overrides).to match('Key' => 'Value')
   end
+
+  it 'should process multiple parent stacks' do
+    op = subject.parser
+    op.parse(%w(--parents parent1,parent2,parent3 --no-deploy))
+    expect(subject.deploy).to eq(false)
+    expect(Moonshot.config.parent_stacks.count).to be(3)
+  end
 end

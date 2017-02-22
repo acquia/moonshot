@@ -8,6 +8,11 @@ module Moonshot
                   'Parent stack to import parameters from') do |v|
           Moonshot.config.parent_stacks = [v]
         end
+
+        parser.on('--parents a,b,c', Array,
+                  'List of parent stacks to import parameters from') do |v|
+          Moonshot.config.parent_stacks = v
+        end
       end
     end
   end
