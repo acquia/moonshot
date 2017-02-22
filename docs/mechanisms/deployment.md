@@ -35,9 +35,9 @@ manage a Deployment Group for in CodeDeploy.
 
 ### optional_asg | string,array
 
-The logical name of one or more Auto Scaling Groups to create and
-manage a Deployment Group for in CodeDeploy. This ASG doesn't have
-to exist. If it does, it will be added to the Deployment Group.
+The logical name of one or more Auto Scaling Groups to add to the
+Deployment Group in CodeDeploy. These ASGs don't have to exist.
+If they do, they will be added to the Deployment Group.
 
 ### role | string
 
