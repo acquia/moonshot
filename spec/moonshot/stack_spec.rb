@@ -66,7 +66,7 @@ describe Moonshot::Stack do
             { key: 'ah_stage', value: 'rspec-app-staging' }
           ],
           parameters: [],
-          capabilities: ['CAPABILITY_IAM']
+          capabilities: ['CAPABILITY_IAM', 'CAPABILITY_NAMED_IAM']
         }
       end
 
