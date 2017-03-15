@@ -18,11 +18,15 @@ module Moonshot
         parser.on('--force', '-f', TrueClass, 'Apply ChangeSet without confirmation') do |v|
           @force = v
         end
+
+        parser.on('--refresh-parameters', TrueClass, 'Update parameters from parent stacks') do |v|
+          @refresh_parameters = v
+        end
       end
 
       def execute
         @force = true unless Moonshot.config.interactive
-        controller.update(dry_run: @dry_run, force: @force)
+        controller.update(dry_run: @dry_run, force: @force, refresh_parameters: @refresh_parameters)
       end
     end
   end

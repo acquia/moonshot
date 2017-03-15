@@ -153,8 +153,7 @@ describe 'update' do
       }
       expect(stack).to receive(:parameters).and_return(existing_parameters)
       expect(stack).to receive(:update)
-
-      subject.update(dry_run: false, force: false)
+      subject.update(dry_run: false, force: false, refresh_parameters: false)
 
       pc = subject.config.parameters
       expect(pc.keys).to eq(%w(InputParameter1 InputParameter2 InputParameter3 InputParameter4))
@@ -166,6 +165,31 @@ describe 'update' do
         { parameter_key: 'InputParameter4', parameter_value: 'Override4' }
       ]
       expect(pc.values.map(&:to_cf)).to eq(expected_update_stack_parameters)
+    end
+  end
+
+  context 'when refresh-parameters option is provided' do
+    before(:each) do
+      subject.config.answer_file = fixture_path('answer2.yml')
+      subject.config.parameter_overrides['InputParameter4'] = 'Override4'
+
+      existing_parameters = {
+        'InputParameter1' => 'Existing1',
+        'InputParameter2' => 'Existing2',
+        'InputParameter3' => 'Existing3'
+      }
+      expect(stack).to receive(:parameters).and_return(existing_parameters)
+      expect(stack).to receive(:update)
+    end
+
+    it 'should preserve existing existing parent parameters' do
+      expect_any_instance_of(Moonshot::ParentStackParameterLoader).to receive(:load_missing_only!)
+      subject.update(dry_run: false, force: false, refresh_parameters: false)
+    end
+
+    it 'should refresh all parent stack parameters' do
+      expect_any_instance_of(Moonshot::ParentStackParameterLoader).to receive(:load!)
+      subject.update(dry_run: false, force: false, refresh_parameters: true)
     end
   end
 end

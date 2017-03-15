@@ -63,7 +63,7 @@ module Moonshot
       end
     end
 
-    def update(dry_run:, force:) # rubocop:disable AbcSize
+    def update(dry_run:, force:, refresh_parameters:) # rubocop:disable AbcSize
       # Scan the template for all required parameters and configure
       # the ParameterCollection.
       @config.parameters = ParameterCollection.from_template(stack.template)
@@ -75,7 +75,8 @@ module Moonshot
 
       # Import all Outputs from parent stacks as Parameters on this
       # stack.
-      ParentStackParameterLoader.new(@config).load_missing_only!
+      parent_stack_params = ParentStackParameterLoader.new(@config)
+      refresh_parameters ? parent_stack_params.load! : parent_stack_params.load_missing_only!
 
       # If there is an answer file, use it to populate parameters.
       if @config.answer_file
@@ -91,9 +92,7 @@ module Moonshot
 
       # Interview the user for missing parameters, using the
       # appropriate prompts.
-      @config.parameters.values.each do |sp|
-        next if sp.set?
-
+      @config.parameters.values.reject(&:set?).each do |sp|
         parameter_source = @config.parameter_sources.fetch(sp.name,
                                                            @config.default_parameter_source)
         parameter_source.get(sp)
