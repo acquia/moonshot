@@ -13,6 +13,8 @@ class Moonshot::DeploymentMechanism::CodeDeploy # rubocop:disable ClassLength
   include Moonshot::CredsHelper
   include Moonshot::DoctorHelper
 
+  DEFAULT_ROLE_NAME = 'CodeDeployRole'.freeze
+
   # @param asg [Array, String]
   #   The logical name of the AutoScalingGroup to create and manage a Deployment
   #   Group for in CodeDeploy.
@@ -37,7 +39,7 @@ class Moonshot::DeploymentMechanism::CodeDeploy # rubocop:disable ClassLength
   def initialize(
       asg: [],
       optional_asg: [],
-      role: 'CodeDeployRole',
+      role: DEFAULT_ROLE_NAME,
       app_name: nil,
       group_name: nil,
       config_name: 'CodeDeployDefault.OneAtATime')
@@ -247,7 +249,35 @@ class Moonshot::DeploymentMechanism::CodeDeploy # rubocop:disable ClassLength
   def role
     iam_client.get_role(role_name: @codedeploy_role).role
   rescue Aws::IAM::Errors::NoSuchEntity
-    raise "Did not find an IAM Role: #{@codedeploy_role}"
+    # Auto create the IAM Role if it does not exist in the current AWS account
+    ilog.start "Missing IAM Role: #{@codedeploy_role.blue}. Creating it now ..." do |s|
+      code_deploy_policy = {
+        'Version' => '2012-10-17',
+        'Statement' => [
+          {
+            'Sid' => '',
+            'Effect' => 'Allow',
+            'Principal' => {
+              'Service' => [
+                'codedeploy.amazonaws.com'
+              ]
+            },
+            'Action' => 'sts:AssumeRole'
+          }
+        ]
+      }
+
+      result = iam_client.create_role(
+        role_name: @codedeploy_role,
+        assume_role_policy_document: code_deploy_policy.to_json
+      )
+      iam_client.attach_role_policy(
+        role_name: @codedeploy_role,
+        policy_arn: 'arn:aws:iam::aws:policy/service-role/AWSCodeDeployRole'
+      )
+      s.success "Created IAM Role successfully: #{@codedeploy_role.blue}"
+      result.role
+    end
   end
 
   def delete_deployment_group
@@ -372,7 +402,7 @@ class Moonshot::DeploymentMechanism::CodeDeploy # rubocop:disable ClassLength
   end
 
   def doctor_check_code_deploy_role
-    iam_client.get_role(role_name: @codedeploy_role).role
+    role
     success("#{@codedeploy_role} exists.")
   rescue => e
     help = <<-EOF
