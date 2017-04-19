@@ -17,8 +17,9 @@ module Moonshot::BuildMechanism
     def_delegator :@build_mechanism, :output_file
 
     # @param build_mechanism Delegates building after GitHub release is created.
-    def initialize(build_mechanism)
+    def initialize(build_mechanism, max_tag_find_attemps: 15)
       @build_mechanism = build_mechanism
+      @max_tag_find_attemps = max_tag_find_attemps
     end
 
     def doctor_hook
@@ -113,7 +114,7 @@ module Moonshot::BuildMechanism
     def git_push_tag(remote, tag)
       cmd = "git push #{remote} refs/tags/#{tag}:refs/tags/#{tag}"
       sh_step(cmd) do
-        sleep 2 # GitHub needs a moment to register the tag.
+        hub_find_remote_tag(tag)
       end
     end
 
@@ -139,6 +140,22 @@ module Moonshot::BuildMechanism
       end
       log.info("release #{semver} already exists") if exists
       exists
+    end
+
+    def hub_find_remote_tag(tag_name)
+      tries = 1
+      # Attempt to find the build. Rescue and re-attempt if the build can not
+      # be found on github yet.
+      begin
+        # Start with a sleep because the tag generally takes about a second
+        # to show up on github.
+        sleep tries * tries
+        sh_out("hub ls-remote --exit-code --tags upstream #{tag_name}")
+      rescue RuntimeError => e
+        tries += 1
+        retry unless tries >= @max_tag_find_attemps
+        raise e
+      end
     end
 
     def validate_commit
