@@ -275,7 +275,7 @@ module Moonshot
               event.resource_status.green
             end
       str << " #{event.logical_resource_id}"
-      str << " #{event.resource_status_reason.light_black}" if event.resource_status_reason
+      str << " #{event.resource_status_reason}" if event.resource_status_reason
 
       str
     end

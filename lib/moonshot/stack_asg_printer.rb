@@ -153,7 +153,7 @@ module Moonshot
 
     def row_for_activity(activity)
       [
-        activity.start_time.to_s.light_black,
+        activity.start_time.to_s,
         activity.description,
         status_with_color(activity.status_code),
         activity.progress.to_s << '%'
