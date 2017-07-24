@@ -152,9 +152,13 @@ module Moonshot
 
       run_plugins(:pre_delete)
       run_hook(:deploy, :pre_delete)
-      stack.delete
-      run_hook(:deploy, :post_delete)
-      run_plugins(:post_delete)
+      stack_ok = stack.delete
+      if stack_ok # rubocop:disable GuardClause
+        run_hook(:deploy, :post_delete)
+        run_plugins(:post_delete)
+      else
+        raise 'Stack deletion failed!'
+      end
     end
 
     def doctor

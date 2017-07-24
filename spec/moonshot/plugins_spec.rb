@@ -38,7 +38,7 @@ describe 'Plugins support' do
   end
 
   it "doesn't call an undefined method" do
-    expect(stack).to receive(:delete)
+    expect(stack).to receive(:delete).and_return(true)
 
     # The assertion here is that calling MockPlugin#pre_delete would cause an
     # exception. Using an expect().not_to receive() changes the behavior of
