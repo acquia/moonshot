@@ -33,6 +33,26 @@ Moonshot.config do |c|
 ...
 ```
 
+**skip_ci_status** is an optional flag. It would allow us to skip checks 
+on the commit's CI job status. Without this option, the GithubRelease mechanism will wait until the build is finished.
+
+Sample Usage
+
+```ruby
+Moonshot.config do |c|
+  wait_for_travis_mechanism = TravisDeploy.new("acquia/moonshot", true)
+  c.build_mechanism = GithubRelease.new(wait_for_travis_mechanism, skip_ci_status: true)
+...
+```
+Also a command-line option is available to override this value.
+
+	Usage: moonshot build VERSION
+	    -v, --[no-]verbose               Show debug logging
+	    -s, --skip-ci-status             Skip checks on CI jobs
+	    -n, --environment=NAME           Which environment to operate on.
+		--[no-]interactive-logger    Enable or disable fancy logging
+	    -F, --foo    
+
 ## TravisDeploy
 
 The Travis Build Mechanism waits for Travis-CI to finish building a

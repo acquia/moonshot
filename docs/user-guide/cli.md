@@ -16,6 +16,13 @@ Display debug logging. The types of things logged here are mostly
 useful only for core Moonshot developers, or if you are working on
 custom plugins.
 
+## `--skip-ci-status / -s`
+
+*Default: Disabled*
+
+It would allow us to skip checks on the commit's CI job status. 
+Without this option, the GithubRelease mechanism will wait until the build is finished.
+
 #### `--environment=NAME / -n NAME`
 
 *Default: dev-$USER, or as specified in the `environment_name`

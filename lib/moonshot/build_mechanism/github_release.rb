@@ -17,10 +17,20 @@ module Moonshot::BuildMechanism
     def_delegator :@build_mechanism, :output_file
 
     # @param build_mechanism Delegates building after GitHub release is created.
-    def initialize(build_mechanism, ci_status_timeout: 600, max_tag_find_timeout: 240)
+    def initialize(build_mechanism,
+                   ci_status_timeout: 600,
+                   max_tag_find_timeout: 240,
+                   skip_ci_status: false)
       @build_mechanism = build_mechanism
       @ci_status_timeout = ci_status_timeout
       @max_tag_find_timeout = max_tag_find_timeout
+      @skip_ci_status = skip_ci_status
+    end
+
+    def deploy_cli_hook(parser)
+      parser.on('-s', '--skip-ci-status', 'Skips checks on CI jobs', FalseClass) do |value|
+        @skip_ci_status = value
+      end
     end
 
     def doctor_hook
@@ -159,7 +169,7 @@ module Moonshot::BuildMechanism
       sh_step(cmd, msg: "Validate commit #{@sha}.") do |_, out|
         @commit_detail = out
       end
-      @ci_statuses = check_ci_status(@sha)
+      @ci_statuses = check_ci_status(@sha) if @skip_ci_status == false
     end
 
     def validate_changelog(version)

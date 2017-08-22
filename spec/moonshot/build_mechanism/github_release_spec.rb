@@ -189,5 +189,28 @@ module Moonshot # rubocop:disable ModuleLength
         expect { subject.send(:check_ci_status, sha) }.to raise_error(Shell::CommandError)
       end
     end
+    
+    describe '#validate_commit' do
+      let(:skip_ci) { false }
+      subject { 
+        s = described_class.new(build_mechanism, skip_ci_status: skip_ci);
+        s.resources = resources
+        s
+      }
+      
+      it 'calls check_ci_status' do
+        expect(subject).to receive(:check_ci_status)
+        subject.send(:validate_commit)
+      end
+
+      context 'when skip_ci_status is true' do
+        let(:skip_ci) { true }
+        it 'does not call check_ci_status' do
+          expect(subject).not_to receive(:check_ci_status)           
+          subject.send(:validate_commit)
+        end
+      end
+    end
+
   end
 end

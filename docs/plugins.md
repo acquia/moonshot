@@ -67,6 +67,7 @@ new command line option:
 ```
 Usage: moonshot build VERSION
     -v, --[no-]verbose               Show debug logging
+    -s, --skip-ci-status             Skip checks on CI jobs
     -n, --environment=NAME           Which environment to operate on.
         --[no-]interactive-logger    Enable or disable fancy logging
     -F, --foo                        ENABLE HYPERDRIVE
