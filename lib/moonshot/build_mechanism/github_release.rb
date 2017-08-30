@@ -27,14 +27,8 @@ module Moonshot::BuildMechanism
       @skip_ci_status = skip_ci_status
     end
 
-    def deploy_cli_hook(parser)
-      parser.on('-s', '--skip-ci-status', 'Skips checks on CI jobs', FalseClass) do |value|
-        @skip_ci_status = value
-      end
-    end
-
     def build_cli_hook(parser)
-      parser.on('-s', '--skip-ci-status', 'Skips checks on CI jobs', FalseClass) do |value|
+      parser.on('-s', '--[no-]skip-ci-status', 'Skips checks on CI jobs', TrueClass) do |value|
         @skip_ci_status = value
       end
     end
