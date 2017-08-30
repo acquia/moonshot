@@ -33,6 +33,12 @@ module Moonshot::BuildMechanism
       end
     end
 
+    def build_cli_hook(parser)
+      parser.on('-s', '--skip-ci-status', 'Skips checks on CI jobs', FalseClass) do |value|
+        @skip_ci_status = value
+      end
+    end
+
     def doctor_hook
       super
       @build_mechanism.doctor_hook
