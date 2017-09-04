@@ -1,12 +1,12 @@
 describe Moonshot::Commands::Build do
 
-  it 'should not handle --skip-ci-status and build correctly' do
+  it 'should raise RuntimeError when send --skip-ci-status param without GithubRelease plugin' do
     cli_dispatcher = Moonshot::CommandLineDispatcher.new('build', subject, {})
     parser = cli_dispatcher.send(:build_parser, subject)
     expect { parser.parse(%w(--skip-ci-status)) }.to raise_error(RuntimeError)
   end
   
-  it 'should handle --skip-ci-status and build correctly' do
+  it 'should not raise RuntimeError when send --skip-ci-status param with GithubRelease plugin' do
     Moonshot.config = Moonshot::ControllerConfig.new
     Moonshot.config do |c|
       c.build_mechanism = Moonshot::BuildMechanism::GithubRelease.new('')
