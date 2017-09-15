@@ -26,6 +26,7 @@ module Moonshot
     attr_accessor :ssh_command
     attr_accessor :ssh_config
     attr_accessor :ssh_instance
+    attr_accessor :template_s3_bucket
 
     def initialize
       @default_parameter_source = AskUserSource.new
