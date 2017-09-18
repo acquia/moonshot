@@ -177,15 +177,15 @@ module Moonshot
     end
 
     def upload_template_to_s3
-      raise 'The S3 bucket to store the template in is not configured.' unless @config.template_s3_bucket
+      raise 'The S3 bucket to store the template in is not configured.' unless @config.template_s3_bucket # rubocop:disable LineLength
 
       s3_object_key = "#{@name}-#{File.basename(template.filename)}"
-        s3_client = Aws::S3::Client.new
-        s3_client.put_object(
-          bucket: @config.template_s3_bucket,
-          key: s3_object_key,
-          body: template.body
-        )
+      s3_client = Aws::S3::Client.new
+      s3_client.put_object(
+        bucket: @config.template_s3_bucket,
+        key: s3_object_key,
+        body: template.body
+      )
       template_url = "http://#{@config.template_s3_bucket}.s3.amazonaws.com/#{s3_object_key}"
       puts "The template has been uploaded to #{template_url}"
 
