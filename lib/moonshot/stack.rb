@@ -176,14 +176,35 @@ module Moonshot
       raise "Could not describe stack: #{name}"
     end
 
+    def upload_template_to_s3
+      raise 'The S3 bucket to store the template in is not configured.' unless @config.template_s3_bucket # rubocop:disable LineLength
+
+      s3_object_key = "#{@name}-#{File.basename(template.filename)}"
+      s3_client = Aws::S3::Client.new
+      s3_client.put_object(
+        bucket: @config.template_s3_bucket,
+        key: s3_object_key,
+        body: template.body
+      )
+      template_url = "http://#{@config.template_s3_bucket}.s3.amazonaws.com/#{s3_object_key}"
+      puts "The template has been uploaded to #{template_url}"
+
+      template_url
+    end
+
     def create_stack
-      cf_client.create_stack(
+      parameters = {
         stack_name: @name,
-        template_body: template.body,
         capabilities: %w(CAPABILITY_IAM CAPABILITY_NAMED_IAM),
         parameters: @config.parameters.values.map(&:to_cf),
         tags: make_tags
-      )
+      }
+      if @config.template_s3_bucket
+        parameters[:template_url] = upload_template_to_s3
+      else
+        parameters[:template_body] = template.body
+      end
+      cf_client.create_stack(parameters)
     rescue Aws::CloudFormation::Errors::AccessDenied
       raise 'You are not authorized to perform create_stack calls.'
     end
@@ -195,14 +216,20 @@ module Moonshot
         Time.now.utc.to_i.to_s
       ].join('-')
 
-      cf_client.create_change_set(
+      parameters = {
         change_set_name: change_set_name,
         description: "Moonshot update command for application '#{Moonshot.config.app_name}'",
         stack_name: @name,
-        template_body: template.body,
         capabilities:  %w(CAPABILITY_IAM CAPABILITY_NAMED_IAM),
         parameters: @config.parameters.values.map(&:to_cf)
-      )
+      }
+      if @config.template_s3_bucket
+        parameters[:template_url] = upload_template_to_s3
+      else
+        parameters[:template_body] = template.body
+      end
+
+      cf_client.create_change_set(parameters)
 
       change_set_name
     end
@@ -289,7 +316,12 @@ module Moonshot
     end
 
     def doctor_check_template_against_aws
-      cf_client.validate_template(template_body: template.body)
+      if @config.template_s3_bucket
+        parameters[:template_url] = upload_template_to_s3
+      else
+        parameters[:template_body] = template.body
+      end
+      cf_client.validate_template(parameters)
       success('CloudFormation template is valid.')
     rescue => e
       critical('Invalid CloudFormation template!', e.message)
