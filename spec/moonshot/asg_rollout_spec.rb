@@ -150,11 +150,10 @@ describe Moonshot::Tools::ASGRollout do
     end
 
     let(:should_be_successful) { false }
-    let(:should_use_everything) { false }
+    let(:should_use_everything) { true }
 
     it 'should fail' do
-      expect { subject.run! }
-        .to raise_error('TerminateWhen for i-0000001 did not complete in 0.35 seconds!')
+      expect { subject.run! }.not_to raise_error
 
       log_expectations = [
         [:success, 'Increased MaxSize/DesiredCapacity by 1.'],
@@ -172,6 +171,15 @@ describe Moonshot::Tools::ASGRollout do
         [:debug, 'Checking for terminatability 3/5'],
         [:debug, 'Checking for terminatability 4/5'],
         [:failure, 'TerminateWhen for i-0000001 did not complete in 0.35 seconds!'],
+        [:success, 'Terminated i-0000001!'],
+        [:debug, 'This is a debug message from a pre-detach hook.'],
+        [:info, 'This is an info message from a pre-detach hook.'],
+        [:success, 'PreDetach hook complete for i-0000002!'],
+        [:success, 'Detached instance i-0000002, and decremented DesiredCapacity.'],
+        [:success, 'Instance i-0000002 is ASG:Detached/ELB:Missing!'],
+        [:debug, "Checking for terminatability 5/5"],
+        [:success, "Completed TerminateWhen check for i-0000002!"],
+        [:success, 'Terminated i-0000002!'],
         [:success, 'Restored MaxSize/DesiredCapacity values to normal!']
       ]
       expect(moonshot_config.interactive_logger.final_logs).to eq(log_expectations)

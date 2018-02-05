@@ -130,15 +130,16 @@ module Moonshot
           timeout = @config.terminate_when_timeout
 
           loop do
-            break if @config.terminate_when.call(he)
+            if @config.terminate_when.call(he)
+              s.success "Completed TerminateWhen check for #{instance.blue}!"
+              break
+            end
             sleep @config.terminate_when_delay
             if Time.now.to_f - start > timeout
               s.failure "TerminateWhen for #{instance.blue} did not complete in #{timeout} seconds!"
-              raise "TerminateWhen for #{instance.blue} did not complete in #{timeout} seconds!"
+              break
             end
           end
-
-          s.success "Completed TerminateWhen check for #{instance.blue}!"
         end
       end
 
