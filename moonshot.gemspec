@@ -29,6 +29,7 @@ Gem::Specification.new do |s|
   s.add_dependency('vandamme')
   s.add_dependency('pry')
   s.add_dependency('require_all')
+  s.add_dependency('rdoc')
 
   s.add_development_dependency('rspec')
   s.add_development_dependency('simplecov')
