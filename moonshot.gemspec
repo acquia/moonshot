@@ -34,7 +34,7 @@ Gem::Specification.new do |s|
   s.add_dependency('travis')
   s.add_dependency('vandamme')
   s.add_dependency('pry')
-  s.add_dependency('require_all', '~> 1.5.0')
+  s.add_dependency('require_all', '~> 2.0.0')
 
   s.add_development_dependency('rspec')
   s.add_development_dependency('simplecov')

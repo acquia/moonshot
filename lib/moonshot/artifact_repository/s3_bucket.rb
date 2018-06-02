@@ -1,3 +1,6 @@
+require_relative '../creds_helper'
+require_relative '../doctor_helper'
+require_relative '../resources_helper'
 # The S3Bucket stores builds in an S3 Bucket.
 #
 # For example:
@@ -6,9 +9,9 @@
 #   self.artifact_repository = S3Bucket.new('my-application-builds')
 # end
 class Moonshot::ArtifactRepository::S3Bucket
-  include Moonshot::ResourcesHelper
   include Moonshot::CredsHelper
   include Moonshot::DoctorHelper
+  include Moonshot::ResourcesHelper
 
   attr_reader :bucket_name
 
