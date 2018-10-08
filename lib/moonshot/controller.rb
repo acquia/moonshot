@@ -112,7 +112,7 @@ module Moonshot
 
       run_hook(:deploy, :pre_update)
       stack.update(dry_run: dry_run, force: force)
-      run_hook(:deploy, :post_update)
+      run_hook(:deploy, :post_update) unless dry_run
       run_plugins(:post_update)
     end
 
