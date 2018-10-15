@@ -46,9 +46,7 @@ module Moonshot
 
       return change_set.delete if dry_run
 
-      unless force
-        change_set.confirm? || raise('ChangeSet rejected!')
-      end
+      !force && change_set.confirm? || raise('ChangeSet rejected!')
 
       execute_change_set(change_set)
     end
