@@ -320,12 +320,13 @@ module Moonshot
     end
 
     def doctor_check_template_against_aws
+      validate_params = {}
       if @config.template_s3_bucket
-        parameters[:template_url] = upload_template_to_s3
+        validate_params[:template_url] = upload_template_to_s3
       else
-        parameters[:template_body] = template.body
+        validate_params[:template_body] = template.body
       end
-      cf_client.validate_template(parameters)
+      cf_client.validate_template(validate_params)
       success('CloudFormation template is valid.')
     rescue => e
       critical('Invalid CloudFormation template!', e.message)
