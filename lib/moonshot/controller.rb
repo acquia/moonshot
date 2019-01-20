@@ -11,7 +11,7 @@ module Moonshot
       Moonshot::StackLister.new(@config.app_name).list
     end
 
-    def create # rubocop:disable AbcSize
+    def create
       # Scan the template for all required parameters and configure
       # the ParameterCollection.
       @config.parameters = ParameterCollection.from_template(stack.template)
@@ -20,17 +20,8 @@ module Moonshot
       # stack.
       ParentStackParameterLoader.new(@config).load!
 
-      # If there is an answer file, use it to populate parameters.
-      if @config.answer_file
-        YAML.load_file(@config.answer_file).each do |key, value|
-          @config.parameters[key] = value
-        end
-      end
-
-      # Apply any overrides configured, such as from the CLI -p option.
-      @config.parameter_overrides.each do |key, value|
-        @config.parameters[key] = value
-      end
+      # Override Parameters from default then defined answer_file, then cli input params
+      @config = ParameterCollection.apply_overrides(@config)
 
       # Interview the user for missing parameters, using the
       # appropriate prompts.
@@ -78,17 +69,8 @@ module Moonshot
       parent_stack_params = ParentStackParameterLoader.new(@config)
       refresh_parameters ? parent_stack_params.load! : parent_stack_params.load_missing_only!
 
-      # If there is an answer file, use it to populate parameters.
-      if @config.answer_file
-        YAML.load_file(@config.answer_file).each do |key, value|
-          @config.parameters[key] = value
-        end
-      end
-
-      # Apply any overrides configured, such as from the CLI -p option.
-      @config.parameter_overrides.each do |key, value|
-        @config.parameters[key] = value
-      end
+      # Override Parameters from default then defined answer_file, then cli input params
+      @config = ParameterCollection.apply_overrides(@config)
 
       # Interview the user for missing parameters, using the
       # appropriate prompts.

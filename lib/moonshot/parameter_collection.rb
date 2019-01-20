@@ -17,6 +17,34 @@ module Moonshot
       obj
     end
 
+    def self.apply_overrides(config)
+      raise unless config.instance_of?(Moonshot::ControllerConfig)
+
+      default_answer_file = File.join(config.project_root,
+                                      'moonshot',
+                                      'params',
+                                      "#{config.environment_name}.yml")
+
+      answer_file = config.answer_file ? config.answer_file : default_answer_file
+
+      # The order we override parameters in is, in order of least to most important:
+      #   * project_root/moonshot/params/#{environment}.yml
+      #   * file defined by the user with -a/--answer-file
+      #   * individual parameters the user input with -P/--parameter
+      #
+      if File.readable?(answer_file)
+        YAML.load_file(answer_file).each do |key, value|
+          config.parameters[key] = value
+        end
+      end
+
+      config.parameter_overrides.each do |key, value|
+        config.parameters[key] = value
+      end
+
+      config
+    end
+
     def initialize
       @hash = {}
     end
