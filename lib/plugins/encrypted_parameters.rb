@@ -96,7 +96,7 @@ module Moonshot
 
         @ilog.start_threaded "Checking for KMS Key #{@kms_key_parameter_name}" do |s|
           if Moonshot.config.parameters.key?(@kms_key_parameter_name)
-            if 'Auto' == Moonshot.config.parameters[@kms_key_parameter_name].value
+            if Moonshot.config.parameters[@kms_key_parameter_name].value == 'Auto'
               s.continue "Auto-generating KMS Key for #{@kms_key_parameter_name.blue}... "
               key_arn = KmsKey.create.arn
               Moonshot.config.parameters[@kms_key_parameter_name].set(key_arn)

@@ -20,7 +20,7 @@ module Moonshot
       def initialize
         yield self if block_given?
         validate_configuration
-        @target_name ||= '%{app_name}_%{timestamp}_%{user}.tar.gz'
+        @target_name ||= '%<app_name>s_%<timestamp>s_%<user>s.tar.gz'
       end
 
       # Factory method to create preconfigured Backup plugins. Uploads current
@@ -33,7 +33,7 @@ module Moonshot
           b.bucket = bucket
           b.backup_parameters = true
           b.backup_template = true
-          b.hooks = [:post_create, :post_update]
+          b.hooks = %i[post_create post_update]
         end
       end
 
@@ -110,7 +110,7 @@ module Moonshot
 
           # adding template file
           if @backup_template
-            template_file_path = render('cloud_formation/%{app_name}.json')
+            template_file_path = render('cloud_formation/%<app_name>s.json')
             add_file_to_tar(writer, template_file_path)
           end
         end
@@ -123,7 +123,7 @@ module Moonshot
       # @param writer [TarWriter]
       # @param file_name [String]
       def add_file_to_tar(writer, file_name)
-        writer.add_file(File.basename(file_name), 0644) do |io|
+        writer.add_file(File.basename(file_name), 0o644) do |io|
           begin
             File.open(file_name, 'r') { |f| io.write(f.read) }
           rescue Errno::ENOENT
@@ -139,7 +139,7 @@ module Moonshot
       # @param target_filename [String]
       # @param content [String]
       def add_str_to_tar(writer, target_filename, content)
-        writer.add_file(File.basename(target_filename), 0644) do |io|
+        writer.add_file(File.basename(target_filename), 0o644) do |io|
           io.write(content.to_yaml)
         end
       end
@@ -196,17 +196,12 @@ module Moonshot
       end
 
       def define_bucket
-        case
         # returning already calculated bucket name
-        when @target_bucket
-          @target_bucket
+        return @target_bucket if @target_bucket
         # single bucket for all accounts
-        when @bucket
-          @bucket
+        return @bucket if @bucket
         # calculating bucket based on account name
-        when @buckets
-          bucket_by_account(iam_account)
-        end
+        return bucket_by_account(iam_account) if @buckets
       end
 
       def bucket_by_account(account)

@@ -152,9 +152,11 @@ module Moonshot
 
         # Support the legacy file location from Moonshot 1.0.
         YamlStackTemplate.new(
-          File.join(@config.project_root, 'cloud_formation', "#{@config.app_name}.yml")),
+          File.join(@config.project_root, 'cloud_formation', "#{@config.app_name}.yml")
+        ),
         JsonStackTemplate.new(
-          File.join(@config.project_root, 'cloud_formation', "#{@config.app_name}.json"))
+          File.join(@config.project_root, 'cloud_formation', "#{@config.app_name}.json")
+        )
       ]
 
       template = templates.find(&:exist?)
@@ -199,7 +201,7 @@ module Moonshot
     def create_stack
       parameters = {
         stack_name: @name,
-        capabilities: %w(CAPABILITY_IAM CAPABILITY_NAMED_IAM),
+        capabilities: %w[CAPABILITY_IAM CAPABILITY_NAMED_IAM],
         parameters: @config.parameters.values.map(&:to_cf),
         tags: make_tags
       }
@@ -224,7 +226,7 @@ module Moonshot
         change_set_name: change_set_name,
         description: "Moonshot update command for application '#{Moonshot.config.app_name}'",
         stack_name: @name,
-        capabilities:  %w(CAPABILITY_IAM CAPABILITY_NAMED_IAM),
+        capabilities:  %w[CAPABILITY_IAM CAPABILITY_NAMED_IAM],
         parameters: @config.parameters.values.map(&:to_cf)
       }
       if @config.template_s3_bucket

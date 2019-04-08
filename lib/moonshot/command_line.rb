@@ -51,7 +51,7 @@ module Moonshot
 
       # Determine what command is being run, which should be the first argument.
       command = ARGV.shift
-      if %w(--help -h help).include?(command) || command.nil?
+      if %w[--help -h help].include?(command) || command.nil?
         usage
         return
       end

@@ -61,10 +61,10 @@ class Moonshot::BuildMechanism::Script
       end
 
       result = wait.value
-      if result.exitstatus == 0
+      if result.exitstatus.zero?
         step.success "Build script #{@script} exited successfully!"
       end
-      unless result.exitstatus == 0
+      unless result.exitstatus.zero?
         ilog.error "Build script failed with exit status #{result.exitstatus}!"
         ilog.error output.join("\n")
         step.failure "Build script #{@script} failed with exit status #{result.exitstatus}!"

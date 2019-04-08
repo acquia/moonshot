@@ -83,16 +83,16 @@ module Moonshot
       end
 
       def run_pre_detach(instance)
-        if @config.pre_detach
-          log.start_threaded "Running PreDetach hook on #{instance.blue}..." do |s|
-            he = HookExecEnvironment.new(@controller.config, instance)
-            if false == @config.pre_detach.call(he)
-              s.failure "PreDetach hook failed for #{instance.blue}!"
-              raise "PreDetach hook failed for #{instance.blue}!"
-            end
+        return unless @config.pre_detach
 
-            s.success "PreDetach hook complete for #{instance.blue}!"
+        log.start_threaded "Running PreDetach hook on #{instance.blue}..." do |s|
+          he = HookExecEnvironment.new(@controller.config, instance)
+          if @config.pre_detach.call(he) == false
+            s.failure "PreDetach hook failed for #{instance.blue}!"
+            raise "PreDetach hook failed for #{instance.blue}!"
           end
+
+          s.success "PreDetach hook complete for #{instance.blue}!"
         end
       end
 

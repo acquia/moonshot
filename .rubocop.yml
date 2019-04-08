@@ -10,6 +10,8 @@ AllCops:
     - 'lib/default/**/*'
 Metrics/AbcSize:
   Max: 35
+Metrics/BlockLength:
+  Max: 35
 Metrics/MethodLength:
   Max: 30
 Metrics/LineLength:
@@ -19,4 +21,8 @@ Style/ClassAndModuleChildren:
 Metrics/ClassLength:
   Max: 130
 Style/Documentation:
+  Enabled: false
+Style/MethodMissing:
+  Enabled: false
+Layout/IndentHeredoc:
   Enabled: false

@@ -42,7 +42,8 @@ class Moonshot::DeploymentMechanism::CodeDeploy # rubocop:disable ClassLength
       role: DEFAULT_ROLE_NAME,
       app_name: nil,
       group_name: nil,
-      config_name: 'CodeDeployDefault.OneAtATime')
+      config_name: 'CodeDeployDefault.OneAtATime'
+  )
     @asg_logical_ids = Array(asg)
     @optional_asg_logical_ids = Array(optional_asg)
     @app_name = app_name
@@ -183,7 +184,9 @@ class Moonshot::DeploymentMechanism::CodeDeploy # rubocop:disable ClassLength
       end
 
       groups = as_client.describe_auto_scaling_groups(
-        auto_scaling_group_names: [asg_name])
+        auto_scaling_group_names: [asg_name]
+      )
+
       if groups.auto_scaling_groups.empty?
         raise "Could not find ASG #{asg_name}."
       end
@@ -220,13 +223,16 @@ class Moonshot::DeploymentMechanism::CodeDeploy # rubocop:disable ClassLength
 
   def deployment_group
     cd_client.get_deployment_group(
-      application_name: app_name, deployment_group_name: group_name)
-             .deployment_group_info
+      application_name: app_name,
+      deployment_group_name: group_name
+    ).deployment_group_info
   end
 
   def deployment_group_exists?
     cd_client.get_deployment_group(
-      application_name: app_name, deployment_group_name: group_name)
+      application_name: app_name,
+      deployment_group_name: group_name
+    )
     true
   rescue Aws::CodeDeploy::Errors::ApplicationDoesNotExistException,
          Aws::CodeDeploy::Errors::DeploymentGroupDoesNotExistException
@@ -284,7 +290,8 @@ class Moonshot::DeploymentMechanism::CodeDeploy # rubocop:disable ClassLength
     ilog.start "Deleting #{pretty_deploy_group}." do |s|
       cd_client.delete_deployment_group(
         application_name: app_name,
-        deployment_group_name: group_name)
+        deployment_group_name: group_name
+      )
       s.success
     end
   end
@@ -294,7 +301,8 @@ class Moonshot::DeploymentMechanism::CodeDeploy # rubocop:disable ClassLength
       application_name: app_name,
       deployment_group_name: group_name,
       service_role_arn: role.arn,
-      auto_scaling_groups: asg_names)
+      auto_scaling_groups: asg_names
+    )
   end
 
   def wait_for_asg_capacity

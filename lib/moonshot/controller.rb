@@ -176,7 +176,8 @@ module Moonshot
     def ssh
       run_plugins(:pre_ssh)
       @config.ssh_instance ||= SSHTargetSelector.new(
-        stack, asg_name: @config.ssh_auto_scaling_group_name).choose!
+        stack, asg_name: @config.ssh_auto_scaling_group_name
+      ).choose!
       cb = SSHCommandBuilder.new(@config.ssh_config, @config.ssh_instance)
       result = cb.build(@config.ssh_command)
 

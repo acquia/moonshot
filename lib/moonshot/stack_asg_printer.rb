@@ -1,4 +1,5 @@
 # coding: utf-8
+
 require 'colorize'
 require 'ruby-duration'
 
@@ -16,8 +17,8 @@ module Moonshot
     def print
       asgs.each do |asg|
         asg_info = as_client.describe_auto_scaling_groups(
-          auto_scaling_group_names: [asg.physical_resource_id])
-                            .auto_scaling_groups.first
+          auto_scaling_group_names: [asg.physical_resource_id]
+        ).auto_scaling_groups.first
         t_asg_info = @table.add_leaf("ASG: #{asg.logical_resource_id}")
 
         add_asg_info(t_asg_info, asg_info)
@@ -142,7 +143,8 @@ module Moonshot
     def add_recent_activity_leaf(table, asg_name)
       recent = table.add_leaf('Recent Activity')
       resp = as_client.describe_scaling_activities(
-        auto_scaling_group_name: asg_name).activities
+        auto_scaling_group_name: asg_name
+      ).activities
 
       rows = resp.sort_by(&:start_time).reverse.first(10).map do |activity|
         row_for_activity(activity)

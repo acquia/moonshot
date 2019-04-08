@@ -60,14 +60,16 @@ module Moonshot
       wait_for_change_set unless @change_set
       @cf_client.execute_change_set(
         change_set_name: @name,
-        stack_name: @stack_name)
+        stack_name: @stack_name
+      )
     end
 
     def delete
       wait_for_change_set unless @change_set
       @cf_client.delete_change_set(
         change_set_name: @name,
-        stack_name: @stack_name)
+        stack_name: @stack_name
+      )
     rescue Aws::CloudFormation::Errors::InvalidChangeSetStatus
       sleep 1
       retry

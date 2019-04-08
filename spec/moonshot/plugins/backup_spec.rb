@@ -53,7 +53,7 @@ describe Moonshot::Plugins::Backup do
       end
     end
     it 'should set a default value to target_name if not specified' do
-      expect(backup.target_name).to eq '%{app_name}_%{timestamp}_%{user}.tar.gz'
+      expect(backup.target_name).to eq '%<app_name>s_%<timestamp>s_%<user>s.tar.gz'
     end
   end
 

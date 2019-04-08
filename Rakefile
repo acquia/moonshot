@@ -10,4 +10,4 @@ end
 
 RSpec::Core::RakeTask.new(:spec)
 
-task default: [:spec, :rubocop]
+task default: %i[spec rubocop]
