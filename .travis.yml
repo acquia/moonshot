@@ -15,8 +15,8 @@ addons:
       - cmake
 
 before_install:
-  - gem update --system
-  - gem update bundler
+  - gem i rubygems-update -v '<3' && update_rubygems
+  - gem install bundler
 
 rvm:
   - 2.1
