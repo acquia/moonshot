@@ -216,7 +216,7 @@ module Moonshot
       @config.plugins.each do |plugin|
         next unless plugin.respond_to?(type)
         results[plugin] =
-          if type =~ /setup/
+          if type =~ /^setup_/
             plugin.send(type)
           else
             plugin.send(type, resources)
