@@ -70,7 +70,7 @@ on how Moonshot is maintained.
 
 ## Requirements
 
-- Ruby 2.1 or higher
+- Ruby 2.2 or higher
 
 ## Attributions
 
