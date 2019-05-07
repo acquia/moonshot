@@ -27,6 +27,13 @@ methods:
 - post_doctor
 - pre_ssh
 - post_ssh
+- setup_create
+- setup_update
+- setup_status
+- setup_build
+- setup_deploy
+- setup_delete
+
 
 The method will be handed a single argument, which is an instance of the
 `Moonshot::Resources` class. This instance gives the plugin access to three
@@ -38,6 +45,10 @@ display status to the user of the CLI interface.
 retreive the name of the stack, stack parameters and stack outputs. This support
 should be expanded in the future to provide Plugins with more control over the
 CloudFormation stack.
+
+`setup` hooks work a bit differently. They are invoked before any other business
+logic is executed. This means no resource objects are actually instantiated,
+therefore no parameters are passed in this case.
 
 ## Manipulating CLI options with Plugins
 

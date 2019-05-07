@@ -12,6 +12,7 @@ module Moonshot
     end
 
     def create # rubocop:disable AbcSize
+      run_plugins(:setup_create)
       # Scan the template for all required parameters and configure
       # the ParameterCollection.
       @config.parameters = ParameterCollection.from_template(stack.template)
@@ -64,6 +65,7 @@ module Moonshot
     end
 
     def update(dry_run:, force:, refresh_parameters:) # rubocop:disable AbcSize
+      run_plugins(:setup_update)
       # Scan the template for all required parameters and configure
       # the ParameterCollection.
       @config.parameters = ParameterCollection.from_template(stack.template)
@@ -116,6 +118,7 @@ module Moonshot
     end
 
     def status
+      run_plugins(:setup_status)
       run_plugins(:pre_status)
       run_hook(:deploy, :status)
       stack.status
@@ -129,6 +132,7 @@ module Moonshot
     end
 
     def build_version(version_name)
+      run_plugins(:setup_build)
       run_plugins(:pre_build)
       run_hook(:build, :pre_build, version_name)
       run_hook(:build, :build, version_name)
@@ -138,12 +142,14 @@ module Moonshot
     end
 
     def deploy_version(version_name)
+      run_plugins(:setup_deploy)
       run_plugins(:pre_deploy)
       run_hook(:deploy, :deploy, @config.artifact_repository, version_name)
       run_plugins(:post_deploy)
     end
 
     def delete
+      run_plugins(:setup_delete)
       # Populate the current values of parameters, for use by plugins.
       @config.parameters = ParameterCollection.from_template(stack.template)
       stack.parameters.each do |key, value|
@@ -210,7 +216,12 @@ module Moonshot
       results = {}
       @config.plugins.each do |plugin|
         next unless plugin.respond_to?(type)
-        results[plugin] = plugin.send(type, resources)
+        results[plugin] =
+          if type =~ /setup/
+            plugin.send(type)
+          else
+            plugin.send(type, resources)
+          end
       end
 
       results
