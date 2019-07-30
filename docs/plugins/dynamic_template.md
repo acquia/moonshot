@@ -10,7 +10,7 @@ available in the form of a CLI.
 
 The plugin accepts three configuration parameters:
 - `source`: path to the source template file
-- `parameters`: key-value pairs of the parameters of your choice
+- `parameters`: parameters of your choice (see below - [parameters](#parameters))
 - `destination`: the target file path
 
 Your template must be conforming the ERB standards. You can use both
@@ -24,3 +24,22 @@ Moonshot::Plugins::DynamicTemplate.new(
   destination: 'cloud_formation/cdb-api.json'
 )
 ```
+
+## Parameters
+
+The 'hack' with lambdas created for the cases when you need to read
+CLI parameters before running the plugin.
+
+Parameters could be described in two ways:
+* key-value pairs
+  ```ruby
+  parameters: { deletion_policy: 'Retain' }
+  ```
+
+* lambdas
+  ```ruby
+  parameters = -> environment_name {
+  environment = environment_name =~ prod_regexp ? 'prod' : 'dev'
+  parameters = YAML.load_file("cloud_formation/parameters/#{environment}.yml")
+  }
+  ```

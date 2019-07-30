@@ -24,8 +24,17 @@ module Moonshot
 
     def initialize(source:, parameters:, destination:)
       @source = File.read(source)
-      @parameters = Parameters.new(parameters)
+      @parameters = parameters
       @destination = destination
+    end
+
+    def parameters_obj
+      @parameters_obj ||= Parameters.new(parameters_file)
+    end
+
+    def parameters_file
+      env_name = Moonshot.config.environment_name
+      @parameters.respond_to?(:call) ? @parameters.call(env_name) : @parameters
     end
 
     def process
@@ -52,7 +61,7 @@ module Moonshot
     end
 
     def generate_template
-      ERB.new(@source).result(@parameters.expose_binding)
+      ERB.new(@source).result(parameters_obj.expose_binding)
     end
 
     def write_output(content)
