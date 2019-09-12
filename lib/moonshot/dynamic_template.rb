@@ -22,6 +22,8 @@ module Moonshot
       end
     end
 
+    attr_writer :destination
+
     def initialize(source:, parameters:, destination:)
       @source = File.read(source)
       @parameters = parameters
