@@ -42,12 +42,11 @@ module Moonshot
       wait_for_change_set(change_set)
       return unless change_set.valid?
 
-      if dry_run
-        change_set.display_changes
-      elsif !force
-        change_set.display_changes
-        change_set.confirm? || raise('ChangeSet rejected!')
-      end
+      change_set.display_changes
+
+      return change_set.delete if dry_run
+
+      !force && change_set.confirm? || raise('ChangeSet rejected!')
 
       execute_change_set(change_set)
     end
