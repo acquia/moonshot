@@ -1,5 +1,8 @@
+/moonshot-*.gem
+/.bundle
 /Gemfile.lock
 /vendor
 /coverage
+/cc-test-reporter
 site/
 sample/gems

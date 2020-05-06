@@ -56,7 +56,7 @@ We also want to [help you contribute and answer all your questions](http://moons
 
 ## Requirements
 
-- Ruby 2.2 or higher
+- Ruby 2.5 or higher
 
 ## Attributions
 

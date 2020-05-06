@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = 'moonshot'
-  s.version     = '2.0.0.beta6'
+  s.version     = '2.1.0.beta1'
   s.licenses    = ['Apache-2.0']
   s.summary     = 'A library and CLI tool for launching services into AWS'
   s.description = 'A library and CLI tool for launching services into AWS.'
@@ -37,7 +37,10 @@ Gem::Specification.new do |s|
   s.add_dependency('require_all', '~> 1.5.0')
 
   s.add_development_dependency('rspec')
-  s.add_development_dependency('simplecov')
+  # Workaround for cc-test-reporter with SimpleCov 0.18.
+  # Stop upgrading SimpleCov until the following issue will be resolved.
+  # https://github.com/codeclimate/test-reporter/issues/418
+  s.add_development_dependency('simplecov', '~> 0.17.1')
   # fakefs requires < 0.14.0 for ruby 2.2
   s.add_development_dependency('fakefs', '< 0.14.0')
 end
