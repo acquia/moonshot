@@ -12,6 +12,7 @@ module Moonshot
 
     def build(command = nil)
       cmd = ['ssh', '-t']
+      cmd << @config.ssh_options if @config.ssh_options
       cmd << "-i #{@config.ssh_identity_file}" if @config.ssh_identity_file
       cmd << "-l #{@config.ssh_user}" if @config.ssh_user
       cmd << instance_ip

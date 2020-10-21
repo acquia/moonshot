@@ -1,21 +1,31 @@
-describe Moonshot::ASG do
+describe Moonshot::RotateAsgInstances::ASG do
   let(:name) { 'cdb-worker-dev-jarmes-WorkerASG-Q7DYM7901RBY' }
   let(:instance_id) { 'i-585e91dc' }
   let(:instance_id_2) { 'i-685e91dc' }
-  let(:system) { instance_double(System) }
+  let(:ssh_executor) { Moonshot::SSHForkExecutor }
+  let(:moonshot_config) { Moonshot.config }
+  let(:controller) do
+    instance_double('Moonshot::Controller',
+                    config: moonshot_config,
+                    stack: instance_double(
+                      Moonshot::Stack,
+                      name: 'test_name',
+                      parameters: {}
+                    )
+    )
+  end
   let(:resources) do
     instance_double(
       Moonshot::Resources,
-      stack: instance_double(
-        Moonshot::Stack,
-        name: 'test_name',
-        parameters: {}
-      ),
       ilog: instance_double(Moonshot::InteractiveLoggerProxy),
-      controller: instance_double(
-        Moonshot::Controller,
-        config: instance_double(Moonshot::ControllerConfig, app_name: 'test')
-      )
+      controller: controller
+    )
+  end
+
+  let(:asg) do
+    instance_double(
+      Aws::AutoScaling::AutoScalingGroup,
+      name: 'asg'
     )
   end
 
@@ -38,11 +48,7 @@ describe Moonshot::ASG do
     )
   end
 
-  before(:each) do
-    allow(System).to receive(:new)
-      .and_return(system)
-    stub_cf_client
-  end
+  before(:each) { stub_cf_client }
 
   def stub_cf_client
     @cf_client = instance_double(Aws::CloudFormation::Client)
@@ -53,9 +59,7 @@ describe Moonshot::ASG do
     allow(@cf_client).to receive(:validate_template).and_return(true)
   end
 
-  subject do
-    described_class.new(resources)
-  end
+  subject { described_class.new(resources) }
 
   describe '#cycle_instances' do
     before(:each) do
@@ -108,66 +112,42 @@ describe Moonshot::ASG do
     end
   end
 
-  describe '#initialize' do
-    before(:each) do
-      allow(System).to receive(:new)
-        .and_return(system)
-      stub_cf_client
-    end
-    context 'when MOONSHOT_SSH_USER is not defined' do
-      it 'uses LOGNAME for ssh_user' do
-        ENV['LOGNAME'] = 'SemiCoolDude'
-        ENV.delete('MOONSHOT_SSH_USER')
-        expect(subject.instance_variable_get(:@ssh_user))
-          .to eq('SemiCoolDude')
-      end
-    end
-
-    context 'when MOONSHOT_SSH_USER is defined' do
-      it 'uses MOONSHOT_SSH_USER for ssh_user' do
-        ENV['MOONSHOT_SSH_USER'] = 'CoolDude'
-        expect(subject.instance_variable_get(:@ssh_user))
-          .to eq('CoolDude')
-      end
-    end
-  end
-
   describe '#shutdown_instance' do
-    let(:hostname) { 'ec2-54-236-102-14.compute-1.amazonaws.com' }
+    let(:public_ip_address) { '10.234.32.21' }
     let(:instance) { instance_double(Aws::EC2::Instance) }
+    let(:command_builder) { Moonshot::SSHCommandBuilder }
     subject { super().send(:shutdown_instance, instance_id) }
 
     before(:each) do
+      moonshot_config.ssh_config.ssh_user = 'ci_user'
+      moonshot_config.ssh_config.ssh_options = ssh_options
       allow(Aws::EC2::Instance).to receive(:new).and_return(instance)
-      allow(instance).to receive(:public_dns_name) \
-        .and_return(hostname)
-      allow(System).to receive(:exec)
+      allow_any_instance_of(command_builder).to receive(:instance_ip).and_return(public_ip_address)
+      allow(instance).to receive(:wait_until_stopped)
     end
 
-    it 'looks up the DNS name of the host' do
-      expect(instance).to receive(:public_dns_name) \
-        .and_return(hostname)
-      subject
+
+    context 'when ssh_options are not defined' do
+      let(:ssh_options) { nil }
+
+      it 'issues a shutdown without options to the instance' do
+        expect_any_instance_of(ssh_executor).to receive(:run).with(
+          "ssh -t -l #{moonshot_config.ssh_config.ssh_user} #{public_ip_address} sudo\\ shutdown\\ -h\\ now"
+        )
+        subject
+      end
     end
 
-    it 'issues a shutdown to the instance' do
-      ENV['MOONSHOT_SSH_USER'] = 'ci_user'
-      expect(System).to receive(:exec).with(
-        /ssh (.*) ci_user@#{hostname} 'sudo shutdown -h now'/,
-        raise_on_failure: false
-      )
-      subject
-    end
+    context 'when ssh_options are defined' do
+      let(:ssh_options) { '-v -o UserKnownHostsFile=/dev/null' }
 
-    it 'runs SSH with proper option to ignore host keys' do
-      ENV['MOONSHOT_SSH_USER'] = 'ci_user'
-      opts_string = '-o UserKnownHostsFile=/dev/null ' \
-                    '-o StrictHostKeyChecking=no'
-      expect(System).to receive(:exec).with(
-        /#{opts_string}/,
-        any_args
-      )
-      subject
+      it 'issues a shutdown with options to the instance' do
+        expect_any_instance_of(ssh_executor).to receive(:run).with(
+          'ssh -t -v -o UserKnownHostsFile=/dev/null ' \
+          "-l ci_user #{public_ip_address} sudo\\ shutdown\\ -h\\ now"
+        )
+        subject
+      end
     end
   end
 

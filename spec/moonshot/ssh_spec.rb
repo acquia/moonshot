@@ -6,11 +6,14 @@ describe 'Moonshot SSH features' do
     c.ssh_config.ssh_user = 'joeuser'
     c.ssh_config.ssh_identity_file = '/Users/joeuser/.ssh/thegoods.key'
     c.ssh_command = 'cat /etc/passwd'
-
     Moonshot::Controller.new(c)
   end
 
   describe 'Moonshot::Controller#ssh' do
+    before(:each) do
+      ENV.delete('MOONSHOT_SSH_OPTIONS')
+    end
+
     context 'normally' do
       it 'should execute an ssh command with proper parameters' do
         ts = instance_double(Moonshot::SSHTargetSelector)

@@ -9,12 +9,9 @@ After all outdated instances are shutdown successfully, it terminates them and r
 It allows gracefully shutting down each instance instead of terminating them and killing all the running processes.
 
 ## Configuration
-The plugin uses the ssh username specified in the `MOONSHOT_SSH_USER` or the `LOGNAME` environment variable for logging into the ASG instances to shutdown. The value should be the username with which you have the access to the instances. For example:
-```ruby
-export MOONSHOT_SSH_USER=abhishek.rana
-```
+The plugin uses config.ssh_config.ssh_user value for logging into the ASG instances to shutdown. The value should be the username with which you have the access to the instances.
 
-The plugin needs no additional configuration parameters:
+The plugin accepts additional configuration from config.ssh_config.ssh_options for ssh.
 
 ## Example
 ```ruby
