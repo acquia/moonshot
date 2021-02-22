@@ -63,11 +63,15 @@ module Moonshot
     end
 
     def generate_template
-      ERB.new(@source).result(parameters_obj.expose_binding)
+      ERB.new(minify_template_source).result(parameters_obj.expose_binding)
     end
 
     def write_output(content)
       File.write(@destination, content)
+    end
+
+    def minify_template_source
+      JSON.parse(@source).to_json
     end
   end
 end
