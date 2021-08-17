@@ -141,6 +141,9 @@ module Moonshot
           @step.success('- Waiting for the AutoScaling '\
                        'Group to be up to capacity')
           wait_for_capacity
+        rescue Aws::AutoScaling::Errors::ValidationError => e
+            raise e unless e.message.include?("is not part of Auto Scaling group")
+            wait_for_capacity
         rescue StandardError => e
           @step.failure("Error bringing the ASG up to capacity: #{e.message}")
           @step.failure("Attaching instance: #{instance.instance_id}")
