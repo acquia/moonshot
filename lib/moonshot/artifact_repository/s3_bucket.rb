@@ -1,3 +1,9 @@
+# frozen_string_literal: true
+
+require_relative '../resources_helper'
+require_relative '../creds_helper'
+require_relative '../doctor_helper'
+
 # The S3Bucket stores builds in an S3 Bucket.
 #
 # For example:
@@ -19,7 +25,7 @@ class Moonshot::ArtifactRepository::S3Bucket
 
   def store_hook(build_mechanism, version_name)
     unless build_mechanism.respond_to?(:output_file)
-      raise "S3Bucket does not know how to store artifacts from #{build_mechanism.class}, no method '#output_file'." # rubocop:disable LineLength
+      raise "S3Bucket does not know how to store artifacts from #{build_mechanism.class}, no method '#output_file'."
     end
 
     file = build_mechanism.output_file
@@ -51,7 +57,7 @@ class Moonshot::ArtifactRepository::S3Bucket
   def doctor_check_bucket_exists
     s3_client.get_bucket_location(bucket: @bucket_name)
     success "Bucket '#{@bucket_name}' exists."
-  rescue => e
+  rescue StandardError => e
     # This is warning because the role you use for deployment may not actually
     # be able to read builds, however the instance role assigned to the nodes
     # might.
@@ -68,9 +74,9 @@ class Moonshot::ArtifactRepository::S3Bucket
     )
     s3_client.delete_object(key: 'test-object', bucket: @bucket_name)
     success 'Bucket is writable, new builds can be uploaded.'
-  rescue => e
+  rescue StandardError => e
     # This is a warning because you may deploy to an environment where you have
     # read access to builds, but could not publish a new build.
-    warning('Could not write to bucket, you may still be able to deploy existing builds.', e.message) # rubocop:disable LineLength
+    warning('Could not write to bucket, you may still be able to deploy existing builds.', e.message)
   end
 end

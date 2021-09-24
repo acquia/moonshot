@@ -1,3 +1,7 @@
+# frozen_string_literal: true
+
+require_relative '../ssh_command'
+
 module Moonshot
   module Commands
     class Ssh < Moonshot::SSHCommand
