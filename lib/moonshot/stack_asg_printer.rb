@@ -85,7 +85,7 @@ module Moonshot
 
       hc = asg_info.health_check_type.blue
       gp = (asg_info.health_check_grace_period.to_s << 's').blue
-      table.add_line "Using #{hc} health checks, with a #{gp} health check grace period." # rubocop:disable LineLength
+      table.add_line "Using #{hc} health checks, with a #{gp} health check grace period."
 
       dc = asg_info.desired_capacity.to_s.blue
       min = asg_info.min_size.to_s.blue
@@ -112,11 +112,11 @@ module Moonshot
 
     def instance_row(asg_instance, ec2_instance)
       if ec2_instance
-        if ec2_instance.public_ip_address
-          ip_address = "#{ec2_instance.public_ip_address} (#{ec2_instance.private_ip_address})"
-        else
-          ip_address = "#{ec2_instance.private_ip_address} (PRV)"
-        end
+        ip_address = if ec2_instance.public_ip_address
+                       "#{ec2_instance.public_ip_address} (#{ec2_instance.private_ip_address})"
+                     else
+                       "#{ec2_instance.private_ip_address} (PRV)"
+                     end
         uptime = uptime_format(ec2_instance.launch_time)
       else
         # We've seen race conditions where ASG tells us about instances that EC2 is no longer

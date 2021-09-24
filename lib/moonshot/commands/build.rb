@@ -1,3 +1,7 @@
+# frozen_string_literal: true
+
+require_relative 'interactive_command'
+
 module Moonshot
   module Commands
     class Build < Moonshot::Command
