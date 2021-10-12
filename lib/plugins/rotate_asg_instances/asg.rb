@@ -10,8 +10,7 @@ module Moonshot
       end
 
       def perform_rotation
-        rotate_asg_instances
-        teardown_outdated_instances
+        teardown_outdated_instances if rotate_asg_instances
       end
 
       def verify_ssh
@@ -36,9 +35,17 @@ module Moonshot
         @ilog.start_threaded('Rotating ASG instances...') do |step|
           @step = step
           outdated = identify_outdated_instances
-          @volumes_to_delete = outdated_volumes(outdated)
-          @shutdown_instances = cycle_instances(outdated)
-          @step.success('ASG instances rotated successfully!')
+          if outdated.empty?
+            @step.success('No outdated instances to rotate.')
+            false
+          else
+            with_scale_up do
+              @volumes_to_delete = outdated_volumes(outdated)
+              @shutdown_instances = cycle_instances(outdated)
+            end
+            @step.success('ASG instances rotated successfully!')
+            true
+          end
         end
       end
 
@@ -57,10 +64,38 @@ module Moonshot
         end
       end
 
+      def with_scale_up
+        scaled_up = scale_up_if_possible
+        yield
+      ensure
+        # We avoid raising an error in ensure since that can lead to losing the error from the
+        # above block.
+        attempt_scale_down if scaled_up
+      end
+
       def physical_resource_id
         @resources.controller.stack
                   .resources_of_type('AWS::AutoScaling::AutoScalingGroup')
                   .first.physical_resource_id
+      end
+
+      # Scales up the asg by incrementing the desired count by 1. This is to
+      # make sure that the desired number of instances is maintained even while
+      # they are rotated one at a time.
+      def scale_up_if_possible
+        desired_capacity = asg.desired_capacity
+        if desired_capacity < asg.max_size
+          scale_asg(desired_capacity + 1)
+          true
+        else
+          false
+        end
+      end
+
+      def attempt_scale_down
+        scale_asg(asg.reload.desired_capacity - 1)
+      rescue StandardError => e
+        @ilog.error("Failure encountered during scale down of the desired capacity after rotation: #{e.message}")
       end
 
       def outdated_volumes(outdated_instances)
@@ -109,12 +144,13 @@ module Moonshot
           wait_for_instance(i)
           detach_instance(i)
 
-          @step.success("Shutting down #{i.instance_id}")
+          @step.continue("Shutting down #{i.instance_id}")
           shutdown_instance(i.instance_id)
           shutdown_instances << i
+          @step.success("Shut down #{i.instance_id}")
         end
 
-        @step.success('All instances cycled.')
+        @ilog.info('All instances cycled.')
 
         shutdown_instances
       end
@@ -195,6 +231,13 @@ module Moonshot
         end
       end
 
+      def scale_asg(new_desired_capacity)
+        @step.continue("Changing desired capacity of asg from #{asg.desired_capacity} to #{new_desired_capacity}...")
+        asg.set_desired_capacity(desired_capacity: new_desired_capacity)
+        wait_for_capacity
+        @ilog.info("ASG desired capacity updated to #{new_desired_capacity}.")
+      end
+
       def reap_volumes(volumes)
         volumes.each do |volume_id|
           begin
@@ -212,7 +255,7 @@ module Moonshot
       # Waits for the ASG to reach the desired capacity.
       def wait_for_capacity
         @step.continue(
-          'Replacing outdated instances with new instances for the AutoScaling Group...'
+          'Waiting for Autoscaling group to reach desired capacity...'
         )
         # While we wait for the asg to reach capacity, report instance statuses
         # to the user.
