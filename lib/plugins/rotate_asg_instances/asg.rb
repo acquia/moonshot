@@ -101,9 +101,13 @@ module Moonshot
       def outdated_volumes(outdated_instances)
         volumes = []
         outdated_instances.each do |i|
+          # Terminated instances won't have attached volumes.
+          next if %w(Terminating Terminated).include?(i.lifecycle_state)
+
           begin
             inst = Aws::EC2::Instance.new(id: i.id)
-            volumes << inst.block_device_mappings.first.ebs.volume_id
+            first_block_device = inst.block_device_mappings.first
+            volumes << first_block_device.ebs.volume_id if first_block_device
           rescue StandardError => e
             # We're catching all errors here, because failing to reap a volume
             # is not a critical error, will not cause issues with the update.
