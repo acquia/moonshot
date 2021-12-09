@@ -61,9 +61,9 @@ module Moonshot
     def update_for_account!
       # Evaluated any account-specific configuration.
       @account_alias = Moonshot::AccountContext.get
-      if @account_alias && @per_account_config.key?(account_alias)
-        @per_account_config[@account_alias].call(self)
-      end
+      return unless @account_alias && @per_account_config.key?(account_alias)
+
+      @per_account_config[@account_alias].call(self)
     end
   end
 end

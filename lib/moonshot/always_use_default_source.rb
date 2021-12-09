@@ -6,12 +6,11 @@ module Moonshot
   # answer files or command-line arguments will always apply.
   class AlwaysUseDefaultSource
     def get(sp)
-      unless sp.default?
-        raise "Parameter #{sp.name} does not have a default, cannot use AlwaysUseDefaultSource!"
-      end
-
       # Don't do anything, the default will apply on create, and the
       # previous value will be used on update.
+      return if sp.default?
+
+      raise "Parameter #{sp.name} does not have a default, cannot use AlwaysUseDefaultSource!"
     end
   end
 end
