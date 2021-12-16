@@ -102,7 +102,7 @@ module Moonshot
         volumes = []
         outdated_instances.each do |i|
           # Terminated instances won't have attached volumes.
-          next if %w(Terminating Terminated).include?(i.lifecycle_state)
+          next if instance_in_terminal_state?(i)
 
           begin
             inst = Aws::EC2::Instance.new(id: i.id)
@@ -143,10 +143,10 @@ module Moonshot
         # Iterate over the instances in the stack, detaching and terminating each
         # one.
         outdated_instances.each do |i|
-          next if %w(Terminating Terminated).include?(i.lifecycle_state)
+          next if instance_in_terminal_state?(i)
 
           wait_for_instance(i)
-          detach_instance(i)
+          next unless detach_instance(i)
 
           @step.continue("Shutting down #{i.instance_id}")
           shutdown_instance(i.instance_id)
@@ -181,9 +181,11 @@ module Moonshot
           @step.success('- Waiting for the AutoScaling '\
                        'Group to be up to capacity')
           wait_for_capacity
+          true
         rescue Aws::AutoScaling::Errors::ValidationError => e
           raise e unless e.message.include?('is not part of Auto Scaling group')
           wait_for_capacity
+          false
         rescue StandardError => e
           @step.failure("Error bringing the ASG up to capacity: #{e.message}")
           @step.failure("Attaching instance: #{instance.instance_id}")
@@ -288,8 +290,18 @@ module Moonshot
       # @param id [String] ID of the instance to terminate.
       def shutdown_instance(id)
         instance = Aws::EC2::Instance.new(id: id)
+        return if instance_in_terminal_state?(instance)
         @ssh.exec('sudo shutdown -h now', id)
         instance.wait_until_stopped
+      end
+
+      def instance_in_terminal_state?(instance)
+        state = if instance.is_a?(Aws::EC2::Instance)
+                  instance.state.name
+                elsif instance.is_a?(Aws::AutoScaling::Instance)
+                  instance.load.lifecycle_state
+                end
+        %w(Terminating Terminated).include?(state)
       end
     end
   end
