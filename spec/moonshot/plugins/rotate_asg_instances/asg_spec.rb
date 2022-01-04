@@ -262,4 +262,37 @@ describe Moonshot::RotateAsgInstances::ASG do
       end
     end
   end
+
+  describe '#instance_in_terminal_state?' do
+    subject { described_class.new(resources).send(:instance_in_terminal_state?, terminated_ec2_instance) }
+    
+    context 'when an ec2 instance object is nil' do
+      let(:terminated_ec2_instance) do
+        Aws::EC2::Instance.new(id: "i-123456")
+      end
+
+      before(:each) do
+        allow(terminated_ec2_instance).to receive(:exists?).and_return(false)
+      end
+
+      it 'should send true for  state for nil instance object.' do
+        expect(subject).to match(true)
+      end
+    end
+
+    context 'when an asg instance object is nil' do
+      let(:terminated_ec2_instance) do
+        Aws::AutoScaling::Instance.new(id: "i-123456", group_name: "rspec-asg-group")
+      end
+
+      before(:each) do
+        allow(terminated_ec2_instance).to receive(:load)
+        allow(terminated_ec2_instance.load).to receive(:data)
+      end
+
+      it 'should send true for  state for nil instance object.' do
+        expect(subject).to match(true)
+      end
+    end
+  end
 end

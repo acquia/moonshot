@@ -67,6 +67,9 @@ module Moonshot
       def with_scale_up
         scaled_up = scale_up_if_possible
         yield
+
+      rescue StandardError => e
+        @ilog.error("Failure encountered during scale up to the desired capacity: #{e.message}")
       ensure
         # We avoid raising an error in ensure since that can lead to losing the error from the
         # above block.
@@ -297,11 +300,27 @@ module Moonshot
 
       def instance_in_terminal_state?(instance)
         state = if instance.is_a?(Aws::EC2::Instance)
-                  instance.state.name
+                  check_ec2_instance(instance)
                 elsif instance.is_a?(Aws::AutoScaling::Instance)
-                  instance.load.lifecycle_state
+                  check_asg_instance(instance)
                 end
         %w(Terminating Terminated).include?(state)
+      end
+
+      def check_ec2_instance(instance)
+        if instance.exists?
+          instance.state.name
+        else
+          'Terminated'
+        end
+      end
+
+      def check_asg_instance(instance)
+        if instance.load.data.nil?
+          'Terminated'
+        else
+          instance.load.lifecycle_state
+        end
       end
     end
   end
