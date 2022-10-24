@@ -12,6 +12,7 @@ module Moonshot
     attr_accessor :deployment_mechanism
     attr_accessor :dev_build_name_proc
     attr_accessor :environment_name
+    attr_accessor :extra_tags
     attr_accessor :interactive
     attr_accessor :interactive_logger
     attr_accessor :parameter_overrides
@@ -43,6 +44,7 @@ module Moonshot
       @project_root             = Dir.pwd
       @show_all_stack_events    = false
       @ssh_config               = SSHConfig.new
+      @extra_tags               = []
 
       @dev_build_name_proc = lambda do |c|
         ['dev', c.app_name, c.environment_name, Time.now.to_i].join('/')
