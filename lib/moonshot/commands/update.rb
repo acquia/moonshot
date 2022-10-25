@@ -2,6 +2,7 @@ module Moonshot
   module Commands
     class Update < Moonshot::Command
       include ParameterArguments
+      include TagArguments
       include ShowAllEventsOption
       include ParentStackOption
 
