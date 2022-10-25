@@ -293,7 +293,7 @@ module Moonshot
         default_tags << { key: @config.additional_tag, value: @name }
       end
 
-      default_tags
+      default_tags + @config.extra_tags
     end
 
     def format_event(event)

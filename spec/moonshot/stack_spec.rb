@@ -124,6 +124,31 @@ describe Moonshot::Stack do
           subject.create
         end
       end
+
+      context 'when has extra tags' do
+        let(:expected_create_stack_options) do
+          {
+            tags: [
+              { key: 'moonshot_application', value: 'rspec-app' },
+              { key: 'moonshot_environment', value: 'staging' },
+              { key: 'tag1', value: 'A' },
+              { key: 'tag2', value: 'B' }
+            ]
+          }
+        end
+
+        before do
+          config.extra_tags << { key: 'tag1', value: 'A' }
+          config.extra_tags << { key: 'tag2', value: 'B' }
+        end
+
+        it 'should call CreateStack, then wait for completion' do
+          expect(s3_client).not_to receive(:put_object)
+          expect(cf_client).to receive(:create_stack)
+            .with(hash_including(expected_create_stack_options))
+          subject.create
+        end
+      end
     end
   end
 
