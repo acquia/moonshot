@@ -295,7 +295,7 @@ module Moonshot
 
       default_tags << { key: @config.additional_tag, value: @name } if @config.additional_tag
 
-      default_tags
+      default_tags + @config.extra_tags
     end
 
     def format_event(event)
