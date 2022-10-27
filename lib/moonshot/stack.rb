@@ -230,11 +230,12 @@ module Moonshot
       ].join('-')
 
       parameters = {
-        change_set_name:,
+        change_set_name: change_set_name,
         description: "Moonshot update command for application '#{Moonshot.config.app_name}'",
         stack_name: @name,
-        capabilities: %w[CAPABILITY_IAM CAPABILITY_NAMED_IAM],
-        parameters: @config.parameters.values.map(&:to_cf)
+        capabilities:  %w(CAPABILITY_IAM CAPABILITY_NAMED_IAM),
+        parameters: @config.parameters.values.map(&:to_cf),
+        tags: make_tags
       }
       if @config.template_s3_bucket
         parameters[:template_url] = upload_template_to_s3
