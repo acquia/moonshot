@@ -1,7 +1,15 @@
+# frozen_string_literal: true
+
+require_relative 'parameter_arguments'
+require_relative 'tag_arguments'
+require_relative 'show_all_events_option'
+require_relative 'parent_stack_option'
+
 module Moonshot
   module Commands
     class Create < Moonshot::Command
       include ParameterArguments
+      include TagArguments
       include ShowAllEventsOption
       include ParentStackOption
 
@@ -24,15 +32,6 @@ module Moonshot
 
         parser.on('--template-file=FILE', 'Override the path to the CloudFormation template.') do |v|
           Moonshot.config.template_file = v
-        end
-
-        parser.on('--tag KEY=VALUE', '-TKEY=VALUE', 'Specify stack tags on the command line') do |v|
-          data = v.split('=', 2)
-          unless data.size == 2
-            raise "Invalid tag format '#{v}', expected KEY=VALUE (e.g. MyStackTag=12)"
-          end
-
-          Moonshot.config.extra_tags << { key: data[0], value: data[1] }
         end
       end
 
