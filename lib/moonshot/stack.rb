@@ -39,6 +39,7 @@ module Moonshot
       raise "No stack found #{@name.blue}!" unless stack_exists?
 
       change_set = ChangeSet.new(new_change_set, @name)
+
       wait_for_change_set(change_set)
       return unless change_set.valid?
 
@@ -92,6 +93,12 @@ module Moonshot
         .outputs
         .map { |o| [o.output_key, o.output_value] }
         .to_h
+    end
+
+    def existing_tags
+      get_stack(@name)
+        .tags
+        .map { |o| { key: o.key, value: o.value } }
     end
 
     def exists?
@@ -235,6 +242,7 @@ module Moonshot
         parameters: @config.parameters.values.map(&:to_cf),
         tags: make_tags
       }
+
       if @config.template_s3_bucket
         parameters[:template_url] = upload_template_to_s3
       else
@@ -301,7 +309,7 @@ module Moonshot
         default_tags << { key: @config.additional_tag, value: @name }
       end
 
-      default_tags + @config.extra_tags
+      (default_tags + @config.extra_tags + existing_tags).uniq!
     end
 
     def format_event(event)
