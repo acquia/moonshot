@@ -1,4 +1,6 @@
-# rubocop:disable LineLength
+# frozen_string_literal: true
+
+# rubocop:disable Layout/LineLength
 module Moonshot
   module Commands
     module ParameterArguments
@@ -15,9 +17,7 @@ module Moonshot
 
         parser.on('--parameter KEY=VALUE', '-PKEY=VALUE', 'Specify Stack Parameter on the command line') do |v|
           data = v.split('=', 2)
-          unless data.size == 2
-            raise "Invalid parameter format '#{v}', expected KEY=VALUE (e.g. MyStackParameter=12)"
-          end
+          raise "Invalid parameter format '#{v}', expected KEY=VALUE (e.g. MyStackParameter=12)" unless data.size == 2
 
           Moonshot.config.parameter_overrides[data[0]] = data[1]
         end
@@ -25,3 +25,4 @@ module Moonshot
     end
   end
 end
+# rubocop:enable Layout/LineLength

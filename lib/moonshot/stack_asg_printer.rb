@@ -1,4 +1,4 @@
-# coding: utf-8
+# frozen_string_literal: true
 
 require 'colorize'
 require 'ruby-duration'
@@ -71,7 +71,7 @@ module Moonshot
 
     # Get additional information about instances not returned by the ASG API.
     def get_addl_info(instance_ids)
-      resp = ec2_client.describe_instances(instance_ids: instance_ids)
+      resp = ec2_client.describe_instances(instance_ids:)
 
       data = {}
       resp.reservations.map(&:instances).flatten.each do |instance|
@@ -94,7 +94,7 @@ module Moonshot
       table.add_line "Desired Capacity is #{dc} (Min: #{min}, Max: #{max})."
 
       lbs = asg_info.load_balancer_names
-      table.add_line "Has #{lbs.count.to_s.blue} Load Balancer(s): #{lbs.map(&:blue).join(', ')}" # rubocop:disable LineLength
+      table.add_line "Has #{lbs.count.to_s.blue} Load Balancer(s): #{lbs.map(&:blue).join(', ')}"
     end
 
     def create_instance_table(asg_info)

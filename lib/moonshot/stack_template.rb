@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Moonshot
   # A StackTemplate loads the template from disk and stores information
   # about it.

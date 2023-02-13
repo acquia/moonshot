@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'moonshot/artifact_repository/s3_bucket'
 require 'moonshot/shell'
 require 'digest'
@@ -9,7 +11,7 @@ require 'retriable'
 module Moonshot::ArtifactRepository
   # S3 Bucket repository backed by GitHub releases.
   # If a SemVer package isn't found in S3, it is copied from GitHub releases.
-  class S3BucketViaGithubReleases < S3Bucket # rubocop:disable ClassLength
+  class S3BucketViaGithubReleases < S3Bucket # rubocop:disable Metrics/ClassLength
     include Moonshot::BuildMechanism
     include Moonshot::Shell
 
@@ -36,9 +38,7 @@ module Moonshot::ArtifactRepository
     # artifact repositories a hook before deploy.
     def filename_for_version(version)
       s3_name = super
-      if !@output_file && release?(version) && !in_s3?(s3_name)
-        github_to_s3(version, s3_name)
-      end
+      github_to_s3(version, s3_name) if !@output_file && release?(version) && !in_s3?(s3_name)
       s3_name
     end
 
@@ -51,7 +51,7 @@ module Moonshot::ArtifactRepository
     end
 
     def in_s3?(key)
-      s3_client.head_object(key: key, bucket: bucket_name)
+      s3_client.head_object(key:, bucket: bucket_name)
     rescue ::Aws::S3::Errors::NotFound
       false
     end
@@ -62,7 +62,7 @@ module Moonshot::ArtifactRepository
 
       # If there is a checksum file, attach it as well. We only support MD5
       # since that's what S3 uses.
-      checksum_file = File.basename(file, '.tar.gz') + '.md5'
+      checksum_file = "#{File.basename(file, '.tar.gz')}.md5"
       cmd += " --attach=#{checksum_file}" if File.exist?(checksum_file)
 
       sh_step(cmd)
@@ -218,7 +218,7 @@ module Moonshot::ArtifactRepository
 
     def doctor_check_hub_release_download
       sh_out('hub release download --help')
-    rescue
+    rescue StandardError
       critical '`hub release download` command missing, upgrade hub.' \
                ' See https://github.com/github/hub/pull/1103'
     else

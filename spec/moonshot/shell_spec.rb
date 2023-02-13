@@ -27,7 +27,7 @@ module Moonshot
       end
 
       it 'should not raise if fail is disabled.' do
-        sh_out('false', fail: false)
+        sh_out('false', false)
       end
     end
 

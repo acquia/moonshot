@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 module Moonshot
   # The Controller coordinates and performs all Moonshot actions.
-  class Controller # rubocop:disable ClassLength
+  class Controller # rubocop:disable Metrics/ClassLength
     attr_accessor :config
 
     def initialize(config)
@@ -11,7 +13,7 @@ module Moonshot
       Moonshot::StackLister.new(@config.app_name).list
     end
 
-    def create # rubocop:disable AbcSize
+    def create # rubocop:disable Metrics/AbcSize
       run_plugins(:setup_create)
       # Scan the template for all required parameters and configure
       # the ParameterCollection.
@@ -35,7 +37,7 @@ module Moonshot
 
       # Interview the user for missing parameters, using the
       # appropriate prompts.
-      @config.parameters.values.each do |sp|
+      @config.parameters.hash.each_value do |sp|
         next if sp.set?
 
         parameter_source = @config.parameter_sources.fetch(sp.name,
@@ -51,12 +53,12 @@ module Moonshot
       # Fail if any parameters are still missing without defaults.
       missing_parameters = @config.parameters.missing_for_create
       unless missing_parameters.empty?
-        raise "The following parameters were not provided: #{missing_parameters.map(&:name).join(', ')}" # rubocop:disable LineLength
+        raise "The following parameters were not provided: #{missing_parameters.map(&:name).join(', ')}"
       end
 
       run_hook(:deploy, :pre_create)
       stack_ok = stack.create
-      if stack_ok # rubocop:disable GuardClause
+      if stack_ok # rubocop:disable Style/GuardClause
         run_hook(:deploy, :post_create)
         run_plugins(:post_create)
       else
@@ -64,7 +66,7 @@ module Moonshot
       end
     end
 
-    def update(dry_run:, force:, refresh_parameters:) # rubocop:disable AbcSize
+    def update(dry_run:, force:, refresh_parameters:) # rubocop:disable Metrics/AbcSize
       run_plugins(:setup_update)
       # Scan the template for all required parameters and configure
       # the ParameterCollection.
@@ -108,11 +110,11 @@ module Moonshot
       # Fail if any parameters are still missing without defaults.
       missing_parameters = @config.parameters.missing_for_update
       unless missing_parameters.empty?
-        raise "The following parameters were not provided: #{missing_parameters.map(&:name).join(', ')}" # rubocop:disable LineLength
+        raise "The following parameters were not provided: #{missing_parameters.map(&:name).join(', ')}"
       end
 
       run_hook(:deploy, :pre_update)
-      stack.update(dry_run: dry_run, force: force)
+      stack.update(dry_run:, force:)
       run_hook(:deploy, :post_update)
       run_plugins(:post_update)
     end
@@ -159,7 +161,7 @@ module Moonshot
       run_plugins(:pre_delete)
       run_hook(:deploy, :pre_delete)
       stack_ok = stack.delete
-      if stack_ok # rubocop:disable GuardClause
+      if stack_ok # rubocop:disable Style/GuardClause
         run_hook(:deploy, :post_delete)
         run_plugins(:post_delete)
       else
@@ -199,14 +201,14 @@ module Moonshot
 
     def resources
       @resources ||=
-        Resources.new(stack: stack, ilog: @config.interactive_logger, controller: self)
+        Resources.new(stack:, ilog: @config.interactive_logger, controller: self)
     end
 
     def run_hook(type, name, *args)
       mech = get_mechanism(type)
       name = name.to_s << '_hook'
 
-      return unless mech && mech.respond_to?(name)
+      return unless mech.respond_to?(name)
 
       mech.resources = resources
       mech.send(name, *args)
@@ -216,6 +218,7 @@ module Moonshot
       results = {}
       @config.plugins.each do |plugin|
         next unless plugin.respond_to?(type)
+
         results[plugin] =
           if type =~ /^setup_/
             plugin.send(type)

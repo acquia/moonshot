@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'colorize'
 
 # This mechanism is used to deploy software to an auto-scaling group within
@@ -8,12 +10,12 @@ require 'colorize'
 #   self.artifact_repository = S3Bucket.new('foobucket')
 #   self.deployment_mechanism = CodeDeploy.new(asg: 'AutoScalingGroup')
 # end
-class Moonshot::DeploymentMechanism::CodeDeploy # rubocop:disable ClassLength
+class Moonshot::DeploymentMechanism::CodeDeploy # rubocop:disable Metrics/ClassLength
   include Moonshot::ResourcesHelper
   include Moonshot::CredsHelper
   include Moonshot::DoctorHelper
 
-  DEFAULT_ROLE_NAME = 'CodeDeployRole'.freeze
+  DEFAULT_ROLE_NAME = 'CodeDeployRole'
 
   # @param asg [Array, String]
   #   The logical name of the AutoScalingGroup to create and manage a Deployment
@@ -37,12 +39,12 @@ class Moonshot::DeploymentMechanism::CodeDeploy # rubocop:disable ClassLength
   #   CodeDeployDefault.OneAtATime.
   # rubocop:disable Metrics/ParameterLists
   def initialize(
-      asg: [],
-      optional_asg: [],
-      role: DEFAULT_ROLE_NAME,
-      app_name: nil,
-      group_name: nil,
-      config_name: 'CodeDeployDefault.OneAtATime'
+    asg: [],
+    optional_asg: [],
+    role: DEFAULT_ROLE_NAME,
+    app_name: nil,
+    group_name: nil,
+    config_name: 'CodeDeployDefault.OneAtATime'
   )
     @asg_logical_ids = Array(asg)
     @optional_asg_logical_ids = Array(optional_asg)
@@ -52,6 +54,7 @@ class Moonshot::DeploymentMechanism::CodeDeploy # rubocop:disable ClassLength
     @codedeploy_config = config_name
     @ignore_app_stop_failures = false
   end
+  # rubocop:enable Metrics/ParameterLists
 
   def post_create_hook
     create_application_if_needed
@@ -63,7 +66,7 @@ class Moonshot::DeploymentMechanism::CodeDeploy # rubocop:disable ClassLength
   def post_update_hook
     post_create_hook
 
-    unless deployment_group_ok? # rubocop:disable GuardClause
+    unless deployment_group_ok? # rubocop:disable Style/GuardClause
       delete_deployment_group
       create_deployment_group_if_needed
     end
@@ -102,7 +105,7 @@ class Moonshot::DeploymentMechanism::CodeDeploy # rubocop:disable ClassLength
   end
 
   def deploy_cli_hook(parser)
-    parser.on('--ignore-app-stop-failures', TrueClass, 'Continue deployment on ApplicationStop failures') do |v| # rubocop:disable LineLength
+    parser.on('--ignore-app-stop-failures', TrueClass, 'Continue deployment on ApplicationStop failures') do |v|
       puts "ignore = #{v}"
       @ignore_app_stop_failures = v
     end
@@ -179,29 +182,24 @@ class Moonshot::DeploymentMechanism::CodeDeploy # rubocop:disable ClassLength
     autoscaling_groups = []
     @asg_logical_ids.each do |asg_logical_id|
       asg_name = stack.physical_id_for(asg_logical_id)
-      unless asg_name
-        raise "Could not find #{asg_logical_id} resource in Stack."
-      end
+      raise "Could not find #{asg_logical_id} resource in Stack." unless asg_name
 
       groups = as_client.describe_auto_scaling_groups(
         auto_scaling_group_names: [asg_name]
       )
 
-      if groups.auto_scaling_groups.empty?
-        raise "Could not find ASG #{asg_name}."
-      end
+      raise "Could not find ASG #{asg_name}." if groups.auto_scaling_groups.empty?
 
       autoscaling_groups.push(groups.auto_scaling_groups.first)
     end
     @optional_asg_logical_ids.each do |asg_logical_id|
       asg_name = stack.physical_id_for(asg_logical_id)
       next unless asg_name
+
       groups = as_client.describe_auto_scaling_groups(
         auto_scaling_group_names: [asg_name]
       )
-      unless groups.auto_scaling_groups.empty?
-        autoscaling_groups.push(groups.auto_scaling_groups.first)
-      end
+      autoscaling_groups.push(groups.auto_scaling_groups.first) unless groups.auto_scaling_groups.empty?
     end
     autoscaling_groups
   end
@@ -241,13 +239,13 @@ class Moonshot::DeploymentMechanism::CodeDeploy # rubocop:disable ClassLength
 
   def deployment_group_ok?
     return false unless deployment_group_exists?
+
     asgs = deployment_group.auto_scaling_groups
     return false unless asgs
     return false unless asgs.count == auto_scaling_groups.count
+
     asgs.each do |asg|
-      if (auto_scaling_groups.find_index { |a| a.auto_scaling_group_name == asg.name }).nil?
-        return false
-      end
+      return false if (auto_scaling_groups.find_index { |a| a.auto_scaling_group_name == asg.name }).nil?
     end
     true
   end
@@ -314,10 +312,11 @@ class Moonshot::DeploymentMechanism::CodeDeploy # rubocop:disable ClassLength
           count = asg.instances.count { |i| i.lifecycle_state == 'InService' }
           if asg.desired_capacity == count
             asgs_at_capacity += 1
-            s.continue "#{asg.auto_scaling_group_name} DesiredCapacity is #{asg.desired_capacity}, currently #{count} instance(s) are InService." # rubocop:disable LineLength
+            s.continue "#{asg.auto_scaling_group_name} DesiredCapacity is #{asg.desired_capacity}, currently #{count} instance(s) are InService." # rubocop:disable Layout/LineLength
           end
         end
         break if asgs.count == asgs_at_capacity
+
         sleep 5
       end
 
@@ -335,7 +334,7 @@ class Moonshot::DeploymentMechanism::CodeDeploy # rubocop:disable ClassLength
 
       case status
       when 'Created', 'Queued', 'InProgress'
-        step.continue "Waiting for Deployment #{id.blue} to complete, current status is '#{status}'." # rubocop:disable LineLength
+        step.continue "Waiting for Deployment #{id.blue} to complete, current status is '#{status}'."
       when 'Succeeded'
         step.success "Deployment #{id.blue} completed successfully!"
         break
@@ -350,10 +349,10 @@ class Moonshot::DeploymentMechanism::CodeDeploy # rubocop:disable ClassLength
   end
 
   def handle_deployment_failure(deployment_id)
-    instances = cd_client.list_deployment_instances(deployment_id: deployment_id)
+    instances = cd_client.list_deployment_instances(deployment_id:)
                          .instances_list.map do |instance_id|
-      cd_client.get_deployment_instance(deployment_id: deployment_id,
-                                        instance_id: instance_id)
+      cd_client.get_deployment_instance(deployment_id:,
+                                        instance_id:)
     end
 
     instances.map(&:instance_summary).each do |inst_summary|
@@ -381,7 +380,7 @@ class Moonshot::DeploymentMechanism::CodeDeploy # rubocop:disable ClassLength
     when Moonshot::ArtifactRepository::S3Bucket
       s3_revision_for(artifact_repo, version_name)
     when NilClass
-      raise 'Must specify an ArtifactRepository with CodeDeploy. Take a look at the S3Bucket example.' # rubocop:disable LineLength
+      raise 'Must specify an ArtifactRepository with CodeDeploy. Take a look at the S3Bucket example.'
     else
       raise "Cannot use #{artifact_repo.class} to deploy with CodeDeploy."
     end
@@ -412,7 +411,7 @@ class Moonshot::DeploymentMechanism::CodeDeploy # rubocop:disable ClassLength
   def doctor_check_code_deploy_role
     role
     success("#{@codedeploy_role} exists.")
-  rescue => e
+  rescue StandardError => e
     help = <<-EOF
 Error: #{e.message}
 
@@ -427,7 +426,7 @@ http://docs.aws.amazon.com/codedeploy/latest/userguide/how-to-create-service-rol
       if stack.template.resource_names.include?(asg_logical_id)
         success("Resource '#{asg_logical_id}' exists in the CloudFormation template.")
       else
-        critical("Resource '#{asg_logical_id}' does not exist in the CloudFormation template!") # rubocop:disable LineLength
+        critical("Resource '#{asg_logical_id}' does not exist in the CloudFormation template!")
       end
     end
   end

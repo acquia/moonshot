@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Moonshot
   module Commands
     class Update < Moonshot::Command
@@ -11,7 +13,7 @@ module Moonshot
       def parser
         parser = super
 
-        parser.on('--dry-run', TrueClass, 'Show the changes that would be applied, but do not execute them') do |v| # rubocop:disable LineLength
+        parser.on('--dry-run', TrueClass, 'Show the changes that would be applied, but do not execute them') do |v|
           @dry_run = v
         end
 
@@ -23,7 +25,7 @@ module Moonshot
           @refresh_parameters = v
         end
 
-        parser.on('--template-file=FILE', 'Override the path to the CloudFormation template.') do |v| # rubocop:disable LineLength
+        parser.on('--template-file=FILE', 'Override the path to the CloudFormation template.') do |v|
           Moonshot.config.template_file = v
         end
       end

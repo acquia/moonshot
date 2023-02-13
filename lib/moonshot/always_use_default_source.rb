@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Moonshot
   # The AlwaysUseDefaultSource will always use the previous value in
   # the stack, or use the default value during stack creation. This is

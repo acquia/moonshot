@@ -1,5 +1,6 @@
+# frozen_string_literal: true
+
 require 'open3'
-include Open3
 
 # Compile a release artifact using a shell script.
 #
@@ -18,6 +19,8 @@ class Moonshot::BuildMechanism::Script
   include Moonshot::ResourcesHelper
   include Moonshot::DoctorHelper
 
+  include Open3
+
   attr_reader :output_file
 
   def initialize(script, output_file: 'output.tar.gz')
@@ -35,12 +38,12 @@ class Moonshot::BuildMechanism::Script
       'OUTPUT_FILE' => @output_file
     }
     ilog.start_threaded "Running Script: #{@script}" do |s|
-      run_script(s, env: env)
+      run_script(s, env:)
     end
   end
 
   def post_build_hook(_version)
-    unless File.exist?(@output_file) # rubocop:disable GuardClause
+    unless File.exist?(@output_file) # rubocop:disable Style/GuardClause
       raise 'Build command did not produce output file!'
     end
   end
@@ -61,9 +64,7 @@ class Moonshot::BuildMechanism::Script
       end
 
       result = wait.value
-      if result.exitstatus.zero?
-        step.success "Build script #{@script} exited successfully!"
-      end
+      step.success "Build script #{@script} exited successfully!" if result.exitstatus.zero?
       unless result.exitstatus.zero?
         ilog.error "Build script failed with exit status #{result.exitstatus}!"
         ilog.error output.join("\n")

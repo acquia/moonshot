@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Moonshot
   # The StackEventsPoller queries DescribeStackEvents every time #latest_events
   # is invoked, filtering out events that have already been returned. It can

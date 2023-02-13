@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rubygems/package'
 require 'zlib'
 require 'yaml'
@@ -29,6 +31,7 @@ module Moonshot
       # @return [Backup] configured backup object
       def self.to_bucket(bucket)
         raise ArgumentError if bucket.nil? || bucket.empty?
+
         Moonshot::Plugins::Backup.new do |b|
           b.bucket = bucket
           b.backup_parameters = true
@@ -53,18 +56,16 @@ module Moonshot
         return if @target_bucket.nil?
 
         resources.ilog.start("#{log_message} in progress.") do |s|
-          begin
-            tar_out = tar(@files)
-            zip_out = zip(tar_out)
-            upload(zip_out)
+          tar_out = tar(@files)
+          zip_out = zip(tar_out)
+          upload(zip_out)
 
-            s.success("#{log_message} succeeded.")
-          rescue => e
-            s.failure("#{log_message} failed: #{e}")
-          ensure
-            tar_out.close unless tar_out.nil?
-            zip_out.close unless zip_out.nil?
-          end
+          s.success("#{log_message} succeeded.")
+        rescue StandardError => e
+          s.failure("#{log_message} failed: #{e}")
+        ensure
+          tar_out&.close
+          zip_out&.close
         end
       end
 
@@ -124,11 +125,9 @@ module Moonshot
       # @param file_name [String]
       def add_file_to_tar(writer, file_name)
         writer.add_file(File.basename(file_name), 0o644) do |io|
-          begin
-            File.open(file_name, 'r') { |f| io.write(f.read) }
-          rescue Errno::ENOENT
-            warn "'#{file_name}' was not found."
-          end
+          File.open(file_name, 'r') { |f| io.write(f.read) }
+        rescue Errno::ENOENT
+          warn "'#{file_name}' was not found."
         end
       end
 

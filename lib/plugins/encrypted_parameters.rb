@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # This plugin encrypts parameters of the stack using a KMS Key,
 # storing and passing the key used to the stack as a parameter as
 # well. The resources in the stack can then use that KMS Key to

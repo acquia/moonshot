@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'moonshot/shell'
 require 'travis'
 require 'travis/pro'
@@ -118,7 +120,7 @@ module Moonshot::BuildMechanism
 
     def doctor_check_travis_auth
       sh_out("bundle exec travis raw #{@endpoint} repos/#{@slug}")
-    rescue => e
+    rescue StandardError => e
       critical "`travis` not available or not authorized.\n#{e.message}"
     else
       success '`travis` installed and authorized.'

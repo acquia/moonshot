@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'English'
 
 require 'aws-sdk-cloudformation'
@@ -23,10 +25,13 @@ module Moonshot
 
   module ArtifactRepository
   end
+
   module BuildMechanism
   end
+
   module DeploymentMechanism
   end
+
   module Plugins
   end
 end

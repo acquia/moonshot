@@ -1,7 +1,8 @@
+# frozen_string_literal: true
+
 module Moonshot
   class ChangeSet
-    attr_reader :name
-    attr_reader :stack_name
+    attr_reader :name, :stack_name
 
     def initialize(name, stack_name)
       @name = name
@@ -11,9 +12,7 @@ module Moonshot
     end
 
     def confirm?
-      unless Moonshot.config.interactive
-        raise 'Cannot confirm ChangeSet when interactive mode is disabled!'
-      end
+      raise 'Cannot confirm ChangeSet when interactive mode is disabled!' unless Moonshot.config.interactive
 
       loop do
         print 'Apply changes? '
@@ -21,6 +20,7 @@ module Moonshot
 
         return true if resp == 'yes'
         return false if resp == 'no'
+
         puts "Please enter 'yes' or 'no'!"
       end
     end
@@ -39,9 +39,10 @@ module Moonshot
       @change_set.changes.map(&:resource_change).each do |c|
         puts "* #{c.action} #{c.logical_resource_id} (#{c.resource_type})"
 
-        if c.replacement == 'True'
+        case c.replacement
+        when 'True'
           puts ' - Will be replaced'
-        elsif c.replacement == 'Conditional'
+        when 'Conditional'
           puts ' - May be replaced (Conditional)'
         end
 

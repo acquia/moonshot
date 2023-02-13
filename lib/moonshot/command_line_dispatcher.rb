@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Moonshot
   class CommandLineDispatcher
     def initialize(command, klass, args)
@@ -49,15 +51,11 @@ module Moonshot
       %i[build_mechanism deployment_mechanism artifact_repository].each do |prov|
         provider = Moonshot.config.send(prov)
 
-        if provider.respond_to?(hook_func_name(@command))
-          parser = provider.send(hook_func_name(@command), parser)
-        end
+        parser = provider.send(hook_func_name(@command), parser) if provider.respond_to?(hook_func_name(@command))
       end
 
       Moonshot.config.plugins.each do |plugin|
-        if plugin.respond_to?(hook_func_name(@command))
-          parser = plugin.send(hook_func_name(@command), parser)
-        end
+        parser = plugin.send(hook_func_name(@command), parser) if plugin.respond_to?(hook_func_name(@command))
       end
 
       parser

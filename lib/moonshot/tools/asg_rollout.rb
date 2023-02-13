@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 module Moonshot
   module Tools
-    class ASGRollout # rubocop:disable ClassLength
+    class ASGRollout # rubocop:disable Metrics/ClassLength
       attr_accessor :config
 
       def initialize(controller:, logical_id:)
@@ -16,7 +18,7 @@ module Moonshot
           new_instance = wait_for_new_instance
           begin
             wait_for_in_service(new_instance)
-          rescue
+          rescue StandardError
             next
           end
           break
@@ -74,6 +76,7 @@ module Moonshot
               raise "Instance #{new_instance.blue} went OutOfService while waiting to join..."
             end
             break if instance_health.in_service?
+
             s.continue "Instance #{new_instance.blue} is #{instance_health}..."
             sleep @config.instance_health_delay
           end
@@ -98,7 +101,7 @@ module Moonshot
 
       def detach(instance, decrement:)
         log.start_threaded "Detaching instance #{instance.blue}..." do |s|
-          asg.detach_instance(instance, decrement: decrement)
+          asg.detach_instance(instance, decrement:)
 
           if decrement
             s.success "Detached instance #{instance.blue}, and decremented DesiredCapacity."
@@ -115,6 +118,7 @@ module Moonshot
           loop do
             instance_health = asg.instance_health(instance)
             break if instance_health.out_of_service?
+
             s.continue "Instance #{instance.blue} is #{instance_health}..."
             sleep @config.instance_health_delay
           end
@@ -155,9 +159,7 @@ module Moonshot
         return @asg if @asg
 
         asg_name = @controller.stack.physical_id_for(@logical_id)
-        unless asg_name
-          raise "Could not find Auto Scaling Group #{@logical_id}!"
-        end
+        raise "Could not find Auto Scaling Group #{@logical_id}!" unless asg_name
 
         @asg ||= ASGRollout::ASG.new(asg_name)
       end

@@ -1,33 +1,16 @@
+# frozen_string_literal: true
+
 module Moonshot
   # Holds configuration for Moonshot::Controller
   class ControllerConfig
     attr_reader :account_alias
 
-    attr_accessor :additional_tag
-    attr_accessor :answer_file
-    attr_accessor :app_name
-    attr_accessor :artifact_repository
-    attr_accessor :build_mechanism
-    attr_accessor :changeset_wait_time
-    attr_accessor :deployment_mechanism
-    attr_accessor :dev_build_name_proc
-    attr_accessor :environment_name
-    attr_accessor :interactive
-    attr_accessor :interactive_logger
-    attr_accessor :parameter_overrides
-    attr_accessor :parameters
-    attr_accessor :parent_stacks
-    attr_accessor :default_parameter_source
-    attr_accessor :parameter_sources
-    attr_accessor :plugins
-    attr_accessor :project_root
-    attr_accessor :show_all_stack_events
-    attr_accessor :ssh_auto_scaling_group_name
-    attr_accessor :ssh_command
-    attr_accessor :ssh_config
-    attr_accessor :ssh_instance
-    attr_accessor :template_file
-    attr_accessor :template_s3_bucket
+    attr_accessor :additional_tag, :answer_file, :app_name, :artifact_repository, :build_mechanism,
+                  :changeset_wait_time, :deployment_mechanism, :dev_build_name_proc, :environment_name,
+                  :interactive, :interactive_logger, :parameter_overrides, :parameters, :parent_stacks,
+                  :default_parameter_source, :parameter_sources, :plugins, :project_root,
+                  :show_all_stack_events, :ssh_auto_scaling_group_name, :ssh_command, :ssh_config,
+                  :ssh_instance, :template_file, :template_s3_bucket
 
     def initialize
       @default_parameter_source = AskUserSource.new
