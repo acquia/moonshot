@@ -12,10 +12,30 @@ module Moonshot
     attr_reader :app_name
     attr_reader :name
 
+    class << self
+      def generate_name(config)
+        [config.app_name, config.environment_name].join('-')
+      end
+
+      def make_tags(config)
+        default_tags = [
+          { key: 'moonshot_application', value: config.app_name },
+          { key: 'moonshot_environment', value: config.environment_name },
+        ]
+        name = generate_name(config)
+
+        if config.additional_tag
+          default_tags << { key: config.additional_tag, value: name }
+        end
+
+        default_tags + config.extra_tags
+      end
+    end
+
     def initialize(config)
       @config = config
       @ilog = config.interactive_logger
-      @name = [@config.app_name, @config.environment_name].join('-')
+      @name = self.class.generate_name(@config)
 
       yield @config if block_given?
     end
@@ -292,16 +312,7 @@ module Moonshot
     end
 
     def make_tags
-      default_tags = [
-        { key: 'moonshot_application', value: @config.app_name },
-        { key: 'moonshot_environment', value: @config.environment_name }
-      ]
-
-      if @config.additional_tag
-        default_tags << { key: @config.additional_tag, value: @name }
-      end
-
-      default_tags + @config.extra_tags
+      self.class.make_tags(@config)
     end
 
     def format_event(event)
