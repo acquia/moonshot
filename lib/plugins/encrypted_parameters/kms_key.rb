@@ -1,3 +1,5 @@
+require_relative "../stack_tags.rb"
+
 module Moonshot
   module Plugins
     class EncryptedParameters
@@ -11,7 +13,10 @@ module Moonshot
         end
 
         def self.create
-          resp = Aws::KMS::Client.new.create_key
+          tags=Moonshot::Plugins::StackTags.new().tags
+          resp = Aws::KMS::Client.new.create_key({
+            tags: tags, # One or more tags. Each tag consists of a tag key and a tag value.
+          })
           arn = resp.key_metadata.arn
 
           new(arn)
