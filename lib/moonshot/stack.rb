@@ -12,10 +12,30 @@ module Moonshot
     attr_reader :app_name
     attr_reader :name
 
+    class << self
+      def generate_name(config)
+        [config.app_name, config.environment_name].join('-')
+      end
+
+      def make_tags(config)
+        default_tags = [
+          { key: 'moonshot_application', value: config.app_name },
+          { key: 'moonshot_environment', value: config.environment_name },
+        ]
+        name = generate_name(config)
+
+        if config.additional_tag
+          default_tags << { key: config.additional_tag, value: name }
+        end
+
+        default_tags + config.extra_tags
+      end
+    end
+
     def initialize(config)
       @config = config
       @ilog = config.interactive_logger
-      @name = [@config.app_name, @config.environment_name].join('-')
+      @name = self.class.generate_name(@config)
 
       yield @config if block_given?
     end
@@ -225,12 +245,8 @@ module Moonshot
         description: "Moonshot update command for application '#{Moonshot.config.app_name}'",
         stack_name: @name,
         capabilities:  %w(CAPABILITY_IAM CAPABILITY_NAMED_IAM),
-<<<<<<< HEAD
-        parameters: @config.parameters.values.map(&:to_cf)
-=======
         parameters: @config.parameters.values.map(&:to_cf),
         tags: make_tags
->>>>>>> 02a16fc (CPD-7518: Add tags option to update command. (#288))
       }
       if @config.template_s3_bucket
         parameters[:template_url] = upload_template_to_s3
@@ -289,16 +305,7 @@ module Moonshot
     end
 
     def make_tags
-      default_tags = [
-        { key: 'moonshot_application', value: @config.app_name },
-        { key: 'moonshot_environment', value: @config.environment_name }
-      ]
-
-      if @config.additional_tag
-        default_tags << { key: @config.additional_tag, value: @name }
-      end
-
-      default_tags + @config.extra_tags
+      self.class.make_tags(@config)
     end
 
     def format_event(event)

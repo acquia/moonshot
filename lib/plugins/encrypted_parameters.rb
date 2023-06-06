@@ -102,7 +102,9 @@ module Moonshot
               Moonshot.config.parameters[@kms_key_parameter_name].set(key_arn)
               s.success "Created a new KMS Key for #{@kms_key_parameter_name.blue}!"
             else
-              key_arn = KmsKey.new(Moonshot.config.parameters[@kms_key_parameter_name].value).arn
+              kms=KmsKey.new(Moonshot.config.parameters[@kms_key_parameter_name].value)
+              key_arn = kms.arn
+              kms.update
               s.success "Using existing KMS Key for #{@kms_key_parameter_name.blue}!"
             end
           end
