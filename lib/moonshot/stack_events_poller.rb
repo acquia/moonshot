@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Moonshot
   # The StackEventsPoller queries DescribeStackEvents every time #latest_events
   # is invoked, filtering out events that have already been returned. It can
@@ -32,7 +34,7 @@ module Moonshot
     def filter_events(events)
       if @errors_only
         events.select do |event|
-          %w(CREATE_FAILED UPDATE_FAILED DELETE_FAILED).include?(event.resource_status)
+          %w[CREATE_FAILED UPDATE_FAILED DELETE_FAILED].include?(event.resource_status)
         end
       else
         events

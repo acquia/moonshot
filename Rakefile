@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'bundler/setup'
 require 'rspec/core/rake_task'
 require 'rubocop/rake_task'
@@ -10,4 +12,4 @@ end
 
 RSpec::Core::RakeTask.new(:spec)
 
-task default: [:spec, :rubocop]
+task default: %i[spec rubocop]

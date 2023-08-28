@@ -97,7 +97,7 @@ describe Moonshot::Stack do
       end
 
       context 'when template_s3_bucket is set' do
-        let(:time_obj) { Time.new('2017-11-07 12:00:00 +0000') }
+        let(:time_obj) { Time.parse('2017-11-07 12:00:00 +0000') }
 
         before(:each) do
           config.template_s3_bucket = 'rspec-bucket'

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Moonshot
   module Commands
     class Delete < Moonshot::Command
@@ -8,7 +10,7 @@ module Moonshot
 
       def parser
         parser = super
-        parser.on('--template-file=FILE', 'Override the path to the CloudFormation template.') do |v| # rubocop:disable LineLength
+        parser.on('--template-file=FILE', 'Override the path to the CloudFormation template.') do |v|
           Moonshot.config.template_file = v
         end
       end

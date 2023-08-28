@@ -1,4 +1,5 @@
-# -*- coding: utf-8 -*-
+# frozen_string_literal: true
+
 require 'colorize'
 
 module Moonshot
@@ -19,18 +20,16 @@ module Moonshot
       puts
       puts self.class.name.split('::').last
       private_methods.each do |meth|
-        begin
-          send(meth) if meth =~ /^doctor_check_/
-        rescue DoctorCritical
-          # Stop running checks in this Mechanism.
-          success = false
-          break
-        rescue => e
-          success = false
-          print '  ✗ '.red
-          puts "Exception while running check: #{e.class}: #{e.message.lines.first}"
-          break
-        end
+        send(meth) if meth =~ /^doctor_check_/
+      rescue DoctorCritical
+        # Stop running checks in this Mechanism.
+        success = false
+        break
+      rescue StandardError => e
+        success = false
+        print '  ✗ '.red
+        puts "Exception while running check: #{e.class}: #{e.message.lines.first}"
+        break
       end
 
       success
@@ -44,13 +43,13 @@ module Moonshot
     def warning(str, additional_info = nil)
       print '  ? '.yellow
       puts str
-      additional_info.lines.each { |l| puts "      #{l}" } if additional_info
+      additional_info&.lines&.each { |l| puts "      #{l}" }
     end
 
     def critical(str, additional_info = nil)
       print '  ✗ '.red
       puts str
-      additional_info.lines.each { |l| puts "      #{l}" } if additional_info
+      additional_info&.lines&.each { |l| puts "      #{l}" }
       raise DoctorCritical
     end
   end

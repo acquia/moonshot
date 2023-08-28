@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'moonshot/ssh_fork_executor'
 
 module Moonshot

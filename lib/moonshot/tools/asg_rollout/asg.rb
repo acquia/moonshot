@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Moonshot
   module Tools
     class ASGRollout
@@ -20,14 +22,15 @@ module Moonshot
           autoscaling.update_auto_scaling_group(
             auto_scaling_group_name: @name,
             max_size: max,
-            desired_capacity: desired)
+            desired_capacity: desired
+          )
         end
 
         def non_conforming_instances
           asg = load_asg
 
           asg.instances
-             .select { |i| i.launch_configuration_name != asg.launch_configuration_name }
+             .reject { |i| i.launch_configuration_name == asg.launch_configuration_name }
              .map(&:instance_id)
         end
 
@@ -59,17 +62,17 @@ module Moonshot
           resp = autoscaling.detach_instances(
             auto_scaling_group_name: @name,
             instance_ids: [id],
-            should_decrement_desired_capacity: decrement)
+            should_decrement_desired_capacity: decrement
+          )
 
           activity = resp.activities.first
-          unless activity
-            raise 'Did not receive Activity from DetachInstances call!'
-          end
+          raise 'Did not receive Activity from DetachInstances call!' unless activity
 
           # Wait for the detach activity to complete:
           loop do
             resp = autoscaling.describe_scaling_activities(
-              auto_scaling_group_name: @name)
+              auto_scaling_group_name: @name
+            )
 
             current_status = resp.activities
                                  .find { |a| a.activity_id == activity.activity_id }
@@ -97,7 +100,8 @@ module Moonshot
 
         def asg_instance_state(id)
           resp = autoscaling.describe_auto_scaling_instances(
-            instance_ids: [id])
+            instance_ids: [id]
+          )
 
           instance_info = resp.auto_scaling_instances.first
           return 'Missing' unless instance_info
@@ -110,12 +114,11 @@ module Moonshot
             load_balancer_name: elb_name,
             instances: [
               { instance_id: id }
-            ])
+            ]
+          )
 
           instance_info = resp.instance_states.first
-          unless instance_info
-            raise "Failed to call DescribeInstanceHealth for #{id}!"
-          end
+          raise "Failed to call DescribeInstanceHealth for #{id}!" unless instance_info
 
           instance_info.state
         rescue Aws::ElasticLoadBalancing::Errors::InvalidInstance
@@ -133,11 +136,10 @@ module Moonshot
 
         def load_asg
           resp = autoscaling.describe_auto_scaling_groups(
-            auto_scaling_group_names: [@name])
+            auto_scaling_group_names: [@name]
+          )
 
-          if resp.auto_scaling_groups.empty?
-            raise "Failed to call DescribeAutoScalingGroups for #{@name}!"
-          end
+          raise "Failed to call DescribeAutoScalingGroups for #{@name}!" if resp.auto_scaling_groups.empty?
 
           asg = resp.auto_scaling_groups.first
           @last_seen_ids = asg.instances.map(&:instance_id)
@@ -149,9 +151,7 @@ module Moonshot
           return @elb_name if @elb_name
 
           asg = load_asg
-          if asg.load_balancer_names.size > 1
-            raise 'ASGRollout does not support configurations with multiple ELBs!'
-          end
+          raise 'ASGRollout does not support configurations with multiple ELBs!' if asg.load_balancer_names.size > 1
 
           @elb_name ||= asg.load_balancer_names.first
         end

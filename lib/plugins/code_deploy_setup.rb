@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Moonshot
   module Plugins
     # Plugin to ensure CodeDeploy has all necessary S3 buckets created.

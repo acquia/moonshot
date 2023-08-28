@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Moonshot
   # Resources is a dependency container that holds references to instances
   # provided to a Mechanism (build, deploy, etc.).

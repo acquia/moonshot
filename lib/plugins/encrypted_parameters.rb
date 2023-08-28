@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # This plugin encrypts parameters of the stack using a KMS Key,
 # storing and passing the key used to the stack as a parameter as
 # well. The resources in the stack can then use that KMS Key to
@@ -96,13 +98,13 @@ module Moonshot
 
         @ilog.start_threaded "Checking for KMS Key #{@kms_key_parameter_name}" do |s|
           if Moonshot.config.parameters.key?(@kms_key_parameter_name)
-            if 'Auto' == Moonshot.config.parameters[@kms_key_parameter_name].value
+            if Moonshot.config.parameters[@kms_key_parameter_name].value == 'Auto'
               s.continue "Auto-generating KMS Key for #{@kms_key_parameter_name.blue}... "
               key_arn = KmsKey.create.arn
               Moonshot.config.parameters[@kms_key_parameter_name].set(key_arn)
               s.success "Created a new KMS Key for #{@kms_key_parameter_name.blue}!"
             else
-              kms=KmsKey.new(Moonshot.config.parameters[@kms_key_parameter_name].value)
+              kms = KmsKey.new(Moonshot.config.parameters[@kms_key_parameter_name].value)
               key_arn = kms.arn
               kms.update
               s.success "Using existing KMS Key for #{@kms_key_parameter_name.blue}!"

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Moonshot
   # A Rigid Hash-like structure that only accepts manipulation of
   # parameters defined in the Stack template. Anything else results in
@@ -6,6 +8,7 @@ module Moonshot
     extend Forwardable
 
     def_delegators :@hash, :key?, :fetch, :[], :keys, :values
+    attr_reader :hash
 
     def self.from_template(template)
       obj = new

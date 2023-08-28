@@ -1,4 +1,6 @@
-require_relative '../../moonshot/stack.rb'
+# frozen_string_literal: true
+
+require_relative '../../moonshot/stack'
 
 module Moonshot
   module Plugins
@@ -6,19 +8,20 @@ module Moonshot
       # Class that manages KMS keys in AWS.
       class KmsKey
         attr_reader :arn
+
         class << self
           def create
             standard_tags = stack_tags
             resp = Aws::KMS::Client.new.create_key({
-               tags:  standard_tags, # An array of tags.
-              })
+                                                     tags: standard_tags # An array of tags.
+                                                   })
             arn = resp.key_metadata.arn
             new(arn)
           end
 
           def stack_tags
             tags = Moonshot::Stack.make_tags(Moonshot.config)
-            tags.map { |tag| { tag_key:  tag[:key], tag_value:  tag[:value] } }
+            tags.map { |tag| { tag_key: tag[:key], tag_value: tag[:value] } }
           end
         end
 
@@ -30,9 +33,9 @@ module Moonshot
         def update
           standard_tags = self.class.stack_tags
           @kms_client.tag_resource({
-            key_id: @arn, # arn of the CMK being tagged
-            tags: standard_tags, # An array of tags.
-          })
+                                     key_id: @arn, # arn of the CMK being tagged
+                                     tags: standard_tags # An array of tags.
+                                   })
         end
 
         def delete

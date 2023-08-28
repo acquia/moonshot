@@ -1,4 +1,5 @@
-# coding: utf-8
+# frozen_string_literal: true
+
 require 'colorize'
 require 'ruby-duration'
 
@@ -16,7 +17,8 @@ module Moonshot
     def print
       asgs.each do |asg|
         asg_info = as_client.describe_auto_scaling_groups(
-          auto_scaling_group_names: [asg.physical_resource_id])
+          auto_scaling_group_names: [asg.physical_resource_id]
+        )
                             .auto_scaling_groups.first
         t_asg_info = @table.add_leaf("ASG: #{asg.logical_resource_id}")
 
@@ -70,7 +72,7 @@ module Moonshot
 
     # Get additional information about instances not returned by the ASG API.
     def get_addl_info(instance_ids)
-      resp = ec2_client.describe_instances(instance_ids: instance_ids)
+      resp = ec2_client.describe_instances(instance_ids:)
 
       data = {}
       resp.reservations.map(&:instances).flatten.each do |instance|
@@ -93,7 +95,7 @@ module Moonshot
       table.add_line "Desired Capacity is #{dc} (Min: #{min}, Max: #{max})."
 
       lbs = asg_info.load_balancer_names
-      table.add_line "Has #{lbs.count.to_s.blue} Load Balancer(s): #{lbs.map(&:blue).join(', ')}" # rubocop:disable LineLength
+      table.add_line "Has #{lbs.count.to_s.blue} Load Balancer(s): #{lbs.map(&:blue).join(', ')}"
     end
 
     def create_instance_table(asg_info)
@@ -142,7 +144,8 @@ module Moonshot
     def add_recent_activity_leaf(table, asg_name)
       recent = table.add_leaf('Recent Activity')
       resp = as_client.describe_scaling_activities(
-        auto_scaling_group_name: asg_name).activities
+        auto_scaling_group_name: asg_name
+      ).activities
 
       rows = resp.sort_by(&:start_time).reverse.first(10).map do |activity|
         row_for_activity(activity)

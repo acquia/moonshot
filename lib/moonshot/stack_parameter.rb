@@ -1,8 +1,8 @@
+# frozen_string_literal: true
+
 module Moonshot
   class StackParameter
-    attr_reader :name
-    attr_reader :default
-    attr_reader :description
+    attr_reader :name, :default, :description
 
     def initialize(name, default: nil, use_previous: false, description: '')
       @default      = default
@@ -32,9 +32,7 @@ module Moonshot
     end
 
     def use_previous!(value)
-      if @value
-        raise "Value already set for StackParameter #{@name}, cannot use previous value!"
-      end
+      raise "Value already set for StackParameter #{@name}, cannot use previous value!" if @value
 
       # Make the current value available to plugins.
       @value = value
@@ -42,9 +40,7 @@ module Moonshot
     end
 
     def value
-      unless @value || default?
-        raise "No value set and no default for StackParameter #{@name}!"
-      end
+      raise "No value set and no default for StackParameter #{@name}!" unless @value || default?
 
       @value || default
     end

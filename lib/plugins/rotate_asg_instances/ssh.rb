@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Moonshot
   module RotateAsgInstances
     class SSHValidationError < StandardError
@@ -15,6 +17,7 @@ module Moonshot
           # rubocop:disable Style/RaiseArgs
           raise SSHValidationError.new(response) unless
             response.exitstatus.zero?
+          # rubocop:enable Style/RaiseArgs
         end
       end
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Moonshot
   class StackListPrinter
     attr_accessor :stacks
