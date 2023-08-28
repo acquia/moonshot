@@ -1,5 +1,8 @@
+# frozen_string_literal: true
+
 require 'English'
 require 'aws-sdk'
+
 require 'logger'
 require 'thor'
 require 'interactive-logger'
@@ -16,10 +19,13 @@ module Moonshot
 
   module ArtifactRepository
   end
+
   module BuildMechanism
   end
+
   module DeploymentMechanism
   end
+
   module Plugins
   end
 end

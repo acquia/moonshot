@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Moonshot
   # This class implements the command-line `moonshot` tool.
   class CommandLine
@@ -10,7 +12,7 @@ module Moonshot
       @classes || []
     end
 
-    def run! # rubocop:disable CyclomaticComplexity, MethodLength, PerceivedComplexity
+    def run! # rubocop:disable Metrics/MethodLength
       # Commands defined as Moonshot::Commands require a properly
       # configured Moonshot.rb and supporting files. Without them, we only
       # support `--help` and `new`.
@@ -24,7 +26,7 @@ module Moonshot
 
         if Dir.pwd == '/'
           warn 'No Moonfile.rb found, are you in a project? Maybe you need to '\
-	        			'create one with `moonshot new <app_name>`?'
+               'create one with `moonshot new <app_name>`?'
           raise 'No Moonfile found'
         end
 
@@ -51,7 +53,7 @@ module Moonshot
 
       # Determine what command is being run, which should be the first argument.
       command = ARGV.shift
-      if %w(--help -h help).include?(command) || command.nil?
+      if %w[--help -h help].include?(command) || command.nil?
         usage
         return
       end
@@ -94,7 +96,7 @@ module Moonshot
       max_len = fields.map(&:first).map(&:size).max
 
       fields.each do |f|
-        line = format("  %-#{max_len}s # %s", *f)
+        line = format("  %-#{max_len}s # %s", *f) # rubocop:disable Lint/FormatParameterMismatch
         warn line
       end
     end
@@ -117,9 +119,9 @@ module Moonshot
 
     def commandify(klass)
       word = klass.to_s.split('::').last
-      word.gsub!(/([A-Z\d]+)([A-Z][a-z])/, '\1_\2'.freeze)
-      word.gsub!(/([a-z\d])([A-Z])/, '\1_\2'.freeze)
-      word.tr!('_'.freeze, '-'.freeze)
+      word.gsub!(/([A-Z\d]+)([A-Z][a-z])/, '\1_\2')
+      word.gsub!(/([a-z\d])([A-Z])/, '\1_\2')
+      word.tr!('_', '-')
       word.downcase!
       word
     end
@@ -127,10 +129,11 @@ module Moonshot
     def handle_early_commands
       # If this is a legacy (Thor) help command, re-write it as
       # OptionParser format.
-      if ARGV[0] == 'help'
+      case ARGV[0]
+      when 'help'
         ARGV.delete_at(0)
         ARGV.push('-h')
-      elsif ARGV[0] == 'new'
+      when 'new'
         app_name = ARGV[1]
         ::Moonshot::Commands::New.run!(app_name)
         return true

@@ -1,11 +1,13 @@
+# frozen_string_literal: true
+
 module Moonshot
   module Plugins
     class DynamicTemplate
       def initialize(source:, parameters:, destination:)
         @dynamic_template = ::Moonshot::DynamicTemplate.new(
-          source: source,
-          parameters: parameters,
-          destination: destination
+          source:,
+          parameters:,
+          destination:
         )
       end
 
@@ -14,7 +16,7 @@ module Moonshot
       end
 
       def cli_hook(parser)
-        parser.on('--template-file=FILE', 'Override the path to the CloudFormation template.') do |v| # rubocop:disable LineLength
+        parser.on('--template-file=FILE', 'Override the path to the CloudFormation template.') do |v|
           @dynamic_template.destination = v
           Moonshot.config.template_file = v
         end

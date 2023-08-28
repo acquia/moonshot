@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Moonshot
   module Plugins
     # Plugin to ensure CodeDeploy has all necessary S3 buckets created.
@@ -33,11 +35,11 @@ module Moonshot
       # Create an S3 bucket in each supported region for CodeDeploy
       def setup_code_deploy_s3_buckets
         @regions.uniq.each do |region|
-          client = s3_client(region: region)
+          client = s3_client(region:)
           name = bucket_name(region)
           bucket = Aws::S3::Bucket.new(
             name,
-            client: client
+            client:
           )
           bucket.create unless bucket.exists?
         end

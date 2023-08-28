@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Moonshot
   # Create convenience methods for various AWS client creation.
   module CredsHelper

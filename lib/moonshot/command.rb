@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'optparse'
 
 module Moonshot
@@ -44,7 +46,7 @@ module Moonshot
       # Degrade to a more compatible logger if the terminal seems outdated,
       # or at the users request.
       if !$stdout.isatty || !@use_interactive_logger
-        log = Logger.new(STDOUT)
+        log = Logger.new($stdout)
         controller.config.interactive_logger = InteractiveLoggerProxy.new(log)
       end
 

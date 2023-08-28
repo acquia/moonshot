@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Moonshot
   # Provides shorthand methods for accessing resources provided by the Resources
   # container.
@@ -8,16 +10,18 @@ module Moonshot
 
     # TODO: Deprecate this interface.
     def log
-      @log ||= Logger.new(STDOUT)
+      @log ||= Logger.new($stdout)
     end
 
     def stack
       raise 'Resources not provided to Mechanism!' unless @resources
+
       @resources.stack
     end
 
     def ilog
       raise 'Resources not provided to Mechanism!' unless @resources
+
       @resources.ilog
     end
   end

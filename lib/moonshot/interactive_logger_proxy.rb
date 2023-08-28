@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'forwardable'
 
 module Moonshot
@@ -10,8 +12,7 @@ module Moonshot
         @logger = logger
       end
 
-      def blank
-      end
+      def blank; end
 
       def continue(str = nil)
         @logger.info(str) if str
@@ -21,8 +22,7 @@ module Moonshot
         @logger.error(str)
       end
 
-      def repaint
-      end
+      def repaint; end
 
       def success(str = 'Success')
         @logger.info(str)

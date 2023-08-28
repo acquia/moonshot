@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'erb'
 
 module Moonshot
@@ -51,6 +53,7 @@ module Moonshot
 
     def validate_destination_exists
       return unless File.file?(@destination)
+
       raise TemplateExists, "Output file '#{@destination}' already exists."
     end
 

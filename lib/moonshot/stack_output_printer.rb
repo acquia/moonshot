@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Moonshot
   # Display the stack outputs to the user.
   class StackOutputPrinter

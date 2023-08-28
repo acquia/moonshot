@@ -47,7 +47,7 @@ class Moonshot::ArtifactRepository::S3Bucket
   def upload_to_s3(file, key)
     s3_client.put_object(
       acl: 'bucket-owner-full-control',
-      key: key,
+      key:,
       body: File.open(file),
       bucket: @bucket_name,
       storage_class: 'STANDARD_IA'

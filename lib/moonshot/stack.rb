@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'yaml'
 
 module Moonshot
@@ -5,12 +7,11 @@ module Moonshot
   # stores the state of the active stack running on AWS, but contains a
   # reference to the StackTemplate that would be applied with an update
   # action.
-  class Stack # rubocop:disable ClassLength
+  class Stack # rubocop:disable Metrics/ClassLength
     include CredsHelper
     include DoctorHelper
 
-    attr_reader :app_name
-    attr_reader :name
+    attr_reader :app_name, :name
 
     class << self
       def generate_name(config)
@@ -20,13 +21,11 @@ module Moonshot
       def make_tags(config)
         default_tags = [
           { key: 'moonshot_application', value: config.app_name },
-          { key: 'moonshot_environment', value: config.environment_name },
+          { key: 'moonshot_environment', value: config.environment_name }
         ]
         name = generate_name(config)
 
-        if config.additional_tag
-          default_tags << { key: config.additional_tag, value: name }
-        end
+        default_tags << { key: config.additional_tag, value: name } if config.additional_tag
 
         default_tags + config.extra_tags
       end
@@ -131,7 +130,7 @@ module Moonshot
       resource_summary = resource_summaries.find do |r|
         r.logical_resource_id == logical_id
       end
-      resource_summary.physical_resource_id if resource_summary
+      resource_summary&.physical_resource_id
     end
 
     # @return [Array<Aws::CloudFormation::Types::StackResourceSummary>]
@@ -172,9 +171,11 @@ module Moonshot
 
         # Support the legacy file location from Moonshot 1.0.
         YamlStackTemplate.new(
-          File.join(@config.project_root, 'cloud_formation', "#{@config.app_name}.yml")),
+          File.join(@config.project_root, 'cloud_formation', "#{@config.app_name}.yml")
+        ),
         JsonStackTemplate.new(
-          File.join(@config.project_root, 'cloud_formation', "#{@config.app_name}.json"))
+          File.join(@config.project_root, 'cloud_formation', "#{@config.app_name}.json")
+        )
       ]
 
       # If a template file has been specified in the config, look there first.
@@ -186,6 +187,7 @@ module Moonshot
       template = templates.find(&:exist?)
 
       raise 'No template found in moonshot/template.{yml,json}!' unless template
+
       template
     end
 
@@ -204,9 +206,7 @@ module Moonshot
     end
 
     def upload_template_to_s3
-      unless @config.template_s3_bucket
-        raise 'The S3 bucket to store the template in is not configured.'
-      end
+      raise 'The S3 bucket to store the template in is not configured.' unless @config.template_s3_bucket
 
       s3_object_key = "#{@name}-#{Time.now.getutc.to_i}-#{File.basename(template.filename)}"
       template_url = "http://#{@config.template_s3_bucket}.s3.amazonaws.com/#{s3_object_key}"
@@ -226,7 +226,7 @@ module Moonshot
     def create_stack
       parameters = {
         stack_name: @name,
-        capabilities: %w(CAPABILITY_IAM CAPABILITY_NAMED_IAM),
+        capabilities: %w[CAPABILITY_IAM CAPABILITY_NAMED_IAM],
         parameters: @config.parameters.values.map(&:to_cf),
         tags: make_tags
       }
@@ -248,10 +248,10 @@ module Moonshot
       ].join('-')
 
       parameters = {
-        change_set_name: change_set_name,
+        change_set_name:,
         description: "Moonshot update command for application '#{Moonshot.config.app_name}'",
         stack_name: @name,
-        capabilities:  %w(CAPABILITY_IAM CAPABILITY_NAMED_IAM),
+        capabilities: %w[CAPABILITY_IAM CAPABILITY_NAMED_IAM],
         parameters: @config.parameters.values.map(&:to_cf),
         tags: make_tags
       }
@@ -276,36 +276,31 @@ module Moonshot
       events.show_only_errors unless @config.show_all_stack_events
 
       @ilog.start_threaded "Waiting for #{stack_name} to be successfully #{past_tense_verb}." do |s|
-        begin
-          cf_client.wait_until(wait_target, stack_name: stack_id) do |w|
-            w.delay = 10
-            w.max_attempts = 360 # 60 minutes.
-            w.before_wait do |attempt, resp|
-              begin
-                events.latest_events.each { |e| @ilog.error(format_event(e)) }
-                # rubocop:disable Lint/HandleExceptions
-              rescue Aws::CloudFormation::Errors::ValidationError
-                # Do nothing.  The above event logging block may result in
-                # a ValidationError while waiting for a stack to delete.
-              end
-              # rubocop:enable Lint/HandleExceptions
-
-              if attempt == w.max_attempts - 1
-                s.failure "#{stack_name} was not #{past_tense_verb} after 30 minutes."
-                result = false
-
-                # We don't want the interactive logger to catch an exception.
-                throw :success
-              end
-              s.continue "Waiting for CloudFormation Stack to be successfully #{past_tense_verb}, current status '#{resp.stacks.first.stack_status}'." # rubocop:disable LineLength
+        cf_client.wait_until(wait_target, stack_name: stack_id) do |w|
+          w.delay = 10
+          w.max_attempts = 360 # 60 minutes.
+          w.before_wait do |attempt, resp|
+            begin
+              events.latest_events.each { |e| @ilog.error(format_event(e)) }
+            rescue Aws::CloudFormation::Errors::ValidationError
+              # Do nothing.  The above event logging block may result in
+              # a ValidationError while waiting for a stack to delete.
             end
-          end
+            if attempt == w.max_attempts - 1
+              s.failure "#{stack_name} was not #{past_tense_verb} after 30 minutes."
+              result = false
 
-          s.success "#{stack_name} successfully #{past_tense_verb}." if result
-        rescue Aws::Waiters::Errors::FailureStateError
-          result = false
-          s.failure "#{stack_name} failed to update."
+              # We don't want the interactive logger to catch an exception.
+              throw :success
+            end
+            s.continue "Waiting for CloudFormation Stack to be successfully #{past_tense_verb}, current status '#{resp.stacks.first.stack_status}'." # rubocop:disable Layout/LineLength
+          end
         end
+
+        s.success "#{stack_name} successfully #{past_tense_verb}." if result
+      rescue Aws::Waiters::Errors::FailureStateError
+        result = false
+        s.failure "#{stack_name} failed to update."
       end
 
       result
@@ -347,7 +342,7 @@ module Moonshot
       end
       cf_client.validate_template(validate_params)
       success('CloudFormation template is valid.')
-    rescue => e
+    rescue StandardError => e
       critical('Invalid CloudFormation template!', e.message)
     end
 
@@ -371,6 +366,7 @@ module Moonshot
 
       success = wait_for_stack_state(:stack_update_complete, 'updated')
       raise 'Failed to update the CloudFormation Stack.' unless success
+
       success
     end
   end

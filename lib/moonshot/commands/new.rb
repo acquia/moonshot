@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Moonshot
   module Commands
     class New < Moonshot::Command
@@ -25,6 +27,7 @@ module Moonshot
         def create_project_dir
           raise "Directory '#{@application_name}' already exists!" \
             if Dir.exist?(project_path)
+
           Dir.mkdir(project_path)
         end
 
@@ -49,7 +52,7 @@ Moonshot.config do |m|
   m.build_mechanism      = Script.new('bin/build.sh')
   m.deployment_mechanism = CodeDeploy.new(asg: 'AutoScalingGroup')
 end
-EOF
+          EOF
         end
 
         def print_success_message
@@ -69,7 +72,7 @@ You will also need to ensure your Amazon account is configured for
 CodeDeploy by creating a role that allows deployments.
 
 See: http://moonshot.readthedocs.io/en/latest/mechanisms/deployment/
-EOF
+          EOF
         end
       end
     end

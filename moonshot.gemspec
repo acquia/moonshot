@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 Gem::Specification.new do |s|
   s.name        = 'moonshot'
-  s.version     = '2.0.0.beta6'
+  s.version     = '3.0.0'
   s.licenses    = ['Apache-2.0']
   s.summary     = 'A library and CLI tool for launching services into AWS'
   s.description = 'A library and CLI tool for launching services into AWS.'
@@ -14,6 +16,8 @@ Gem::Specification.new do |s|
   s.homepage    = 'https://github.com/acquia/moonshot'
 
   s.add_dependency('aws-sdk', '~> 2.0', '>= 2.2.0')
+  s.required_ruby_version = '>= 3.1.2'
+
   s.add_dependency('activesupport')
   s.add_dependency('colorize')
   s.add_dependency('highline')

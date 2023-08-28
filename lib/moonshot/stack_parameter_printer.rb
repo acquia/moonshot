@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Moonshot
   # Displays information about existing stack parameters to the user, with
   # information on what a stack update would do.
@@ -18,7 +20,7 @@ module Moonshot
 
     def format_value(value)
       if value.size > 60
-        value[0..60] + '...'
+        "#{value[0..60]}..."
       else
         value
       end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'thor'
 require 'retriable'
 
@@ -17,7 +19,7 @@ module Moonshot::Shell
 
   # Run a command, returning stdout. Stderr is suppressed unless the command
   # returns non-zero.
-  def sh_out(cmd, fail: true, stdin: '')
+  def sh_out(cmd, fail = true, stdin = '')
     r_in, w_in = IO.pipe
     r_out, w_out = IO.pipe
     r_err, w_err = IO.pipe
@@ -53,13 +55,11 @@ module Moonshot::Shell
     define_method(meth) { |*args| shell.public_send(meth, *args) }
   end
 
-  def sh_step(cmd, args = {})
+  def sh_step(cmd, **args)
     msg = args.delete(:msg) || cmd
-    if msg.length > (terminal_width - 18)
-      msg = "#{msg[0..(terminal_width - 22)]}..."
-    end
+    msg = "#{msg[0..(terminal_width - 22)]}..." if msg.length > (terminal_width - 18)
     ilog.start_threaded(msg) do |step|
-      out = sh_out(cmd, args)
+      out = sh_out(cmd, **args)
       yield step, out if block_given?
       step.success
     end
@@ -73,9 +73,9 @@ module Moonshot::Shell
   # @param opts [Hash] Options for retriable.
   #
   # @return [String] Stdout form the command.
-  def sh_retry(cmd, fail: true, stdin: '', opts: {})
+  def sh_retry(cmd, fail = true, stdin = '', opts: {})
     Retriable.retriable(DEFAULT_RETRY_OPTIONS.merge(opts)) do
-      out = sh_out(cmd, stdin: stdin)
+      out = sh_out(cmd, stdin:)
       yield out if block_given?
       out
     end

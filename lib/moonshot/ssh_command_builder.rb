@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'shellwords'
 
 module Moonshot
@@ -26,7 +28,7 @@ module Moonshot
       @instance_ip ||= Aws::EC2::Client.new
                                        .describe_instances(instance_ids: [@instance_id])
                                        .reservations.first.instances.first.public_ip_address
-    rescue
+    rescue StandardError
       raise "Failed to determine public IP address for instance #{@instance_id}!"
     end
   end

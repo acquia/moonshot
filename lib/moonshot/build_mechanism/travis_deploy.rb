@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'moonshot/shell'
 require 'travis'
 require 'travis/pro'
@@ -25,8 +27,7 @@ module Moonshot::BuildMechanism
       @cli_args = "-r #{@slug} #{@endpoint}"
     end
 
-    def pre_build_hook(_)
-    end
+    def pre_build_hook(_); end
 
     def build_hook(version)
       job_number = find_build_and_job(version)
@@ -34,8 +35,7 @@ module Moonshot::BuildMechanism
       check_build(version)
     end
 
-    def post_build_hook(_)
-    end
+    def post_build_hook(_); end
 
     private
 
@@ -120,7 +120,7 @@ module Moonshot::BuildMechanism
 
     def doctor_check_travis_auth
       sh_out("bundle exec travis raw #{@endpoint} repos/#{@slug}")
-    rescue => e
+    rescue StandardError => e
       critical "`travis` not available or not authorized.\n#{e.message}"
     else
       success '`travis` installed and authorized.'
