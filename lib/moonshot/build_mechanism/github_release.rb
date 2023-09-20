@@ -227,7 +227,7 @@ module Moonshot::BuildMechanism
     end
 
     def doctor_check_hub_auth
-      sh_out('hub ci-status')
+      sh_out('hub api user')
     rescue => e
       critical "`hub` failed, install hub and authorize it.\n#{e.message}"
     else
