@@ -57,7 +57,7 @@ module Moonshot # rubocop:disable ModuleLength
       describe '#doctor_check_hub_auth' do
         it 'should succeed with 0 exit status.' do
           expect(subject).to receive(:sh_out)
-            .with('hub api user')
+            .with('hub ci-status master')
           expect(subject).to receive(:success)
             .with('`hub` installed and authorized.')
           subject.send(:doctor_check_hub_auth)
