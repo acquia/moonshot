@@ -77,9 +77,16 @@ module Moonshot
     end
 
     def wait_for_change_set
-      @cf_client.wait_until(:change_set_create_complete,
-                            stack_name: @stack_name,
-                            change_set_name: @name)
+      begin
+        @cf_client.wait_until(:change_set_create_complete,
+                              stack_name: @stack_name,
+                              change_set_name: @name)
+      rescue Aws::Waiter::Error::FailureStateError => e
+        puts "Got error on waiting ChangeSetCreateComplete - #{e.message}"
+        if e.message != 'stopped waiting, encountered a failure state'
+          throw e
+        end
+      end
 
       @change_set = @cf_client.describe_change_set(stack_name: @stack_name,
                                                    change_set_name: @name)
