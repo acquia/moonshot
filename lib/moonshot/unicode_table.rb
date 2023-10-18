@@ -35,12 +35,14 @@ module Moonshot
     end
 
     def draw(depth = 1, first = true)
+      space = ' '
+      pipe = '|'
       print first ? '┌' : '├'
       print '─' * depth
-      puts ' ' << @name.light_black
+      puts "#{space}" << @name.light_black
       @lines = [''] + @lines + ['']
       @lines.each do |line|
-        puts '│' << (' ' * depth) << line
+        puts "#{pipe}" << (' ' * depth) << line
       end
       @children.each do |child|
         child.draw(depth + 1, false)
