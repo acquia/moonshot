@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'aws-sdk-elasticloadbalancing'
+
 module Moonshot
   module Tools
     class ASGRollout
