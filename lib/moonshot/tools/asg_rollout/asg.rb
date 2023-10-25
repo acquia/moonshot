@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'aws-sdk-elasticloadbalancing'
+require 'aws-sdk-autoscaling'
 
 module Moonshot
   module Tools
