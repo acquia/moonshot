@@ -164,11 +164,13 @@ module Moonshot
       def upload(io_zip)
         opts = {}
         opts[:region] = @bucket_region if @bucket_region
-        s3_client(opts).put_object(
-          acl: 'private',
-          bucket: @target_bucket,
-          key: @target_name,
-          body: io_zip
+        s3_client(**opts).put_object(
+          {
+            acl: 'private',
+            bucket: @target_bucket,
+            key: @target_name,
+            body: io_zip
+          }
         )
       end
 
