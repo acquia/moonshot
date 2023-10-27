@@ -111,7 +111,7 @@ module Moonshot
           begin
             inst = Aws::EC2::Instance.new(id: i.id)
             first_block_device = inst.block_device_mappings.first
-            volumes << first_block_device.ebs.volume_id if first_block_device
+            volumes << first_block_device[:ebs][:volume_id] if first_block_device
           rescue StandardError => e
             # We're catching all errors here, because failing to reap a volume
             # is not a critical error, will not cause issues with the update.
@@ -220,6 +220,7 @@ module Moonshot
       #   List of instances to terminate. Defaults to all instances with outdated
       #   launch configurations.
       def terminate_instances(shutdown_instances)
+        @ilog.info("Terminate instances: #{shutdown_instances}")
         if shutdown_instances.any?
           @step.continue(
             "Terminating #{shutdown_instances.size} outdated instances..."
@@ -233,7 +234,7 @@ module Moonshot
             next
           end
 
-          next unless %w[stopping stopped].include?(instance.state.name)
+          next unless %w[stopping stopped].include?(instance.state[:name])
 
           instance.wait_until_stopped
 
@@ -309,8 +310,9 @@ module Moonshot
       end
 
       def check_ec2_instance(instance)
+        @ilog.info("Check ec2 instance: #{instance}")
         if instance.exists?
-          instance.state.name
+          instance.state[:name]
         else
           'Terminated'
         end
