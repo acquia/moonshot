@@ -1,7 +1,15 @@
+# frozen_string_literal: true
+
+require_relative 'parameter_arguments'
+require_relative 'tag_arguments'
+require_relative 'show_all_events_option'
+require_relative 'parent_stack_option'
+
 module Moonshot
   module Commands
     class Create < Moonshot::Command
       include ParameterArguments
+      include TagArguments
       include ShowAllEventsOption
       include ParentStackOption
 
@@ -20,6 +28,10 @@ module Moonshot
 
         parser.on('--version VERSION_NAME', 'Version for initial deployment. If unset, a new development build is created from the local directory') do |v| # rubocop:disable LineLength
           @version = v
+        end
+
+        parser.on('--template-file=FILE', 'Override the path to the CloudFormation template.') do |v|
+          Moonshot.config.template_file = v
         end
       end
 

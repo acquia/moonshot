@@ -15,4 +15,20 @@ describe Moonshot::Commands::Update do
       expect(Moonshot.config.parameter_overrides).to match(expected)
     end
   end
+
+  extra_tags = {
+    %w(-T Key=Value -T OtherKey=OtherValue) =>
+      [{ key: 'Key', value: 'Value' }, { key: 'OtherKey', value: 'OtherValue' }],
+    %w(-TKey=ValueWith=Equals) => [{ key: 'Key', value: 'ValueWith=Equals' }],
+    %w(--tag Key=Value --tag OtherKey=OtherValue) =>
+      [{ key: 'Key', value: 'Value' }, { key: 'OtherKey', value: 'OtherValue' }]
+  }
+
+  extra_tags.each do |input, expected|
+    it "Should process #{input} correctly" do
+      op = subject.parser
+      op.parse(input)
+      expect(Moonshot.config.extra_tags).to match(expected)
+    end
+  end
 end
