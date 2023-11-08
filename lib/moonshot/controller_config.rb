@@ -10,7 +10,7 @@ module Moonshot
                   :interactive, :interactive_logger, :parameter_overrides, :parameters, :parent_stacks,
                   :default_parameter_source, :parameter_sources, :plugins, :project_root,
                   :show_all_stack_events, :ssh_auto_scaling_group_name, :ssh_command, :ssh_config,
-                  :ssh_instance, :template_file, :template_s3_bucket
+                  :ssh_instance, :template_file, :template_s3_bucket, :extra_tags
 
     def initialize
       @default_parameter_source = AskUserSource.new
