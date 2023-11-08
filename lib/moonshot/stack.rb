@@ -250,7 +250,7 @@ module Moonshot
       ].join('-')
 
       parameters = {
-        change_set_name: change_set_name,
+        change_set_name:,
         description: "Moonshot update command for application '#{Moonshot.config.app_name}'",
         stack_name: @name,
         capabilities:  %w(CAPABILITY_IAM CAPABILITY_NAMED_IAM),
