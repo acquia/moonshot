@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |s|
   s.name        = 'moonshot'
-  s.version     = '3.0.0'
+  s.version     = '3.0.2'
   s.licenses    = ['Apache-2.0']
   s.summary     = 'A library and CLI tool for launching services into AWS'
   s.description = 'A library and CLI tool for launching services into AWS.'
