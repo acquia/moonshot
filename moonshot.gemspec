@@ -15,7 +15,7 @@ Gem::Specification.new do |s|
   s.executables = ['moonshot']
   s.homepage    = 'https://github.com/acquia/moonshot'
 
-  s.required_ruby_version = '>= 3.1.3'
+  s.required_ruby_version = '>= 3.1.2'
 
   s.add_dependency('aws-sdk-autoscaling', '~> 1.5')
   s.add_dependency('aws-sdk-cloudformation', '~> 1.4')
