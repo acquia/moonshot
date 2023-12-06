@@ -33,7 +33,7 @@ module Moonshot
       @change_set.status_reason
     end
 
-    def display_changes
+    def display_changes # rubocop:disable Metrics/CyclomaticComplexity
       wait_for_change_set unless @change_set
 
       @change_set.changes.map(&:resource_change).each do |c|

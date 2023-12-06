@@ -42,7 +42,9 @@ module Moonshot::BuildMechanism
       @build_mechanism.doctor_hook
     end
 
+    # rubocop: disable Naming/MethodParameterName
     def resources=(r)
+      # rubocop: enable Naming/MethodParameterName
       super
       @build_mechanism.resources = r
     end
@@ -231,7 +233,7 @@ module Moonshot::BuildMechanism
 
     def doctor_check_hub_auth
       sh_out('hub ci-status master')
-    rescue => e
+    rescue StandardError => e
       critical "`hub` failed, install hub and authorize it.\n#{e.message}"
     else
       success '`hub` installed and authorized.'

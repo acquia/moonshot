@@ -51,7 +51,7 @@ module Moonshot::ArtifactRepository
     end
 
     def in_s3?(key)
-      s3_client.head_object(key: key, bucket: bucket_name)
+      s3_client.head_object(key:, bucket: bucket_name)
     rescue ::Aws::S3::Errors::NotFound
       false
     end

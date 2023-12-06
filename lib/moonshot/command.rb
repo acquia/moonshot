@@ -10,7 +10,7 @@ module Moonshot
       attr_accessor :usage, :description, :only_in_account
     end
 
-    def self.inherited(base)
+    def self.inherited(base) # rubocop:disable Lint/MissingSuper
       Moonshot::CommandLine.register(base)
       base.extend(ClassMethods)
     end

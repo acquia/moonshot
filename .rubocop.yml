@@ -20,29 +20,7 @@ Metrics/ClassLength:
   Max: 130
 Style/Documentation:
   Enabled: false
-Style/MissingRespondToMissing:
-  Enabled: false
-Layout/HeredocIndentation:
-  Enabled: false
 Naming/HeredocDelimiterNaming:
-  Enabled: false
-Naming/MemoizedInstanceVariableName:
-  Enabled: false
-Naming/MethodParameterName:
-  Enabled: false
-Metrics/CyclomaticComplexity:
-  Enabled: false
-Metrics/PerceivedComplexity:
-  Enabled: false
-Style/OptionalBooleanParameter:
-  Enabled: false
-Lint/EmptyFile:
-  Enabled: false
-Lint/MissingSuper:
-  Enabled: false
-Style/FormatStringToken:
-  Enabled: false
-Style/NumericLiteralPrefix:
   Enabled: false
 Style/HashSyntax:
   Enabled: false

@@ -4,7 +4,7 @@ require 'colorize'
 
 module Moonshot
   class AskUserSource
-    def get(sp)
+    def get(sp) # rubocop:disable Naming/MethodParameterName
       return unless Moonshot.config.interactive
 
       @sp = sp

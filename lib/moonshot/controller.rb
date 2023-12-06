@@ -13,7 +13,7 @@ module Moonshot
       Moonshot::StackLister.new(@config.app_name).list
     end
 
-    def create # rubocop:disable Metrics/AbcSize
+    def create # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       run_plugins(:setup_create)
       # Scan the template for all required parameters and configure
       # the ParameterCollection.
@@ -66,7 +66,7 @@ module Moonshot
       end
     end
 
-    def update(dry_run:, force:, refresh_parameters:) # rubocop:disable Metrics/AbcSize
+    def update(dry_run:, force:, refresh_parameters:) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       run_plugins(:setup_update)
       # Scan the template for all required parameters and configure
       # the ParameterCollection.

@@ -3,7 +3,7 @@
 module Moonshot
   module AccountContext
     def self.get
-      @account ||= determine_account_name
+      @get ||= determine_account_name
     end
 
     def self.set(account_name)

@@ -45,33 +45,33 @@ module Moonshot
         end
 
         def generate_moonfile
-          <<-EOF
-Moonshot.config do |m|
-  m.app_name             = '#{@application_name}'
-  m.artifact_repository  = S3Bucket.new('<your_bucket>')
-  m.build_mechanism      = Script.new('bin/build.sh')
-  m.deployment_mechanism = CodeDeploy.new(asg: 'AutoScalingGroup')
-end
+          <<~EOF
+            Moonshot.config do |m|
+              m.app_name             = '#{@application_name}'
+              m.artifact_repository  = S3Bucket.new('<your_bucket>')
+              m.build_mechanism      = Script.new('bin/build.sh')
+              m.deployment_mechanism = CodeDeploy.new(asg: 'AutoScalingGroup')
+            end
           EOF
         end
 
         def print_success_message
-          warn <<-EOF
-Your application is configured, the following changes have been made
-to your project directory:
+          warn <<~EOF
+            Your application is configured, the following changes have been made
+            to your project directory:
 
-  * Created Moonfile.rb, where you can configure your project.
-  * Created moonshot/plugins, where you can place custom Ruby code
-    to add hooks to core Moonshot actions (create, update, delete, etc.)
-  * Created moonshot/cli_extensions, where you can place custom Ruby
-    code to add your own project-specific commands to Moonshot.
-  * Created moonshot/template.yml, where you can build your
-    CloudFormation template.
+              * Created Moonfile.rb, where you can configure your project.
+              * Created moonshot/plugins, where you can place custom Ruby code
+                to add hooks to core Moonshot actions (create, update, delete, etc.)
+              * Created moonshot/cli_extensions, where you can place custom Ruby
+                code to add your own project-specific commands to Moonshot.
+              * Created moonshot/template.yml, where you can build your
+                CloudFormation template.
 
-You will also need to ensure your Amazon account is configured for
-CodeDeploy by creating a role that allows deployments.
+            You will also need to ensure your Amazon account is configured for
+            CodeDeploy by creating a role that allows deployments.
 
-See: http://moonshot.readthedocs.io/en/latest/mechanisms/deployment/
+            See: http://moonshot.readthedocs.io/en/latest/mechanisms/deployment/
           EOF
         end
       end

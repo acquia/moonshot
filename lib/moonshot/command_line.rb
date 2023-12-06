@@ -12,7 +12,7 @@ module Moonshot
       @classes || []
     end
 
-    def run! # rubocop:disable Metrics/MethodLength
+    def run! # rubocop:disable Metrics/MethodLength, Metrics/CyclomaticComplexity
       # Commands defined as Moonshot::Commands require a properly
       # configured Moonshot.rb and supporting files. Without them, we only
       # support `--help` and `new`.

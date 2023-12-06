@@ -11,11 +11,11 @@ module Moonshot
     end
 
     # rubocop:disable Metrics/AbcSize
-    def list
+    def list # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       result = []
       next_token = nil
       loop do
-        resp = cf_client.describe_stacks(next_token: next_token)
+        resp = cf_client.describe_stacks(next_token:)
         resp.stacks.each do |stack|
           app_tag = stack.tags.find { |t| t.key == 'moonshot_application' }
           env_tag = stack.tags.find { |t| t.key == 'moonshot_environment' }

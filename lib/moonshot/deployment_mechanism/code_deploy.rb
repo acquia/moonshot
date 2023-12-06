@@ -346,7 +346,7 @@ class Moonshot::DeploymentMechanism::CodeDeploy # rubocop:disable Metrics/ClassL
     success
   end
 
-  def handle_deployment_failure(deployment_id)
+  def handle_deployment_failure(deployment_id) # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
     instances = cd_client.list_deployment_instances(deployment_id:)
                          .instances_list.map do |instance_id|
       cd_client.get_deployment_instance(deployment_id:,
@@ -410,11 +410,11 @@ class Moonshot::DeploymentMechanism::CodeDeploy # rubocop:disable Metrics/ClassL
     role
     success("#{@codedeploy_role} exists.")
   rescue StandardError => e
-    help = <<-EOF
-Error: #{e.message}
+    help = <<~EOF
+      Error: #{e.message}
 
-For information on provisioning an account for use with CodeDeploy, see:
-http://docs.aws.amazon.com/codedeploy/latest/userguide/how-to-create-service-role.html
+      For information on provisioning an account for use with CodeDeploy, see:
+      http://docs.aws.amazon.com/codedeploy/latest/userguide/how-to-create-service-role.html
     EOF
     critical("Could not find #{@codedeploy_role}, ", help)
   end

@@ -19,7 +19,7 @@ module Moonshot::Shell
 
   # Run a command, returning stdout. Stderr is suppressed unless the command
   # returns non-zero.
-  def sh_out(cmd, fail = true, stdin = '')
+  def sh_out(cmd, fail = true, stdin = '') # rubocop:disable Style/OptionalBooleanParameter
     r_in, w_in = IO.pipe
     r_out, w_out = IO.pipe
     r_err, w_err = IO.pipe
@@ -48,7 +48,7 @@ module Moonshot::Shell
   module_function :sh_out
 
   def shell
-    @thor_shell ||= Thor::Base.shell.new
+    @shell ||= Thor::Base.shell.new
   end
 
   Thor::Shell::Basic.public_instance_methods(false).each do |meth|
@@ -73,7 +73,7 @@ module Moonshot::Shell
   # @param opts [Hash] Options for retriable.
   #
   # @return [String] Stdout form the command.
-  def sh_retry(cmd, fail = true, stdin = '', opts: {})
+  def sh_retry(cmd, fail = true, stdin = '', opts: {}) # rubocop:disable Style/OptionalBooleanParameter
     Retriable.retriable(DEFAULT_RETRY_OPTIONS.merge(opts)) do
       out = sh_out(cmd, stdin:)
       yield out if block_given?

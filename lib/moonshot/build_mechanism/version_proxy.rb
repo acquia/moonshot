@@ -21,7 +21,9 @@ class Moonshot::BuildMechanism::VersionProxy
     @dev.doctor_hook
   end
 
+  # rubocop: disable Naming/MethodParameterName
   def resources=(r)
+    # rubocop: enable Naming/MethodParameterName
     super
     @release.resources = r
     @dev.resources = r
