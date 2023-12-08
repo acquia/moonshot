@@ -4,23 +4,23 @@ require 'colorize'
 
 module Moonshot
   class AskUserSource
-    def get(sp) # rubocop:disable Naming/MethodParameterName
+    def get(param)
       return unless Moonshot.config.interactive
 
-      @sp = sp
+      @param = param
 
       prompt
       loop do
         input = gets.chomp
 
-        if String(input).empty? && @sp.default?
+        if String(input).empty? && @param.default?
           # We will use the default value, print it here so the output is clear.
           puts 'Using default value.'
           return
         elsif String(input).empty?
-          puts "Cannot proceed without value for #{@sp.name}!"
+          puts "Cannot proceed without value for #{@param.name}!"
         else
-          @sp.set(String(input))
+          @param.set(String(input))
           return
         end
 
@@ -31,9 +31,9 @@ module Moonshot
     private
 
     def prompt
-      print "(#{@sp.name})".light_black
-      print " #{@sp.description}" unless @sp.description.empty?
-      print " [#{@sp.default}]".light_black if @sp.default?
+      print "(#{@param.name})".light_black
+      print " #{@param.description}" unless @param.description.empty?
+      print " [#{@param.default}]".light_black if @param.default?
       print ': '
     end
   end

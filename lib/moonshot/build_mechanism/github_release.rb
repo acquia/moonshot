@@ -42,11 +42,9 @@ module Moonshot::BuildMechanism
       @build_mechanism.doctor_hook
     end
 
-    # rubocop: disable Naming/MethodParameterName
-    def resources=(r)
-      # rubocop: enable Naming/MethodParameterName
+    def resources=(res)
       super
-      @build_mechanism.resources = r
+      @build_mechanism.resources = res
     end
 
     def pre_build_hook(version)
