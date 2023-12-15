@@ -19,7 +19,7 @@ module Moonshot::Shell
 
   # Run a command, returning stdout. Stderr is suppressed unless the command
   # returns non-zero.
-  def sh_out(cmd, fail = true, stdin = '') # rubocop:disable Style/OptionalBooleanParameter
+  def sh_out(cmd, fail: true, stdin: '')
     r_in, w_in = IO.pipe
     r_out, w_out = IO.pipe
     r_err, w_err = IO.pipe
@@ -55,11 +55,11 @@ module Moonshot::Shell
     define_method(meth) { |*args| shell.public_send(meth, *args) }
   end
 
-  def sh_step(cmd, **args)
-    msg = args.delete(:msg) || cmd
+  def sh_step(cmd, **kwargs)
+    msg = kwargs.delete(:msg) || cmd
     msg = "#{msg[0..(terminal_width - 22)]}..." if msg.length > (terminal_width - 18)
     ilog.start_threaded(msg) do |step|
-      out = sh_out(cmd, **args)
+      out = sh_out(cmd, **kwargs)
       yield step, out if block_given?
       step.success
     end
@@ -75,7 +75,7 @@ module Moonshot::Shell
   # @return [String] Stdout form the command.
   def sh_retry(cmd, fail = true, stdin = '', opts: {}) # rubocop:disable Style/OptionalBooleanParameter
     Retriable.retriable(DEFAULT_RETRY_OPTIONS.merge(opts)) do
-      out = sh_out(cmd, stdin:)
+      out = sh_out(cmd, fail:, stdin:)
       yield out if block_given?
       out
     end
