@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 module Moonshot
+  class ChangeSetTimeoutError < StandardError; end
+
   class ChangeSet
     attr_reader :name, :stack_name
 
@@ -77,12 +79,34 @@ module Moonshot
     end
 
     def wait_for_change_set
-      @cf_client.wait_until(:change_set_create_complete,
-                            stack_name: @stack_name,
-                            change_set_name: @name)
+      wait_seconds = Moonshot.config.changeset_wait_time || 90
 
-      @change_set = @cf_client.describe_change_set(stack_name: @stack_name,
-      change_set_name: @name)
+      resp = @cf_client.describe_change_set({
+        stack_name: @stack_name,
+        change_set_name: @name
+      })
+
+      if %w(CREATE_COMPLETE FAILED).include?(resp.status)
+        @change_set = resp
+        return
+      end
+
+      started_at = Time.now
+      @cf_client.wait_until(:change_set_create_complete, {
+        stack_name: @stack_name,
+        change_set_name: @name
+      }, {
+        max_attempts: nil,
+        delay: 5,
+        before_wait: -> (attempts, response) do
+          raise ChangeSetTimeoutError, "ChangeSet did not complete creation within #{wait_seconds} seconds!" if Time.now - started_at > wait_seconds
+        end
+      })
+
+      @change_set = @cf_client.describe_change_set({
+        stack_name: @stack_name,
+        change_set_name: @name
+      })
     end
   end
 end
