@@ -40,5 +40,7 @@ Metrics/PerceivedComplexity:
   Enabled: false
 Style/OptionalBooleanParameter:
   Enabled: false
+Style/IfUnlessModifier:
+  Enabled: false
 Lint/EmptyFile:
   Enabled: false

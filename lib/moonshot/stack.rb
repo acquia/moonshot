@@ -21,7 +21,7 @@ module Moonshot
       def make_tags(config)
         default_tags = [
           { key: 'moonshot_application', value: config.app_name },
-          { key: 'moonshot_environment', value: config.environment_name },
+          { key: 'moonshot_environment', value: config.environment_name }
         ]
         name = generate_name(config)
 
@@ -253,7 +253,7 @@ module Moonshot
         change_set_name:,
         description: "Moonshot update command for application '#{Moonshot.config.app_name}'",
         stack_name: @name,
-        capabilities:  %w(CAPABILITY_IAM CAPABILITY_NAMED_IAM),
+        capabilities:  %w(CAPABILITY_IAM CAPABILITY_NAMED_IAM), # rubocop:disable Layout/HashAlignment,Style/PercentLiteralDelimiters
         parameters: @config.parameters.values.map(&:to_cf),
         tags: make_tags
       }
