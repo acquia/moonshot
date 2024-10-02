@@ -37,7 +37,6 @@ Gem::Specification.new do |s|
   s.add_dependency('ruby-duration')
   s.add_dependency('semantic')
   s.add_dependency('thor')
-  s.add_dependency('travis', '=1.14.3')
   s.add_dependency('vandamme')
 
   s.add_development_dependency('fakefs')
