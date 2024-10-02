@@ -10,4 +10,5 @@ group :test do
   gem 'codeclimate-test-reporter'
   gem 'pry'
   gem 'rubocop'
+  gem 'faraday', '>= 2.9.2'
 end
