@@ -27,7 +27,6 @@ Gem::Specification.new do |s|
 
   s.add_dependency('activesupport')
   s.add_dependency('colorize')
-  s.add_dependency('faraday-retry')
   s.add_dependency('highline')
   s.add_dependency('interactive-logger')
   s.add_dependency('pry')
@@ -38,7 +37,7 @@ Gem::Specification.new do |s|
   s.add_dependency('ruby-duration')
   s.add_dependency('semantic')
   s.add_dependency('thor')
-  s.add_dependency('travis', '=1.14.1')
+  s.add_dependency('travis', '=1.14.3')
   s.add_dependency('vandamme')
 
   s.add_development_dependency('fakefs')
