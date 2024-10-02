@@ -36,6 +36,7 @@ Gem::Specification.new do |s|
   s.add_dependency('pry')
   s.add_dependency('require_all')
   s.add_dependency('retriable')
+  s.add_dependency('rexml')
   s.add_dependency('rotp')
   s.add_dependency('ruby-duration')
   s.add_dependency('semantic')
