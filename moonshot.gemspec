@@ -27,6 +27,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency('activesupport')
   s.add_dependency('colorize')
+  s.add_dependency('faraday-retry', '~> 1.0')
   s.add_dependency('highline')
   s.add_dependency('interactive-logger')
   s.add_dependency('pry')
