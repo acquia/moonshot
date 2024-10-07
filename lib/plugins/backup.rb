@@ -200,7 +200,7 @@ module Moonshot
         # single bucket for all accounts
         return @bucket if @bucket
         # calculating bucket based on account name
-        return bucket_by_account(iam_account) if @buckets
+        return bucket_by_account(iam_account) if @buckets # rubocop:disable Style/RedundantReturn
       end
 
       def bucket_by_account(account)

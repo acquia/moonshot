@@ -104,7 +104,7 @@ module Moonshot
               Moonshot.config.parameters[@kms_key_parameter_name].set(key_arn)
               s.success "Created a new KMS Key for #{@kms_key_parameter_name.blue}!"
             else
-              kms=KmsKey.new(Moonshot.config.parameters[@kms_key_parameter_name].value)
+              kms=KmsKey.new(Moonshot.config.parameters[@kms_key_parameter_name].value) # rubocop:disable Style/SpaceAroundOperators
               key_arn = kms.arn
               kms.update
               s.success "Using existing KMS Key for #{@kms_key_parameter_name.blue}!"

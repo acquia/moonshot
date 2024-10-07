@@ -15,28 +15,32 @@ Gem::Specification.new do |s|
   s.executables = ['moonshot']
   s.homepage    = 'https://github.com/acquia/moonshot'
 
-  s.required_ruby_version = '>= 3.1.2'
+  s.required_ruby_version = '>= 3.3.4'
 
   s.add_dependency('aws-sdk-autoscaling', '~> 1.5')
   s.add_dependency('aws-sdk-cloudformation', '~> 1.4')
   s.add_dependency('aws-sdk-codedeploy', '~> 1.5')
-  s.add_dependency('aws-sdk-elasticloadbalancing', '~> 1.3')
   s.add_dependency('aws-sdk-ec2', '~> 1.34')
+  s.add_dependency('aws-sdk-elasticloadbalancing', '~> 1.3')
   s.add_dependency('aws-sdk-iam', '~> 1.4')
   s.add_dependency('aws-sdk-s3', '~> 1.12')
 
   s.add_dependency('activesupport')
   s.add_dependency('colorize')
+  s.add_dependency('faraday', '~> 1.0')
+  s.add_dependency('faraday-rack', '~> 1.0.0')
+  s.add_dependency('faraday-retry', '~> 1.0')
   s.add_dependency('highline')
   s.add_dependency('interactive-logger')
   s.add_dependency('pry')
   s.add_dependency('require_all')
   s.add_dependency('retriable')
+  s.add_dependency('rexml')
   s.add_dependency('rotp')
   s.add_dependency('ruby-duration')
   s.add_dependency('semantic')
   s.add_dependency('thor')
-  s.add_dependency('travis')
+  s.add_dependency('travis', '~> 1.11.1')
   s.add_dependency('vandamme')
 
   s.add_development_dependency('fakefs')

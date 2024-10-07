@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'colorize'
 
 module Moonshot
@@ -39,10 +41,10 @@ module Moonshot
       pipe = '|'
       print first ? '┌' : '├'
       print '─' * depth
-      puts "#{space}" << @name.light_black
+      puts "#{space}" << @name.light_black # rubocop:disable Style/RedundantInterpolation
       @lines = [''] + @lines + ['']
       @lines.each do |line|
-        puts "#{pipe}" << (' ' * depth) << line
+        puts "#{pipe}" << (' ' * depth) << line # rubocop:disable Style/RedundantInterpolation
       end
       @children.each do |child|
         child.draw(depth + 1, false)
