@@ -4,4 +4,3 @@ Moonshot.config do |m|
   m.build_mechanism = Script.new('bin/build.sh')
   m.deployment_mechanism = CodeDeploy.new(asg: 'AutoScalingGroup')
 end
-
