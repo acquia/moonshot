@@ -18,7 +18,7 @@ Gem::Specification.new do |s|
   s.add_dependency('aws-sdk', '~> 2.0', '>= 2.2.0')
   s.required_ruby_version = '>= 3.1.2'
 
-  s.add_dependency('activesupport', '= 6.1.7.1')
+  s.add_dependency('activesupport', '= 7.0.7.1')
   s.add_dependency('colorize')
   s.add_dependency('highline')
   s.add_dependency('interactive-logger')
