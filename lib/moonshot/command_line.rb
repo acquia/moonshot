@@ -25,8 +25,8 @@ module Moonshot
         break if File.exist?('Moonfile.rb')
 
         if Dir.pwd == '/'
-          warn 'No Moonfile.rb found, are you in a project? Maybe you need to '\
-                'create one with `moonshot new <app_name>`?'
+          warn 'No Moonfile.rb found, are you in a project? Maybe you need to ' \
+               'create one with `moonshot new <app_name>`?'
           raise 'No Moonfile found'
         end
 
@@ -88,9 +88,8 @@ module Moonshot
       warn 'Usage: moonshot [command]'
       warn
       warn 'Valid commands include:'
-      fields = []
-      @commands.each do |c, k|
-        fields << [c, k.description]
+      fields = @commands.map do |c, k|
+        [c, k.description]
       end
 
       max_len = fields.map(&:first).map(&:size).max

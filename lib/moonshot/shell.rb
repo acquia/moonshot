@@ -38,10 +38,10 @@ module Moonshot::Shell
 
     if fail && $CHILD_STATUS.exitstatus != 0
       raise CommandError, "`#{cmd}` exited #{$CHILD_STATUS.exitstatus}\n" \
-           "stdout:\n" \
-           "#{stdout}\n" \
-           "stderr:\n" \
-           "#{stderr}\n"
+                          "stdout:\n" \
+                          "#{stdout}\n" \
+                          "stderr:\n" \
+                          "#{stderr}\n"
     end
     stdout
   end

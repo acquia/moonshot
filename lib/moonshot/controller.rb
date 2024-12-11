@@ -204,14 +204,14 @@ module Moonshot
         Resources.new(stack:, ilog: @config.interactive_logger, controller: self)
     end
 
-    def run_hook(type, name, *args)
+    def run_hook(type, name, *)
       mech = get_mechanism(type)
       name = name.to_s << '_hook'
 
       return unless mech.respond_to?(name)
 
       mech.resources = resources
-      mech.send(name, *args)
+      mech.send(name, *)
     end
 
     def run_plugins(type)

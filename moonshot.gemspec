@@ -42,8 +42,5 @@ Gem::Specification.new do |s|
   s.add_dependency('thor')
   s.add_dependency('travis', '~> 1.11.1')
   s.add_dependency('vandamme')
-
-  s.add_development_dependency('fakefs')
-  s.add_development_dependency('rspec')
-  s.add_development_dependency('simplecov')
+  s.metadata['rubygems_mfa_required'] = 'true'
 end
