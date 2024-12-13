@@ -164,13 +164,13 @@ class Moonshot::DeploymentMechanism::CodeDeploy # rubocop:disable Metrics/ClassL
     when [true, true, true]
       'Application and Deployment Group are configured correctly.'.green
     when [true, true, false]
-      'Deployment Group exists, but not associated with the correct '\
+      'Deployment Group exists, but not associated with the correct ' \
       "Auto-Scaling Group, try running #{'update'.yellow}."
     when [true, false, false]
       "Deployment Group does not exist, try running #{'create'.yellow}."
     when [false, false, false]
-      'Application and Deployment Group do not exist, try running'\
-      " #{'create'.yellow}."
+      'Application and Deployment Group do not exist, try running ' \
+      "#{'create'.yellow}."
     end
   end
 
@@ -205,11 +205,7 @@ class Moonshot::DeploymentMechanism::CodeDeploy # rubocop:disable Metrics/ClassL
   end
 
   def asg_names
-    names = []
-    auto_scaling_groups.each do |auto_scaling_group|
-      names.push(auto_scaling_group.auto_scaling_group_name)
-    end
-    names
+    auto_scaling_groups.map(&:auto_scaling_group_name)
   end
 
   def application_exists?

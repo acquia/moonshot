@@ -104,15 +104,13 @@ module Moonshot
     def parameters
       get_stack(@name)
         .parameters
-        .map { |p| [p.parameter_key, p.parameter_value] }
-        .to_h
+        .to_h { |p| [p.parameter_key, p.parameter_value] }
     end
 
     def outputs
       get_stack(@name)
         .outputs
-        .map { |o| [o.output_key, o.output_value] }
-        .to_h
+        .to_h { |o| [o.output_key, o.output_value] }
     end
 
     def exists?

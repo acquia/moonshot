@@ -70,8 +70,8 @@ module Moonshot
       end
 
       # Dynamically responding to hooks supplied in the constructor
-      def method_missing(method_name, *args, &block)
-        @hooks.include?(method_name) ? backup(*args) : super
+      def method_missing(method_name, *, &)
+        @hooks.include?(method_name) ? backup(*) : super
       end
 
       def respond_to?(method_name, include_private = false)
@@ -182,7 +182,7 @@ module Moonshot
           app_name: @app_name,
           stack_name: @stack_name,
           timestamp: Time.now.to_i.to_s,
-          user: ENV['USER']
+          user: ENV.fetch('USER', nil)
         )
       end
 

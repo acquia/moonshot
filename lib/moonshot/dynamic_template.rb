@@ -12,7 +12,7 @@ module Moonshot
     class Parameters
       def initialize(parameters)
         parameters.each do |k, v|
-          instance_variable_set("@#{k}".to_sym, v)
+          instance_variable_set(:"@#{k}", v)
           # Adding an attribute reader for flexibility, this way you can add
           # either `@parameter` or just `parameter` to your template.
           self.class.send(:attr_reader, k.to_sym)

@@ -219,8 +219,8 @@ module Moonshot::ArtifactRepository
     def doctor_check_hub_release_download
       sh_out('hub release download --help')
     rescue StandardError
-      critical '`hub release download` command missing, upgrade hub.' \
-               ' See https://github.com/github/hub/pull/1103'
+      critical '`hub release download` command missing, upgrade hub. ' \
+               'See https://github.com/github/hub/pull/1103'
     else
       success '`hub release download` command available.'
     end

@@ -11,3 +11,9 @@ group :test do
   gem 'pry'
   gem 'rubocop'
 end
+
+group :development do
+  gem 'fakefs'
+  gem 'rspec'
+  gem 'simplecov'
+end

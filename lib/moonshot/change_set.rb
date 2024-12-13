@@ -82,10 +82,10 @@ module Moonshot
                               stack_name: @stack_name,
                               change_set_name: @name)
       rescue Aws::Waiters::Errors::FailureStateError => e
-        if e.message != 'stopped waiting, encountered a failure state'
-          throw e
-        else
+        if e.message == 'stopped waiting, encountered a failure state'
           puts "The change set didn't contain any new changes."
+        else
+          throw e
         end
       end
 

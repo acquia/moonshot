@@ -22,7 +22,7 @@ module Moonshot
                   'Specify Stack Parameter on the command line') do |v|
           data = v.split('=', 2)
           unless data.size == 2
-            raise "Invalid parameter format '#{v}',"\
+            raise "Invalid parameter format '#{v}'," \
                   'expected KEY=VALUE (e.g. MyTemplateParameter=12)'
           end
 

@@ -103,7 +103,7 @@ module Moonshot::BuildMechanism
           s.success
         else
           s.failure("Job #{job_number} did not complete within time limit of " \
-            "#{@timeout} seconds")
+                    "#{@timeout} seconds")
         end
       end
     end

@@ -15,7 +15,7 @@ module Moonshot
               groups.first
             elsif groups.count > 1
               unless @asg_name
-                raise 'Multiple Auto Scaling Groups found in the stack. Please specify which '\
+                raise 'Multiple Auto Scaling Groups found in the stack. Please specify which ' \
                       'one to SSH into using the --auto-scaling-group (-g) option.'
               end
               groups.detect { |x| x.logical_resource_id == @asg_name }
