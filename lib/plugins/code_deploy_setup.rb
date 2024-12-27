@@ -9,18 +9,18 @@ module Moonshot
 
       attr_reader :name, :prefix, :regions
 
-      def initialize(name, prefix: '', regions: [ENV['AWS_REGION']])
-        @regions = regions.reject(&:nil?)
+      def initialize(name, prefix: '', regions: [ENV.fetch('AWS_REGION', nil)])
+        @regions = regions.compact
         if @regions.empty?
-          raise ArgumentError, 'CodeDeploySetup requires at least one region.' \
-                               ' Set regions argument or ENV[\'AWS_REGION\'].'
+          raise ArgumentError, 'CodeDeploySetup requires at least one region. ' \
+                               'Set regions argument or ENV[\'AWS_REGION\'].'
         end
 
         @name = name
         @prefix = prefix
       end
 
-      def bucket_name(region = ENV['AWS_REGION'])
+      def bucket_name(region = ENV.fetch('AWS_REGION', nil))
         if ENV.key?('S3_BUCKET')
           ENV['S3_BUCKET']
         else

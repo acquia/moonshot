@@ -29,7 +29,7 @@ class Moonshot::BuildMechanism::Script
   end
 
   def pre_build_hook(_version)
-    File.delete(@output_file) if File.exist?(@output_file)
+    FileUtils.rm_f(@output_file)
   end
 
   def build_hook(version)

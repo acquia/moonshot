@@ -41,7 +41,7 @@ module Moonshot
         end
 
         def fill_moonfile
-          File.open(File.join(project_path, 'Moonfile.rb'), 'w') { |f| f.write generate_moonfile }
+          File.write(File.join(project_path, 'Moonfile.rb'), generate_moonfile)
         end
 
         def generate_moonfile
