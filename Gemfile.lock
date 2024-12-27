@@ -32,19 +32,24 @@ PATH
       ruby-duration
       semantic
       thor
-      travis
       vandamme
 
 GEM
   remote: https://rubygems.org/
   specs:
-    activesupport (7.0.8.7)
-      concurrent-ruby (~> 1.0, >= 1.0.2)
+    activesupport (8.0.1)
+      base64
+      benchmark (>= 0.3)
+      bigdecimal
+      concurrent-ruby (~> 1.0, >= 1.3.1)
+      connection_pool (>= 2.2.5)
+      drb
       i18n (>= 1.6, < 2)
+      logger (>= 1.4.2)
       minitest (>= 5.1)
-      tzinfo (~> 2.0)
-    addressable (2.8.7)
-      public_suffix (>= 2.0.2, < 7.0)
+      securerandom (>= 0.3)
+      tzinfo (~> 2.0, >= 2.0.5)
+      uri (>= 0.13.1)
     ast (2.4.2)
     aws-eventstream (1.3.0)
     aws-partitions (1.1029.0)
@@ -81,6 +86,8 @@ GEM
     aws-sigv4 (1.10.1)
       aws-eventstream (~> 1, >= 1.0.2)
     base64 (0.2.0)
+    benchmark (0.4.0)
+    bigdecimal (3.1.9)
     codeclimate-test-reporter (1.0.7)
       simplecov
     coderay (1.1.3)
@@ -91,40 +98,33 @@ GEM
     connection_pool (2.4.1)
     diff-lcs (1.5.1)
     docile (1.4.1)
-    ethon (0.16.0)
-      ffi (>= 1.15.0)
+    drb (2.2.1)
     fakefs (2.8.0)
-    faraday (2.7.12)
-      base64
-      faraday-net_http (>= 2.0, < 3.1)
-      ruby2_keywords (>= 0.0.4)
-    faraday-net_http (3.0.2)
+    faraday (2.12.2)
+      faraday-net_http (>= 2.0, < 3.5)
+      json
+      logger
+    faraday-net_http (3.4.0)
+      net-http (>= 0.5.0)
     faraday-rack (2.0.0)
       faraday (~> 2.0)
     faraday-retry (2.2.1)
       faraday (~> 2.0)
-    faraday-typhoeus (1.1.0)
-      faraday (~> 2.0)
-      typhoeus (~> 1.4)
-    ffi (1.17.0)
-    ffi (1.17.0-arm64-darwin)
     github-markup (1.7.0)
-    highline (2.1.0)
+    highline (3.1.1)
+      reline
     i18n (1.14.6)
       concurrent-ruby (~> 1.0)
+    io-console (0.8.0)
     iso8601 (0.13.0)
     jmespath (1.6.2)
     json (2.9.1)
-    json_pure (2.6.3)
     language_server-protocol (3.17.0.3)
-    launchy (2.5.2)
-      addressable (~> 2.8)
+    logger (1.6.4)
     method_source (1.1.0)
     minitest (5.25.4)
-    multi_json (1.15.0)
-    net-http-persistent (4.0.5)
-      connection_pool (~> 2.2)
-    net-http-pipeline (1.0.1)
+    net-http (0.6.0)
+      uri
     parallel (1.26.3)
     parser (3.3.6.0)
       ast (~> 2.4.1)
@@ -132,17 +132,12 @@ GEM
     pry (0.15.2)
       coderay (~> 1.1)
       method_source (~> 1.0)
-    public_suffix (6.0.1)
-    pusher-client (0.6.2)
-      json
-      websocket (~> 1.0)
     racc (1.8.1)
-    rack (3.1.8)
-    rack-test (2.1.0)
-      rack (>= 1.3)
     rainbow (3.1.1)
     rake (13.2.1)
     regexp_parser (2.10.0)
+    reline (0.6.0)
+      io-console (~> 0.5)
     require_all (3.0.0)
     retriable (3.1.2)
     rexml (3.4.0)
@@ -179,7 +174,7 @@ GEM
     ruby-enum (0.9.0)
       i18n
     ruby-progressbar (1.13.0)
-    ruby2_keywords (0.0.5)
+    securerandom (0.4.1)
     semantic (1.6.1)
     simplecov (0.22.0)
       docile (~> 1.1)
@@ -188,35 +183,15 @@ GEM
     simplecov-html (0.13.1)
     simplecov_json_formatter (0.1.4)
     thor (1.3.2)
-    travis (1.14.0)
-      faraday (~> 2.7.10)
-      faraday-rack (~> 2)
-      highline (~> 2.1.0)
-      json_pure (~> 2.6.3)
-      launchy (~> 2.5.2)
-      pusher-client (~> 0.6.2)
-      rack-test (~> 2.1.0)
-      travis-gh (~> 0.21.0)
-    travis-gh (0.21.0)
-      activesupport (~> 7.0.8)
-      addressable (~> 2.8)
-      faraday (~> 2)
-      faraday-retry
-      faraday-typhoeus
-      multi_json (~> 1)
-      net-http-persistent (~> 4)
-      net-http-pipeline
-    typhoeus (1.4.1)
-      ethon (>= 0.9.0)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
     unicode-display_width (3.1.3)
       unicode-emoji (~> 4.0, >= 4.0.4)
     unicode-emoji (4.0.4)
+    uri (1.0.2)
     vandamme (0.0.12)
       commonmarker (~> 0.14.14)
       github-markup (~> 1.3)
-    websocket (1.2.11)
 
 PLATFORMS
   arm64-darwin-24
