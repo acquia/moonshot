@@ -8,17 +8,17 @@ describe Moonshot::Plugins::CodeDeploySetup do
     end
 
     it 'should use the ENV[AWS_REGION] if no region arg is set' do
-      allow(ENV).to receive(:[]).with("AWS_REGION").and_return('us-west-2')
+      allow(ENV).to receive(:fetch).with('AWS_REGION', nil).and_return('us-west-2')
       expect(subject.new('example').regions).to include('us-west-2')
     end
 
     it 'should use return the correct bucket name for the current active region' do
-      allow(ENV).to receive(:[]).with("AWS_REGION").and_return('ap-southeast-1')
+      allow(ENV).to receive(:fetch).with('AWS_REGION', nil).and_return('ap-southeast-1')
       expect(subject.new('example-builds').bucket_name).to eq('example-builds-ap-southeast-1')
     end
 
     it 'should use return the correct bucket prefix' do
-      allow(ENV).to receive(:[]).with("AWS_REGION").and_return('us-east-1')
+      allow(ENV).to receive(:fetch).with('AWS_REGION', nil).and_return('us-east-1')
       expect(subject.new('example-builds').bucket_prefix).to eq('')
       expect(subject.new('example-builds', prefix: 'api').bucket_prefix).to eq('api/')
     end
@@ -36,7 +36,8 @@ describe Moonshot::Plugins::CodeDeploySetup do
     end
 
     it 'creates a bucket for all set regions' do
-      allow(ENV).to receive(:[]).with("AWS_REGION").and_return('us-east-1')
+      #allow(ENV).to receive(:[]).with("AWS_REGION").and_return('us-east-1')
+      allow(ENV).to receive(:fetch).with('AWS_REGION', nil).and_return('us-east-1')
       plugin = subject.new('example')
       expect(plugin.regions).to include('us-east-1')
       expect(s3_bucket).to receive(:exists?)

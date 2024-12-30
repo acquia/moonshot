@@ -55,6 +55,17 @@ module Moonshot::Shell
     define_method(meth) { |*args| shell.public_send(meth, *args) }
   end
 
+  def terminal_width
+    result = if ENV['THOR_COLUMNS']
+               ENV['THOR_COLUMNS'].to_i
+             else
+               unix? ? dynamic_width : 80
+             end
+    result < 10 ? 80 : result
+  rescue StandardError
+    80
+  end
+
   def sh_step(cmd, **args)
     msg = args.delete(:msg) || cmd
     msg = "#{msg[0..(terminal_width - 22)]}..." if msg.length > (terminal_width - 18)
