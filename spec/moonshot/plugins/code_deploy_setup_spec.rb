@@ -36,7 +36,6 @@ describe Moonshot::Plugins::CodeDeploySetup do
     end
 
     it 'creates a bucket for all set regions' do
-      #allow(ENV).to receive(:[]).with("AWS_REGION").and_return('us-east-1')
       allow(ENV).to receive(:fetch).with('AWS_REGION', nil).and_return('us-east-1')
       plugin = subject.new('example')
       expect(plugin.regions).to include('us-east-1')
