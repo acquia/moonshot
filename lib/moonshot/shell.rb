@@ -54,7 +54,7 @@ module Moonshot::Shell
   end
 
   def terminal_width
-    Thor::Shell::Terminal.terminal_width() || DEFAULT_TERMINAL_WIDTH
+    Thor::Shell::Terminal.terminal_width || DEFAULT_TERMINAL_WIDTH
   end
 
   Thor::Shell::Basic.public_instance_methods(false).each do |meth|

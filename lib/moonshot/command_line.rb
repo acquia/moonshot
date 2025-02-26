@@ -96,7 +96,7 @@ module Moonshot
       max_len = fields.map(&:first).map(&:size).max
 
       fields.each do |f|
-        line = format("  %-#{max_len}s # %s", *f) # rubocop:disable Lint/FormatParameterMismatch
+        line = format("  %-#{max_len}s # %s", *f)
         warn line
       end
     end
