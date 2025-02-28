@@ -17,6 +17,8 @@ module Moonshot::Shell
     rand_factor: 0
   }.freeze
 
+  DEFAULT_TERMINAL_WIDTH = 80
+
   # Run a command, returning stdout. Stderr is suppressed unless the command
   # returns non-zero.
   def sh_out(cmd, fail = true, stdin = '')
@@ -49,6 +51,10 @@ module Moonshot::Shell
 
   def shell
     @thor_shell ||= Thor::Base.shell.new
+  end
+
+  def terminal_width
+    Thor::Shell::Terminal.terminal_width || DEFAULT_TERMINAL_WIDTH
   end
 
   Thor::Shell::Basic.public_instance_methods(false).each do |meth|
