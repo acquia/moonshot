@@ -67,12 +67,9 @@ end
 shared_examples 'with a working moonshot application' do
   include FakeFS::SpecHelpers
 
+  # Force aws-sdk to load metadata before FakeFS takes over.
   before(:all) do
-    # Force aws-sdk to load metadata before FakeFS takes over.
-    begin
-      Aws::CloudFormation::Client.new
-    rescue
-    end
+    Aws::CloudFormation::Client.new(stub_responses: true)
   end
 
   before(:each) do
