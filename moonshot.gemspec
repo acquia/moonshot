@@ -25,7 +25,7 @@ Gem::Specification.new do |s|
   s.add_dependency('aws-sdk-iam', '~> 1.4')
   s.add_dependency('aws-sdk-s3', '~> 1.12')
 
-  s.add_dependency('activesupport')
+  s.add_dependency('activesupport','8.0.2')
   s.add_dependency('colorize')
   s.add_dependency('faraday', '~> 1.0')
   s.add_dependency('faraday-rack', '~> 1.0.0')
@@ -40,6 +40,7 @@ Gem::Specification.new do |s|
   s.add_dependency('ruby-duration')
   s.add_dependency('semantic')
   s.add_dependency('thor')
+  s.add_dependency('travis', '~> 1.11.1')
   s.add_dependency('vandamme')
 
   s.add_development_dependency('fakefs')
