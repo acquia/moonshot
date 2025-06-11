@@ -41,7 +41,7 @@ Gem::Specification.new do |s|
   s.add_dependency('ruby-duration')
   s.add_dependency('semantic')
   s.add_dependency('thor')
-  s.add_dependency('vandamme')
+  s.add_dependency('vandamme', '1.4.0')
 
   s.add_development_dependency('fakefs')
   s.add_development_dependency('rspec')
