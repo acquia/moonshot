@@ -58,9 +58,37 @@ module Moonshot
     end
 
     def validate_template(template)
-      Aws::CloudFormation::Client.new.validate_template(
-        template_body: template
-      )
+      if template.bytesize > 50_000 # Leave some margin from the 51,200 limit
+        s3_client = Aws::S3::Client.new
+        bucket_name = "#{Moonshot.config.template_s3_bucket}"
+        template_key = "#{Moonshot.config.environment_name}-#{Time.now.getutc.to_i}-#{File.basename(template.filename)}"
+
+        # Ensure bucket exists
+        begin
+          s3_client.head_bucket(bucket: bucket_name)
+        rescue Aws::S3::Errors::NotFound
+          s3_client.create_bucket(bucket: bucket_name)
+        end
+
+        # Upload template to S3
+        s3_client.put_object(
+          bucket: bucket_name,
+          key: template_key,
+          body: template
+        )
+
+        template_url = "http://#{bucket_name}.s3.amazonaws.com/#{template_key}"
+
+        # Validate using template URL
+        Aws::CloudFormation::Client.new.validate_template(
+          template_url: template_url
+        )
+      else
+        # Use existing method for small templates
+        Aws::CloudFormation::Client.new.validate_template(
+          template_body: template
+        )
+      end
     rescue Aws::CloudFormation::Errors::ValidationError => e
       raise InvalidTemplate, "Invalid template:\n#{e}"
     end
