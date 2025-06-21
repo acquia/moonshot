@@ -208,7 +208,7 @@ module Moonshot
     def upload_template_to_s3
       raise 'The S3 bucket to store the template in is not configured.' unless @config.template_s3_bucket
 
-      s3_object_key = "#{@name}-#{Time.now.getutc.to_i}-#{File.basename(template.filename)}"
+      s3_object_key = "#{File.basename(template.filename)}"
       template_url = "http://#{@config.template_s3_bucket}.s3.amazonaws.com/#{s3_object_key}"
 
       @ilog.start "Uploading template to #{template_url}" do |s|
