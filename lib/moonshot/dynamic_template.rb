@@ -61,7 +61,8 @@ module Moonshot
       if template.bytesize > 50_000 # Leave some margin from the 51,200 limit
         s3_client = Aws::S3::Client.new
         bucket_name = "#{Moonshot.config.template_s3_bucket}"
-        template_key = "cdb-network.json"
+        raise ArgumentError, "template_s3_bucket configuration is required for large templates" unless bucket_name
+        template_key = "cdb-network/cdb-network.json"
 
         # Ensure bucket exists
         begin
