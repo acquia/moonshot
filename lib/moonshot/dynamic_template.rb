@@ -62,7 +62,7 @@ module Moonshot
         s3_client = Aws::S3::Client.new
         bucket_name = "#{Moonshot.config.template_s3_bucket}"
         raise ArgumentError, "template_s3_bucket configuration is required for large templates" unless bucket_name
-        template_key = "cdb-network/cdb-network.json"
+        template_key = "#{Moonshot.config.app_name}/#{Moonshot.config.environment_name}/cdb-network.json"
 
         # Ensure bucket exists
         begin
