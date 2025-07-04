@@ -1,0 +1,32 @@
+version: 2
+updates:
+  - package-ecosystem: "bundler"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    pull-request-branch-name:
+      separator: "-"
+    groups:
+      bundler-dependencies:
+        patterns:
+          - "*"
+  - package-ecosystem: "bundler"
+    directory: "/sample"
+    schedule:
+      interval: "weekly"
+    pull-request-branch-name:
+      separator: "-"
+    groups:
+      bundler-dependencies:
+        patterns:
+          - "*"
+  - package-ecosystem: "pip"
+    directory: "/docs"
+    schedule:
+      interval: "weekly"
+    pull-request-branch-name:
+      separator: "-"
+    groups:
+      pip-dependencies:
+        patterns:
+          - "*"
