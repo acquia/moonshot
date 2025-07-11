@@ -58,10 +58,9 @@ module Moonshot
     end
 
     def validate_template(template)
-      if template.bytesize > 50_000 # Leave some margin from the 51,200 limit
+      if Moonshot.config.template_s3_bucket
         s3_client = Aws::S3::Client.new
         bucket_name = "#{Moonshot.config.template_s3_bucket}"
-        raise ArgumentError, "template_s3_bucket configuration is required for large templates" unless bucket_name
         template_key = "#{Moonshot.config.app_name}/#{Moonshot.config.environment_name}/#{File.basename(@destination)}"
 
         # Ensure bucket exists
