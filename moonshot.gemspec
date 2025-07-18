@@ -41,7 +41,7 @@ Gem::Specification.new do |s|
   s.add_dependency('semantic')
   s.add_dependency('thor')
   s.add_dependency('travis', '~> 1.11.1')
-  s.add_dependency('vandamme')
+  # Removed vandamme dependency - replaced with custom parser
 
   s.add_development_dependency('fakefs')
   s.add_development_dependency('rspec')
