@@ -21,12 +21,10 @@ module Moonshot
     def parse(version)
       version = normalize_version(version)
       version_section = find_version_section(version)
-      
-      if version_section
-        extract_version_content(version_section)
-      else
-        raise "#{version} not found in CHANGELOG.md"
-      end
+
+      raise "#{version} not found in CHANGELOG.md" unless version_section
+
+      extract_version_content(version_section)
     end
 
     private
@@ -37,7 +35,7 @@ module Moonshot
 
     def find_version_section(version)
       sections = split_into_sections
-      
+
       sections.find do |section|
         section_matches_version?(section, version)
       end
@@ -55,21 +53,22 @@ module Moonshot
       # - "1.0.0 - 2023-01-01"
       # - "1.0.0 / 2023-01-01"
       # - "1.0.0 (2023-01-01)"
-      version_pattern = /^(\[?v?#{Regexp.escape(version)}\]?)(\s+[-–]\s+|\s+\/\s+|\s+\(|\s*$)/i
+      version_pattern = %r{^(\[?v?#{Regexp.escape(version)}\]?)(\s+[-–]\s+|\s+/\s+|\s+\(|\s*$)}i
       section.match(version_pattern)
     end
 
     def extract_version_content(version_section)
       lines = version_section.lines
       content_lines = []
-      
+
       # Skip the version header line
-      lines[1..-1]&.each do |line|
+      lines[1..]&.each do |line|
         # Stop at next version header
         break if next_version_header?(line)
+
         content_lines << line
       end
-      
+
       # Clean up and return the content
       content_lines.join.strip
     end

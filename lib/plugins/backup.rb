@@ -228,7 +228,7 @@ module Moonshot
       def validate_targets
         raise ArgumentError, 'You must specify files to back up.' \
           if (@files.nil? || @files.empty?) \
-          && (!@backup_parameters && !@backup_template)
+          && !@backup_parameters && !@backup_template
       end
 
       def validate_hooks
