@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 require 'forwardable'
-require 'moonshot/shell'
 require 'moonshot/changelog_parser'
+require 'moonshot/shell'
 require 'open3'
 require 'semantic'
 require 'shellwords'
