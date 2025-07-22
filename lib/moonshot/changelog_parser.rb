@@ -1,8 +1,8 @@
+# Makes all string literals in this file frozen/immutable for performance
 # frozen_string_literal: true
 
 module Moonshot
-  # Custom changelog parser to replace the unmaintained Vandamme gem
-  # Supports Keep-a-Changelog format and similar markdown formats
+  # Custom changelog parser to replace the unmaintained Vandamme gem (previously used in Moonshot until v3.0.4)
   class ChangelogParser
     # Parses a changelog and extracts content for a specific version
     #
