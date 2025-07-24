@@ -2,4 +2,4 @@
 
 source 'https://rubygems.org'
 
-gem 'moonshot', '~> 3.0.5'
+gem 'moonshot', '~> 0.7.0'
