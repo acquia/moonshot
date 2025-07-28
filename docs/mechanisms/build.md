@@ -28,8 +28,7 @@ Sample Usage
 
 ```ruby
 Moonshot.config do |c|
-  wait_for_travis_mechanism = TravisDeploy.new("acquia/moonshot", true)
-  c.build_mechanism = GithubRelease.new(wait_for_travis_mechanism)
+  c.build_mechanism = GithubRelease.new
 ...
 ```
 
@@ -40,8 +39,7 @@ Sample Usage
 
 ```ruby
 Moonshot.config do |c|
-  wait_for_travis_mechanism = TravisDeploy.new("acquia/moonshot", true)
-  c.build_mechanism = GithubRelease.new(wait_for_travis_mechanism, skip_ci_status: true)
+  c.build_mechanism = GithubRelease.new
 ...
 ```
 Also a command-line option is available to override this value.
@@ -51,24 +49,7 @@ Also a command-line option is available to override this value.
 	    -s, --skip-ci-status             Skip checks on CI jobs
 	    -n, --environment=NAME           Which environment to operate on.
 		--[no-]interactive-logger    Enable or disable fancy logging
-	    -F, --foo    
-
-## TravisDeploy
-
-The Travis Build Mechanism waits for Travis-CI to finish building a
-job matching the VERSION (see above) and the output of the travis job
-has to be 'BUILD=1'. Can be used to make sure that the travis job for
-the repository for that version actually finished before the
-deployment step can be executed.
-
-Sample Usage
-```ruby
-Moonshot.config do |c|
-  # First argument is the repository as known by travis.
-  # Second argument is wether or not you are using travis pro.
-  c.build_mechanism = TravisDeploy.new("acquia/moonshot", pro: true)
-...
-```
+	    -F, --foo
 
 ## Version Proxy
 
