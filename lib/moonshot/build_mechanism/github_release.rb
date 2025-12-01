@@ -189,13 +189,8 @@ module Moonshot::BuildMechanism
     end
 
     def fetch_changes(version)
-      parser = Vandamme::Parser.new(
-        changelog: File.read('CHANGELOG.md'),
-        format: 'markdown'
-      )
-      parser.parse.fetch(version) do
-        raise "#{version} not found in CHANGELOG.md"
-      end
+      changelog_content = File.read('CHANGELOG.md')
+      Moonshot::ChangelogParser.parse(changelog_content, version)
     end
 
     # Checks for the commit's CI job status. If its not finished yet,
