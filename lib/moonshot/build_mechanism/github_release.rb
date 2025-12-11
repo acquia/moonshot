@@ -6,7 +6,6 @@ require 'open3'
 require 'semantic'
 require 'shellwords'
 require 'tempfile'
-require 'vandamme'
 
 module Moonshot::BuildMechanism
   # A build mechanism that creates a tag and GitHub release.
