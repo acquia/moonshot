@@ -205,7 +205,7 @@ module Moonshot::BuildMechanism
         base_interval: 10
       }
       ilog.start_threaded("Check CI status for #{sha}.") do |step|
-        out = sh_retry("hub ci-status master", opts: retry_opts)  # Reverting back to original command
+        out = sh_retry("hub ci-status --verbose master", opts: retry_opts)  # Reverting back to original command
         step.success
       end
       out
