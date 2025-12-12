@@ -21,7 +21,7 @@ module Moonshot::BuildMechanism
     def initialize(build_mechanism,
                    ci_status_timeout: 600,
                    max_tag_find_timeout: 240,
-                   skip_ci_status: false)
+                   skip_ci_status: true)
       @build_mechanism = build_mechanism
       @ci_status_timeout = ci_status_timeout
       @max_tag_find_timeout = max_tag_find_timeout
