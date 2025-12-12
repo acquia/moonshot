@@ -55,6 +55,18 @@ module Moonshot::Shell
     define_method(meth) { |*args| shell.public_send(meth, *args) }
   end
 
+  def terminal_width
+    # Try to get terminal width, default to 80 if not available
+    if $stdout.tty?
+      require 'io/console'
+      IO.console&.winsize&.[](1) || 80
+    else
+      80
+    end
+  rescue StandardError
+    80
+  end
+
   def sh_step(cmd, **kwargs)
     msg = kwargs.delete(:msg) || cmd
     msg = "#{msg[0..(terminal_width - 22)]}..." if msg.length > (terminal_width - 18)
