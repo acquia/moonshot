@@ -25,7 +25,7 @@ Gem::Specification.new do |s|
   s.add_dependency('aws-sdk-iam', '~> 1.4')
   s.add_dependency('aws-sdk-s3', '~> 1.12')
 
-  s.add_dependency('activesupport')
+  s.add_dependency('activesupport', '~> 8.1.1')
   s.add_dependency('colorize')
   s.add_dependency('faraday', '~> 1.0')
   s.add_dependency('faraday-rack', '~> 1.0.0')
