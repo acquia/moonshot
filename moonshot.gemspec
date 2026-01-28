@@ -24,6 +24,7 @@ Gem::Specification.new do |s|
   s.add_dependency('aws-sdk-elasticloadbalancing', '~> 1.3')
   s.add_dependency('aws-sdk-iam', '~> 1.4')
   s.add_dependency('aws-sdk-s3', '~> 1.12')
+  s.add_dependency('aws-sdk-ssm', '~> 1.0')
 
   s.add_dependency('activesupport')
   s.add_dependency('colorize')

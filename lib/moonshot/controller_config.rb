@@ -6,11 +6,11 @@ module Moonshot
     attr_reader :account_alias
 
     attr_accessor :additional_tag, :answer_file, :app_name, :artifact_repository, :build_mechanism,
-                  :changeset_wait_time, :deployment_mechanism, :dev_build_name_proc, :environment_name,
-                  :interactive, :interactive_logger, :parameter_overrides, :parameters, :parent_stacks,
-                  :default_parameter_source, :parameter_sources, :plugins, :project_root,
+                  :changeset_wait_time, :connection_method, :deployment_mechanism, :dev_build_name_proc,
+                  :environment_name, :interactive, :interactive_logger, :parameter_overrides, :parameters,
+                  :parent_stacks, :default_parameter_source, :parameter_sources, :plugins, :project_root,
                   :show_all_stack_events, :ssh_auto_scaling_group_name, :ssh_command, :ssh_config,
-                  :ssh_instance, :template_file, :template_s3_bucket, :extra_tags
+                  :ssh_instance, :ssm_config, :template_file, :template_s3_bucket, :extra_tags
 
     def initialize
       @default_parameter_source = AskUserSource.new
@@ -26,6 +26,8 @@ module Moonshot
       @project_root             = Dir.pwd
       @show_all_stack_events    = false
       @ssh_config               = SSHConfig.new
+      @ssm_config               = SSMConfig.new
+      @connection_method        = :ssm # Default to SSM
       @extra_tags               = []
 
       @dev_build_name_proc = lambda do |c|

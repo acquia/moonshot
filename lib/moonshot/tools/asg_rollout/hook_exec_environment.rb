@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'moonshot/ssh_fork_executor'
+require 'moonshot/ssm_fork_executor'
 
 module Moonshot
   module Tools
@@ -13,14 +14,31 @@ module Moonshot
 
         def initialize(config, instance_id)
           @ilog = config.interactive_logger
-          @command_builder = Moonshot::SSHCommandBuilder.new(config.ssh_config, instance_id)
+          @config = config
           @instance_id = instance_id
+
+          # Determine connection method (default to SSM)
+          @connection_method = config.respond_to?(:connection_method) ? config.connection_method : :ssm
+
+          @command_builder = if @connection_method == :ssm
+                               Moonshot::SSMCommandBuilder.new(config.ssm_config, instance_id)
+                             else
+                               Moonshot::SSHCommandBuilder.new(config.ssh_config, instance_id)
+                             end
         end
 
         def exec(cmd)
           cb = @command_builder.build(cmd)
-          fe = SSHForkExecutor.new
-          fe.run(cb.cmd)
+
+          if @connection_method == :ssm
+            debug("Executing via SSM on #{@instance_id}: #{cmd}")
+            fe = SSMForkExecutor.new
+            fe.run(cb.cmd, cb.instance_id)
+          else
+            debug("Executing via SSH on #{@instance_id}: #{cmd}")
+            fe = SSHForkExecutor.new
+            fe.run(cb.cmd)
+          end
         end
 
         def ec2

@@ -245,7 +245,7 @@ class Moonshot::DeploymentMechanism::CodeDeploy # rubocop:disable Metrics/ClassL
     return false unless asgs.count == auto_scaling_groups.count
 
     asgs.each do |asg|
-      return false if (auto_scaling_groups.find_index { |a| a.auto_scaling_group_name == asg.name }).nil?
+      return false if auto_scaling_groups.find_index { |a| a.auto_scaling_group_name == asg.name }.nil?
     end
     true
   end

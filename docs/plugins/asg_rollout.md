@@ -4,8 +4,35 @@
 
 This plugin adds support for rolling out changes to Auto Scaling
 Groups that have happened after a stack update. It supports various
-pre- and post-actions on the instances (using Moonshot's native SSH
-support).
+pre- and post-actions on the instances using AWS Systems Manager (SSM)
+by default, with fallback support for SSH.
+
+## Connection Methods
+
+By default, Moonshot uses **AWS Systems Manager (SSM)** to execute commands on instances.
+This provides:
+- No need for SSH keys or bastion hosts
+- No requirement for public IP addresses
+- Centralized audit logging through CloudTrail
+- IAM-based access control
+
+### Prerequisites for SSM
+
+- EC2 instances must have the SSM agent installed and running (pre-installed on most modern AMIs)
+- Instances must have an IAM role with SSM permissions (AmazonSSMManagedInstanceCore policy)
+- Network connectivity to SSM endpoints (via VPC endpoints or internet gateway)
+
+### Using SSH Instead
+
+If you need to use SSH instead of SSM, configure it in your Moonshot config:
+
+```ruby
+Moonshot.config do |c|
+  c.connection_method = :ssh
+  c.ssh_config.ssh_user = 'ec2-user'
+  c.ssh_config.ssh_identity_file = '/path/to/key.pem'
+end
+```
 
 ## Example
 
@@ -77,8 +104,8 @@ example above, which accepts the following options:
 
 For the callables above, an instance of `HookExecEnvironment` is
 passed in, providing the following methods:
-  - **exec** *(Moonshot::SSHForkExecutor::Result)*: Run a command on
-    the instance and return the output and exit code.
+  - **exec** *(Moonshot::SSMForkExecutor::Result or Moonshot::SSHForkExecutor::Result)*: Run a command on
+    the instance and return the output and exit code. Uses SSM by default, or SSH if configured.
   - **ec2** *(Aws::EC2::Client)*: A configured Aws::EC2::Client for the region we're
     operating in.
   - **instance_id** *(String)*: The EC2 instance ID.

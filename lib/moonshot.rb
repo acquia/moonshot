@@ -8,6 +8,7 @@ require 'aws-sdk-ec2'
 require 'aws-sdk-iam'
 require 'aws-sdk-autoscaling'
 require 'aws-sdk-s3'
+require 'aws-sdk-ssm'
 
 require 'logger'
 require 'thor'
