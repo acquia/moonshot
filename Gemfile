@@ -9,6 +9,7 @@ gem 'rake', require: false
 group :test do
   gem 'codeclimate-test-reporter'
   gem 'pry'
+  gem 'rexml'
   gem 'rubocop'
 end
 

@@ -7,7 +7,7 @@ module Moonshot
 
       def initialize(resources)
         @resources = resources
-        @ssh = Moonshot::RotateAsgInstances::SSH.new
+        @ssh = Moonshot::RotateAsgInstances::SSH.new(@resources)
         @ilog = @resources.ilog
       end
 

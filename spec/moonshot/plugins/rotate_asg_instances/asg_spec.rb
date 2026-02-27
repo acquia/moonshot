@@ -113,26 +113,32 @@ describe Moonshot::RotateAsgInstances::ASG do
   end
 
   describe '#shutdown_instance' do
-    let(:public_ip_address) { '10.234.32.21' }
     let(:instance) { instance_double(Aws::EC2::Instance) }
     let(:command_builder) { Moonshot::SSHCommandBuilder }
     subject { super().send(:shutdown_instance, instance_id) }
 
     before(:each) do
+      ENV['AWS_REGION'] = 'us-east-1'
       moonshot_config.ssh_config.ssh_user = 'ci_user'
       moonshot_config.ssh_config.ssh_options = ssh_options
       allow(Aws::EC2::Instance).to receive(:new).and_return(instance)
-      allow_any_instance_of(command_builder).to receive(:instance_ip).and_return(public_ip_address)
+      allow(instance).to receive(:exists?).and_return(true)
+      allow(instance).to receive(:state).and_return({ name: 'running' })
       allow(instance).to receive(:wait_until_stopped)
+      allow(ilog).to receive(:info)
     end
 
+    after(:each) do
+      ENV.delete('AWS_REGION')
+    end
 
     context 'when ssh_options are not defined' do
       let(:ssh_options) { nil }
 
       it 'issues a shutdown without options to the instance' do
         expect_any_instance_of(ssh_executor).to receive(:run).with(
-          "ssh -t -l #{moonshot_config.ssh_config.ssh_user} #{public_ip_address} sudo\\ shutdown\\ -h\\ now"
+          'tsh ssh --proxy=teleport.dev.cloudservices.acquia.io -tA ' \
+          "ci_user@#{instance_id}.us-east-1.672327909798 sudo\\ shutdown\\ -h\\ now"
         )
         subject
       end
@@ -143,8 +149,9 @@ describe Moonshot::RotateAsgInstances::ASG do
 
       it 'issues a shutdown with options to the instance' do
         expect_any_instance_of(ssh_executor).to receive(:run).with(
-          'ssh -t -v -o UserKnownHostsFile=/dev/null ' \
-          "-l ci_user #{public_ip_address} sudo\\ shutdown\\ -h\\ now"
+          'tsh ssh -v -o UserKnownHostsFile=/dev/null ' \
+          '--proxy=teleport.dev.cloudservices.acquia.io -tA ' \
+          "ci_user@#{instance_id}.us-east-1.672327909798 sudo\\ shutdown\\ -h\\ now"
         )
         subject
       end

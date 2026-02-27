@@ -29,7 +29,7 @@ describe Moonshot::RotateAsgInstances::SSH do
 
   let(:config) { resources.controller.config }
 
-  subject { described_class.new }
+  subject { described_class.new(resources) }
 
   describe '#test_ssh_connection' do
     it 'raise error if #test_ssh_connection fails' do

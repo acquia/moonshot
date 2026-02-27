@@ -10,6 +10,10 @@ module Moonshot
     end
 
     class SSH
+      def initialize(resources)
+        @resources = resources
+      end
+
       # As per the standard it is raising correctly but still giving an error.
       def test_ssh_connection(instance_id)
         Retriable.retriable(base_interval: 5, tries: 3) do
@@ -29,7 +33,12 @@ module Moonshot
       private
 
       def build_command(command, instance_id)
-        cb = SSHCommandBuilder.new(Moonshot.config.ssh_config, instance_id)
+        teleport_config = Moonshot::TeleportConfig.new(
+          @resources.controller.stack.name,
+          Moonshot.config.ssh_config.ssh_user,
+          ENV['AWS_REGION']
+        )
+        cb = SSHCommandBuilder.new(Moonshot.config.ssh_config, instance_id, teleport_config)
         cb.build(command).cmd
       end
     end

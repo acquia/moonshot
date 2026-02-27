@@ -186,10 +186,13 @@ module Moonshot
       @config.ssh_instance ||= SSHTargetSelector.new(
         stack, asg_name: @config.ssh_auto_scaling_group_name
       ).choose!
-      cb = SSHCommandBuilder.new(@config.ssh_config, @config.ssh_instance)
+      teleport_config = TeleportConfig.new(
+        stack.name, @config.ssh_config.ssh_user, ENV['AWS_REGION']
+      )
+      cb = SSHCommandBuilder.new(@config.ssh_config, @config.ssh_instance, teleport_config)
       result = cb.build(@config.ssh_command)
 
-      warn "Opening SSH connection to #{@config.ssh_instance} (#{result.ip})..."
+      warn "Opening SSH connection to #{@config.ssh_instance} (#{result.host})..."
       exec(result.cmd)
     end
 
