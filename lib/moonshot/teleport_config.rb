@@ -13,7 +13,7 @@ module Moonshot
     DEV_PROXY            = 'teleport.dev.cloudservices.acquia.io'
 
     PROD_IDENTITY_TEMPLATE = 'tbot-auth-%<region>s/identity'
-    DEV_IDENTITY           = 'tbot-auth-clouddata-node/identity'
+    DEV_IDENTITY           = '/opt/machine-id/identity'
 
     attr_reader :proxy_url, :account_id, :region, :ssh_user
 
