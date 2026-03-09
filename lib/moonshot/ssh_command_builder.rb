@@ -17,8 +17,7 @@ module Moonshot
       cmd = ['tsh', 'ssh']
       cmd << @config.ssh_options if @config.ssh_options
       cmd << "--proxy=#{@teleport_config.proxy_url}"
-      cmd << "-ti #{@teleport_config.identity_file}" if @teleport_config.bot_user?
-      cmd << '-tA'
+      cmd << "-i #{@teleport_config.identity_file}" if @teleport_config.bot_user?
       cmd << "#{@teleport_config.ssh_user}@#{instance_host}"
       cmd << Shellwords.escape(command) if command
       Result.new(cmd.join(' '), instance_host)

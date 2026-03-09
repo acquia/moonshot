@@ -7,13 +7,13 @@ module Moonshot
   class TeleportConfig
     PROD_ACCOUNT_ID = '546349603759'
     DEV_ACCOUNT_ID  = '672327909798'
-    BOT_USER        = 'ci_user'
+    BOT_USER        = 'clouddatabot'
 
     PROD_PROXY_TEMPLATE = '%<region>s.teleport.cloudservices.acquia.io'
     DEV_PROXY            = 'teleport.dev.cloudservices.acquia.io'
 
-    PROD_IDENTITY_TEMPLATE = 'tbot-auth-%<region>s/identity'
-    DEV_IDENTITY           = '/opt/machine-id/identity'
+    PROD_IDENTITY_TEMPLATE = '/opt/machine-id/%<region>s/identity'
+    DEV_IDENTITY           = '/opt/machine-id/dev-us-east-1/identity'
 
     attr_reader :proxy_url, :account_id, :region, :ssh_user
 
