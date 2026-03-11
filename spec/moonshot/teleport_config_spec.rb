@@ -34,7 +34,7 @@ describe Moonshot::TeleportConfig do
       end
 
       it 'uses the region-based identity file path' do
-        expect(subject.identity_file).to eq('tbot-auth-us-east-1/identity')
+        expect(subject.identity_file).to eq('/opt/machine-id/us-east-1/identity')
       end
     end
   end
@@ -67,8 +67,8 @@ describe Moonshot::TeleportConfig do
         expect(subject.bot_user?).to be true
       end
 
-      it 'uses the fixed clouddata-node identity file path' do
-        expect(subject.identity_file).to eq('tbot-auth-clouddata-node/identity')
+      it 'uses the dev identity file path' do
+        expect(subject.identity_file).to eq('/opt/machine-id/dev-us-east-1/identity')
       end
     end
   end
