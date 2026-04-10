@@ -113,13 +113,18 @@ module Moonshot::ArtifactRepository
     #
     # @param version [String] Version to be downloaded
     # @param [String] Build file downloaded.
-    # @raise [RuntimeError] If the file fails to download correctly after 3
-    #                       attempts.
+    # @raise [RuntimeError] If the file fails to download correctly within 60 minutes.
     def download_from_github(version)
       file_pattern = "*#{version}*.tar.gz"
       attempts = 0
+      retry_opts = {
+        tries: 360, # up to 360 x 10s = 60 minutes
+        max_elapsed_time: 60 * 60, # 60 minutes
+        base_interval: 10,
+        multiplier: 1 # constant interval, no exponential backoff
+      }
 
-      Retriable.retriable on: RuntimeError do
+      Retriable.retriable(on: RuntimeError, **retry_opts) do
         # Make sure the directory is empty before downloading the release.
         FileUtils.rm(Dir.glob('*'))
 
