@@ -24,7 +24,7 @@ Gem::Specification.new do |s|
   
   s.required_ruby_version = '>= 3.1.2'
 
-  s.add_dependency('activesupport', '= 7.1.5.2')
+  s.add_dependency('activesupport', '= 7.2.3.1')
   s.add_dependency('colorize')
   s.add_dependency('highline')
   s.add_dependency('interactive-logger')
