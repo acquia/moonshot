@@ -24,7 +24,7 @@ module Moonshot
         raise "Invalid command line for '#{@command}'."
       end
 
-      handler.execute(*@args)
+      handler.execute(*@args.first(req_arguments.size))
     end
 
     private
