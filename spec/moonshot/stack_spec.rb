@@ -131,6 +131,24 @@ describe Moonshot::Stack do
             .with(hash_including(expected_create_stack_options))
           subject.create
         end
+
+        it 'builds the S3 client with checksums enabled by default' do
+          expect(Aws::S3::Client).to receive(:new)
+            .with(hash_including(compute_checksums: true))
+            .and_return(s3_client)
+          subject.create
+        end
+
+        context 'when template_s3_upload_checksums is false' do
+          before(:each) { config.template_s3_upload_checksums = false }
+
+          it 'builds the S3 client with checksums disabled' do
+            expect(Aws::S3::Client).to receive(:new)
+              .with(hash_including(compute_checksums: false))
+              .and_return(s3_client)
+            subject.create
+          end
+        end
       end
 
       context 'when has extra tags' do
