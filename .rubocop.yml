@@ -1,6 +1,6 @@
 ---
 AllCops:
-  TargetRubyVersion: 3.3.4
+  TargetRubyVersion: 4.0
   Exclude:
     - '.gemspec'
     - 'vendor/**/*'
